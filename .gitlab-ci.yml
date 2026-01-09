@@ -1,0 +1,60 @@
+include:
+  - project: 'acx/tooling/templates'
+    file: '/CI-Templates/v2/dotnet.yml'
+  - project: 'acx/tooling/ci-templates'
+    file: '/project/v1/dotnet.yml'
+
+default:
+  image: mcr.microsoft.com/dotnet/sdk:9.0
+
+Build:
+  extends: .dotnet-build
+
+Test:
+  extends: .dotnet-test-xunit
+  
+Deploy NuGet Contracts:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Contracts:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj'
+    REPO: 'JFrogViciOne'
+
+Prerelease Raw:
+  extends: .dotnet-deploy-raw-rids
+  variables:
+    SERVER: 'https://ifm.jfrog.io/artifactory/vicione-suite-dev'
+    USER: ${Raw_User_RW_JFrog}
+    PASSWORD: ${Raw_PW_RW_JFrog}
+    PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
+    DST_DIRECTORY: 'fbs/ViciOne.Driver.IoTCore'
+    METADATA_FILE: 'src/ViciOne.Driver.IoTCore/metadata.json'
+    METADATA_VERSION_FILE: 'VERSION'
+    METADATA_MIN_VERSION_FILE: 'VERSION_CORE'
+    METADATA_MIN_VERSION_KEY: 'MinCoreVersion'
+  after_script:
+    - !reference [.push-metadata]
+
+Release Raw:
+  extends: .dotnet-release-raw-rids
+  variables:
+    SERVER: 'https://ifm.jfrog.io/artifactory/vicione-suite-staging'
+    USER: ${Raw_User_RW_JFrog}
+    PASSWORD: ${Raw_PW_RW_JFrog}
+    PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
+    DST_DIRECTORY: 'fbs/ViciOne.Driver.IoTCore'
+    METADATA_FILE: 'src/ViciOne.Driver.IoTCore/metadata.json'
+    METADATA_VERSION_FILE: 'VERSION'
+    METADATA_MIN_VERSION_FILE: 'VERSION_CORE'
+    METADATA_MIN_VERSION_KEY: 'MinCoreVersion'
+  after_script:
+    - !reference [.push-metadata]
+
+# Public Release
+Public Release Raw:
+  extends: .dotnet-release-public

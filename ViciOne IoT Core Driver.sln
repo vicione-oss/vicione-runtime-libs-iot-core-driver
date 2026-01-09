@@ -1,0 +1,94 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{57E4D3A6-6A2E-45DA-83CB-6E068551CB28}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViciOne.Driver.IoTCore", "src\ViciOne.Driver.IoTCore\ViciOne.Driver.IoTCore.csproj", "{730695C1-50C0-4C9E-A082-BE69DAC3C918}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{CF2FF71E-4B31-4A09-9BA2-A2DCB2A303B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VseSample", "samples\VseSample\VseSample.csproj", "{F8297400-F76E-41DC-A150-B0571B1E46E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViciOne.Driver.IoTCore.Contracts", "src\ViciOne.Driver.IoTCore.Contracts\ViciOne.Driver.IoTCore.Contracts.csproj", "{0FCC2B2E-E100-423D-AF91-80C14FD3F581}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{225AAE6F-98C0-4419-9651-35912C491FE8}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		.gitlab-ci.yml = .gitlab-ci.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		NuGet.Config = NuGet.Config
+		README.md = README.md
+		VERSION = VERSION
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A5BE16CA-C980-4B2A-9F56-AF2386A22273}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViciOne.Driver.IoTCore.Tests", "tests\ViciOne.Driver.IoTCore.Tests\ViciOne.Driver.IoTCore.Tests.csproj", "{7176EEAC-65FD-4D48-BFB9-DF4FF79DA954}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoddSample", "samples\IoddSample\IoddSample.csproj", "{8C7E6682-B345-4577-8D58-D12B86FF111A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTCoreSample", "samples\IoTCoreSample\IoTCoreSample.csproj", "{197C2A1E-0512-4429-B2EF-52E70918169A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoLinkMasterSample", "samples\IoLinkMasterSample\IoLinkMasterSample.csproj", "{A769B9A0-4F14-4481-8EF9-9ACBA765BEF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceTreeSample", "samples\DeviceTreeSample\DeviceTreeSample.csproj", "{86BE8072-8403-4FF2-97B6-A4D03B1E1437}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{730695C1-50C0-4C9E-A082-BE69DAC3C918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{730695C1-50C0-4C9E-A082-BE69DAC3C918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{730695C1-50C0-4C9E-A082-BE69DAC3C918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{730695C1-50C0-4C9E-A082-BE69DAC3C918}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8297400-F76E-41DC-A150-B0571B1E46E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8297400-F76E-41DC-A150-B0571B1E46E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8297400-F76E-41DC-A150-B0571B1E46E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8297400-F76E-41DC-A150-B0571B1E46E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FCC2B2E-E100-423D-AF91-80C14FD3F581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FCC2B2E-E100-423D-AF91-80C14FD3F581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FCC2B2E-E100-423D-AF91-80C14FD3F581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FCC2B2E-E100-423D-AF91-80C14FD3F581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7176EEAC-65FD-4D48-BFB9-DF4FF79DA954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7176EEAC-65FD-4D48-BFB9-DF4FF79DA954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7176EEAC-65FD-4D48-BFB9-DF4FF79DA954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7176EEAC-65FD-4D48-BFB9-DF4FF79DA954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C7E6682-B345-4577-8D58-D12B86FF111A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C7E6682-B345-4577-8D58-D12B86FF111A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C7E6682-B345-4577-8D58-D12B86FF111A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C7E6682-B345-4577-8D58-D12B86FF111A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{197C2A1E-0512-4429-B2EF-52E70918169A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{197C2A1E-0512-4429-B2EF-52E70918169A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{197C2A1E-0512-4429-B2EF-52E70918169A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{197C2A1E-0512-4429-B2EF-52E70918169A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A769B9A0-4F14-4481-8EF9-9ACBA765BEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A769B9A0-4F14-4481-8EF9-9ACBA765BEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A769B9A0-4F14-4481-8EF9-9ACBA765BEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A769B9A0-4F14-4481-8EF9-9ACBA765BEF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86BE8072-8403-4FF2-97B6-A4D03B1E1437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86BE8072-8403-4FF2-97B6-A4D03B1E1437}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86BE8072-8403-4FF2-97B6-A4D03B1E1437}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86BE8072-8403-4FF2-97B6-A4D03B1E1437}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{730695C1-50C0-4C9E-A082-BE69DAC3C918} = {57E4D3A6-6A2E-45DA-83CB-6E068551CB28}
+		{F8297400-F76E-41DC-A150-B0571B1E46E4} = {CF2FF71E-4B31-4A09-9BA2-A2DCB2A303B2}
+		{0FCC2B2E-E100-423D-AF91-80C14FD3F581} = {57E4D3A6-6A2E-45DA-83CB-6E068551CB28}
+		{7176EEAC-65FD-4D48-BFB9-DF4FF79DA954} = {A5BE16CA-C980-4B2A-9F56-AF2386A22273}
+		{8C7E6682-B345-4577-8D58-D12B86FF111A} = {CF2FF71E-4B31-4A09-9BA2-A2DCB2A303B2}
+		{197C2A1E-0512-4429-B2EF-52E70918169A} = {CF2FF71E-4B31-4A09-9BA2-A2DCB2A303B2}
+		{A769B9A0-4F14-4481-8EF9-9ACBA765BEF0} = {CF2FF71E-4B31-4A09-9BA2-A2DCB2A303B2}
+		{86BE8072-8403-4FF2-97B6-A4D03B1E1437} = {CF2FF71E-4B31-4A09-9BA2-A2DCB2A303B2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {128A0287-DC90-475C-A54C-2BD9AC60F7F4}
+	EndGlobalSection
+EndGlobal

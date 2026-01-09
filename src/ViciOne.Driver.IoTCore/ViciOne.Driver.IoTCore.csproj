@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts" />
+    <PackageReference Include="ifm.diagnostic.VSEIotCore" />
+    <PackageReference Include="ifm.IoddParser" />
+    <PackageReference Include="ifm.IoddParser.Helpers" />
+    <PackageReference Include="PacketDotNet" />
+    <PackageReference Include="SharpPcap" />
+    <PackageReference Include="ViciOne.Engine.DefaultValidators" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ViciOne.Driver.IoTCore.Contracts\ViciOne.Driver.IoTCore.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

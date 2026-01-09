@@ -1,0 +1,4 @@
+[*.{cs,vb}]
+# CA2227: Sammlungseigenschaften sollten schreibgeschützt sein
+# -> Wird deaktiviert, weil das Projekt größtenteils DTOs enthält
+dotnet_diagnostic.CA2227.severity = none 

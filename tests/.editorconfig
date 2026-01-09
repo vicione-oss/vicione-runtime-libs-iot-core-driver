@@ -1,0 +1,4 @@
+[*.{cs,vb}]
+# CA1515: Consider making public types internal
+# -> Die Basisklassen der Tests, die Hilfsmethoden und -typen enthalten, müssen auch public sein
+dotnet_diagnostic.CA1515.severity = none

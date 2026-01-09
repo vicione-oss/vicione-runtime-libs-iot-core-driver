@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExternalTextDocument xmlns="http://www.io-link.com/IODD/2010/10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.io-link.com/IODD/2010/10 IODD1.1.xsd">
+	<DocumentInfo version="V1.0.7" releaseDate="2015-08-04" copyright="Copyright 2015, ifm electronic gmbh"/>
+	<Language xml:lang="de">
+		<Text id="TI_VendorText" value="www.ifm.com"/>
+		<Text id="TI_VendorUrl" value="www.ifm.com/ifmgb/web/io-link_down.htm"/>
+		<Text id="TI_DeviceName" value="O5D100/O5D102/O5D150/O5D152"/>
+		<Text id="TI_DeviceFamily" value="O5D"/>
+		<Text id="TN_Product1" value="O5D100"/>
+		<Text id="TD_Product1" value="Optischer Abstandssensor. Sichtbares Laserlicht, Laserschutzklasse 2. Anschluss: 2 Schaltausgänge Schließer / Öffner antivalent DC PNP"/>
+		<Text id="TN_Product2" value="O5D102"/>
+		<Text id="TD_Product2" value="Optischer Abstandssensor. Sichtbares Laserlicht, Laserschutzklasse 2. Anschluss: 2 Schaltausgänge Schließer / Öffner antivalent DC NPN"/>
+		<Text id="TN_Product3" value="O5D150"/>
+		<Text id="TD_Product3" value="Optischer Abstandssensor. Sichtbares Laserlicht, Laserschutzklasse 1. Anschluss: 2 Schaltausgänge Schließer / Öffner antivalent DC PNP"/>
+		<Text id="TN_Product4" value="O5D152"/>
+		<Text id="TD_Product4" value="Optischer Abstandssensor. Sichtbares Laserlicht, Laserschutzklasse 1. Anschluss: 2 Schaltausgänge Schließer / Öffner antivalent DC NPN"/>
+		<Text id="TN_SysCmd240" value="Kommando löst das Auftreten von Event 8DFE aus"/>
+		<Text id="TN_SysCmd241" value="Kommando löst das Verschwinden von Event 8DFE aus"/>
+		<Text id="TN_SysCmd242" value="Kommando löst das Auftreten von Event 8DFF aus"/>
+		<Text id="TN_SysCmd243" value="Kommando löst das Verschwinden von Event 8DFF aus"/>
+		<Text id="TN_BDC1" value="SP"/>
+		<Text id="TD_BDC1_SP" value="Smart Sensor Profile: Schaltpunkte im BDC1"/>
+		<Text id="TN_BDC1_SP1" value="Schaltpunkt 1"/>
+		<Text id="TN_BDC1_SP2" value="Schaltpunkt 2"/>
+		<Text id="TN_BDC1_SP2_0" value="(Nicht verwendet)"/>
+		<Text id="TD_BDC1_Config" value="Smart Sensor Profile: Schaltpunktkonfiguration im BDC1"/>
+		<Text id="TN_BDC1_Config_Logic" value="Schaltpunkt Logik"/>
+		<Text id="TN_BDC1_Config_Logic0" value="Schließer"/>
+		<Text id="TN_BDC1_Config_Logic1" value="Öffner"/>
+		<Text id="TN_BDC1_Config_Mode" value="Schaltpunkt Modus"/>
+		<Text id="TN_BDC1_Config_Mode1" value="Einpunkt"/>
+		<Text id="TN_BDC1_Config_Hyst" value="Schaltpunkt Hysterese"/>
+		<Text id="TN_BDC1_Config_Hyst_0" value="(Nicht verwendet)"/>
+		<Text id="TN_Limit_PDV" value="Prozessdatengrenzen"/>
+		<Text id="TD_Limit_PDV" value="Grenzwerte der Prozessdaten"/>
+		<Text id="TN_Limit_PDV_min" value="Min"/>
+		<Text id="TN_Limit_PDV_max" value="Max"/>
+		<Text id="TN_Align" value="Align"/>
+		<Text id="TD_Align" value="Align Signal"/>
+		<Text id="TN_KeyLock" value="Tastensperre"/>
+		<Text id="TN_KeyLock_Locked" value="aktiv"/>
+		<Text id="TN_KeyLock_Unlocked" value="inaktiv"/>
+		<Text id="TN_dFOValue" value="dFO"/>
+		<Text id="TD_dFOValue" value="Verzögerungszeit nach Signalverlust (100 ms Stufen)"/>
+		<Text id="TN_dSValue" value="dS"/>
+		<Text id="TD_dSValue" value="Einschaltverzögerung"/>
+		<Text id="TN_drValue" value="dr"/>
+		<Text id="TD_drValue" value="Ausschaltverzögerung"/>
+		<Text id="TN_DisplayConfig" value="Display"/>
+		<Text id="TD_DisplayConfig" value="Displaykonfiguration"/>
+		<Text id="TN_DisplayConfig_On" value="Display an"/>
+		<Text id="TN_DisplayConfig_Rotate" value="Display gedreht"/>
+		<Text id="TN_DisplayConfig_Off" value="Display aus"/>
+		<Text id="TN_LaserConfig" value="Laser"/>
+		<Text id="TD_LaserConfig" value="Laserkonfiguration"/>
+		<Text id="TN_LaserConfig_On" value="Laser an"/>
+		<Text id="TN_LaserConfig_Off" value="Laser aus"/>
+		<Text id="TN_PDV1" value="Abstand"/>
+		<Text id="TD_PDV1" value="Abb. PDV1. Aktueller Abstand."/>
+		<Text id="TN_PDV2" value="Schaltzustand [OUT1]"/>
+		<Text id="TD_PDV2" value="Abb. BDC1. Zustand abhängig von Einstellungen für BDC1."/>
+		<Text id="TN_PDV2_true" value="Aktiv"/>
+		<Text id="TN_PDV2_false" value="Inaktiv"/>
+		<Text id="TN_PD_In" value="Prozessdateneingang"/>
+		<Text id="TN_Ev_8CB0" value="nEA"/>
+		<Text id="TD_Ev_8CB0" value="Objekt zu nah"/>
+		<Text id="TN_Ev_8CB1" value="fAr"/>
+		<Text id="TD_Ev_8CB1" value="Objekt zu fern"/>
+		<Text id="TN_Ev_8CB4" value="+"/>
+		<Text id="TD_Ev_8CB4" value="Intensität zu hoch"/>
+		<Text id="TN_Ev_8CB5" value="-"/>
+		<Text id="TD_Ev_8CB5" value="Kein Objekt"/>
+		<Text id="TN_Ev_8CA4" value="ErP"/>
+		<Text id="TD_Ev_8CA4" value="Plausibilitätsfehler"/>
+		<Text id="TN_Ev_8DFE" value="Test Event 1"/>
+		<Text id="TD_Ev_8DFE" value="Event tritt auf wenn Index 2 auf den Wert 240 gesetzt wird, Event verschwindet wenn Index 2 auf den Wert 241 gesetzt wird"/>
+		<Text id="TN_Ev_8DFF" value="Test Event 2"/>
+		<Text id="TD_Ev_8DFF" value="Event tritt auf wenn Index 2 auf den Wert 242 gesetzt wird, Event verschwindet wenn Index 2 auf den Wert 243 gesetzt wird"/>
+		<Text id="TN_Param_BDC1" value="Schaltpunktkonfiguration" />
+		<Text id="TN_Param_Limit_PDV" value="Grenzwerte der Prozessdaten" />
+		<Text id="TN_Param_Setup" value="Setup" />
+	</Language>
+	<Stamp crc="3143966133"><Checker name="IODD-Checker V1.1.1" version="V1.1.1.0"/></Stamp>
+</ExternalTextDocument>
