@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace ifm.IOLink;
 
 public sealed partial class IoLinkMasterFinder
 {
+    private const string IoLinkMasterIdentifier = "ifm IO-Link Master AL";
+
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private Task _runningTask = Task.CompletedTask;
     private int _scanRunning;
@@ -88,6 +91,7 @@ public sealed partial class IoLinkMasterFinder
             using var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutToken.Token);
 
             List<DcpDevice> devices = await scanner.Scan(linkedToken.Token);
+            devices = [.. devices.Where(x => x.DeviceName.StartsWith(IoLinkMasterIdentifier, StringComparison.OrdinalIgnoreCase))];
 
             using var handler = new SocketsHttpHandler
             {
