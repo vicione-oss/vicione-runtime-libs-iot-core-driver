@@ -2,36 +2,40 @@
 
 namespace ViciOne.Driver.IoTCore.Contracts.DeviceTree.Extensions;
 
+// TODO: Suppression should be removed when https://github.com/dotnet/sdk/issues/51681 is fixed and delivered.
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Extension members syntax generates nested types")]
 public static class DeviceTreeBaseExtensions
 {
-    public static IDeviceTreeBase Clone(this IDeviceTreeBase tree)
+    extension(IDeviceTreeBase tree)
     {
-        object? instance = Activator.CreateInstance(tree.GetType());
+        public IDeviceTreeBase Clone()
+        {
+            object? instance = Activator.CreateInstance(tree.GetType());
 
-        IEnumerable<PropertyInfo> properties
-            = tree.GetType().GetProperties().Where(p => p.CanRead && p.CanWrite);
+            IEnumerable<PropertyInfo> properties = tree.GetType().GetProperties().Where(p => p.CanRead && p.CanWrite);
 
-        foreach (PropertyInfo property in properties)
-            property.SetValue(instance, property.GetValue(tree));
+            foreach (PropertyInfo property in properties)
+                property.SetValue(instance, property.GetValue(tree));
 
-        return (instance as IDeviceTreeBase)!;
-    }
+            return (instance as IDeviceTreeBase)!;
+        }
 
-    public static IEnumerable<IDeviceTreeBase> GetNodeAndDescendants(this IDeviceTreeBase tree)
-        => new[] { tree }.Concat(tree.Children.SelectMany(child => child.GetNodeAndDescendants()));
+        public IEnumerable<IDeviceTreeBase> GetNodeAndDescendants()
+            => new[] { tree }.Concat(tree.Children.SelectMany(child => child.GetNodeAndDescendants()));
 
-    public static string GetRoot(this IDeviceTreeBase tree)
-    {
-        string[] elements = tree.Id.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        return elements.Length >= 3
-            ? $"{elements[0]}/{elements[1]}/{elements[2]}"
-            : string.Empty;
-    }
+        public string GetRoot()
+        {
+            string[] elements = tree.Id.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            return elements.Length >= 3
+                ? $"{elements[0]}/{elements[1]}/{elements[2]}"
+                : string.Empty;
+        }
 
-    public static void SetIsOffline(this IDeviceTreeBase tree, bool isOffline)
-    {
-        tree.IsOffline = isOffline;
-        foreach (IDeviceTreeBase child in tree.Children)
-            child.SetIsOffline(isOffline);
+        public void SetIsOffline(bool isOffline)
+        {
+            tree.IsOffline = isOffline;
+            foreach (IDeviceTreeBase child in tree.Children)
+                child.SetIsOffline(isOffline);
+        }
     }
 }
