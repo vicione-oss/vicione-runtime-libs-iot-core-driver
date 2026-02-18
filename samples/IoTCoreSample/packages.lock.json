@@ -331,6 +331,14 @@
           "Microsoft.Extensions.Options": "8.0.0"
         }
       },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.1",
+        "contentHash": "RIFgaqoaINxkM2KTOw72dmilDmTrYA0ns2KW4lDz4gZ2+o6IQ894CzmdL3StM2oh7QQq44nCWiqKqc4qUI9Jmg==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
+        }
+      },
       "Microsoft.Extensions.ObjectPool": {
         "type": "Transitive",
         "resolved": "8.0.6",
@@ -539,15 +547,6 @@
         "requested": "[4.1.2, )",
         "resolved": "1.5.7",
         "contentHash": "3v2U9NaVxTkY3+JrpYnTJ5sXWZ5XGWVzQnRe9/HpRC4QfNSCM1IVok/W0Y2JhSZ4rGPB6xx6wed3yiDZZ1xY5g=="
-      },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "CentralTransitive",
-        "requested": "[8.0.1, )",
-        "resolved": "8.0.1",
-        "contentHash": "RIFgaqoaINxkM2KTOw72dmilDmTrYA0ns2KW4lDz4gZ2+o6IQ894CzmdL3StM2oh7QQq44nCWiqKqc4qUI9Jmg==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
-        }
       },
       "PacketDotNet": {
         "type": "CentralTransitive",
