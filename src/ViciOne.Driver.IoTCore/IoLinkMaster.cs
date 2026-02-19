@@ -235,7 +235,7 @@ public sealed class IoLinkMaster : IManageableDevice
             {
                 return Core.GetDataValueAsValue(elementAddress);
             }
-            catch (IoTCoreException ex) when (Timeout is false && ex.IsTimeout())
+            catch (IoTCoreException ex) when (Timeout is false && ex.IsTimeout)
             {
                 Timeout = true;
                 timeoutException = ex;

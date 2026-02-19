@@ -257,7 +257,7 @@ public static partial class IoLinkParser
                 deviceNode.Children.Add(processDataNode);
             }
 
-            if (deviceNode.IsRecordingDevice())
+            if (deviceNode.IsRecordingDevice)
             {
                 deviceNode.Children.Add(new DeviceTreeBlobData()
                 {

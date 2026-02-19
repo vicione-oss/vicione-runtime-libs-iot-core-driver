@@ -45,7 +45,6 @@ public sealed class VseDevice : IManageableDevice
     private Task? _writingTask;
     private PeriodicTimer? _writingTimer;
     private readonly Lock _writingTimerLock = new();
-    private bool _timeout;
     private int _treeRebuildCount;
 
     public bool Connected => GetValueFromService(GetConnectionStateService, out string? value) && value == "connected";
@@ -60,12 +59,12 @@ public sealed class VseDevice : IManageableDevice
     public bool Supervising => _systemMode == IFM.SDK.VSE.SystemMode.Supervise;
     public bool Timeout
     {
-        get => _timeout;
+        get;
         private set
         {
-            if (_timeout == value)
+            if (field == value)
                 return;
-            _timeout = value;
+            field = value;
             TimeoutChanged?.Invoke();
         }
     }

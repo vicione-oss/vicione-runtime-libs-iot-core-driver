@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path=".gitlab-ci.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="NuGet.Config" />
+    <File Path="README.md" />
+    <File Path="VERSION" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/DeviceTreeSample/DeviceTreeSample.csproj" />
+    <Project Path="samples/IoddSample/IoddSample.csproj" />
+    <Project Path="samples/IoLinkMasterSample/IoLinkMasterSample.csproj" />
+    <Project Path="samples/IoTCoreSample/IoTCoreSample.csproj" />
+    <Project Path="samples/VseSample/VseSample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj" />
+    <Project Path="src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ViciOne.Driver.IoTCore.Tests/ViciOne.Driver.IoTCore.Tests.csproj" />
+  </Folder>
+</Solution>
