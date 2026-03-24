@@ -44,7 +44,7 @@ public sealed partial class IoLinkMasterFinder
         if (FunctionBlockEnabled is false)
             return;
 
-        if (ProcessDataInputs.Trigger.Changed &&
+        if ((ProcessDataInputs.Trigger.Changed || cycleInfo.IsFirstCycle) &&
             ProcessDataInputs.Trigger.Value &&
             _runningTask.Status != TaskStatus.WaitingForActivation)
         {

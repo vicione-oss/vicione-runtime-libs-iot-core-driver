@@ -12,7 +12,7 @@ public sealed partial class VariantsSubscriber
         if (FunctionBlockEnabled == false)
             return;
 
-        if (cycleInfo.IsFirstCycle == false && ProcessDataInputs.ActiveVariant.Changed)
+        if (ProcessDataInputs.ActiveVariant.Changed)
         {
             IsWriting = true;
             long value = ProcessDataInputs.ActiveVariant.Value;

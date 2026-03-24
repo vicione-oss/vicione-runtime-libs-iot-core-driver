@@ -48,6 +48,8 @@ public sealed partial class BlobSubscriber
         if (Settings.ProductName.Value is null)
             throw new ArgumentException("Invalid product name configuration.");
 
+        _recordingIdentifier = GetRecordingIdentifier();
+
         // Liegt im InitializeII damit der DeviceTreeSubscriber zuerst initialisiert wird und das Gerät mit dem konfigurierten IoddDirectory anlegt
         _device = driver.GetOrAddIoLinkMaster(Settings.Address.Value);
         _device.BlobDataReceived += OnBlobDataReceived;
@@ -72,7 +74,9 @@ public sealed partial class BlobSubscriber
         if (FunctionBlockEnabled is false)
             return;
 
-        if (_waitingForData is false && ProcessDataInputs.Trigger.Changed && ProcessDataInputs.Trigger.Value is true)
+        if (_waitingForData is false &&
+            (ProcessDataInputs.Trigger.Changed || cycleInfo.IsFirstCycle) &&
+            ProcessDataInputs.Trigger.Value is true)
         {
             _waitingForData = true;
             _device!.GetRecordingBlobData(_recordingIdentifier!, Settings.PortIndex.Value, Settings.IgnoreTimedValueArray.Value);
