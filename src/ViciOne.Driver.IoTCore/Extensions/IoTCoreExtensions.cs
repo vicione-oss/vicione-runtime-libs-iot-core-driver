@@ -6,6 +6,8 @@ using ifmIoTCore.Elements.ServiceData.Requests;
 
 namespace ViciOne.Driver.IoTCore.Extensions;
 
+//TODO: Suppression should be removed when https://github.com/dotnet/sdk/issues/53378 is fixed and delivered.
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "IDE0051:Remove unused private member", Justification = "False positive")]
 internal static class IoTCoreExtensions
 {
     extension(IIoTCore core)
