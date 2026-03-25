@@ -12,7 +12,7 @@ public sealed partial class InputSubscriber
         if (FunctionBlockEnabled == false)
             return;
 
-        if (cycleInfo.IsFirstCycle == false && ProcessDataInputs.Value.Changed)
+        if (ProcessDataInputs.Value.Changed)
         {
             IsWriting = true;
             double value = ProcessDataInputs.Value.Value;

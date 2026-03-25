@@ -4,18 +4,18 @@
     "net10.0": {
       "coverlet.collector": {
         "type": "Direct",
-        "requested": "[8.0.0, )",
-        "resolved": "8.0.0",
-        "contentHash": "EMkj/2F6n6IVPrvGYkqzGJs6phuGGkq6N+E7KW9rNyzNxXbwQ1KfMqWyXNf9nCNEQOA6IjFwmOLvkriwKE7Orw=="
+        "requested": "[8.0.1, )",
+        "resolved": "8.0.1",
+        "contentHash": "heVQl5tKYnnIDYlR1QMVGueYH6iriZTcZB6AjDczQNwZzxkjDIt9C84Pt4cCiZYrbo7jkZOYGWbs6Lo9wAtVLg=="
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.0.1, )",
-        "resolved": "18.0.1",
-        "contentHash": "WNpu6vI2rA0pXY4r7NKxCN16XRWl5uHu6qjuyVLoDo6oYEggIQefrMjkRuibQHm/NslIUNCcKftvoWAN80MSAg==",
+        "requested": "[18.3.0, )",
+        "resolved": "18.3.0",
+        "contentHash": "xW3kXuWRQtgoxJp4J+gdhHSQyK+6Wb/AZDSd7lMvuMRYlZ1tnpkojyfZlWilB5G4dmZ0Y0ZxU/M23TlubndNkw==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.0.1",
-          "Microsoft.TestPlatform.TestHost": "18.0.1"
+          "Microsoft.CodeCoverage": "18.3.0",
+          "Microsoft.TestPlatform.TestHost": "18.3.0"
         }
       },
       "Moq": {
@@ -354,8 +354,8 @@
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.0.1",
-        "contentHash": "O+utSr97NAJowIQT/OVp3Lh9QgW/wALVTP4RG1m2AfFP4IyJmJz0ZBmFJUsRQiAPgq6IRC0t8AAzsiPIsaUDEA=="
+        "resolved": "18.3.0",
+        "contentHash": "23BNy/vziREC20Wwhb50K7+kZe0m07KlLWDQv4qjJ9tt3QjpDpDIqJFrhYHmMEo9xDkuSp55U/8h4bMF7MiB+g=="
       },
       "Microsoft.Extensions.DependencyInjection": {
         "type": "Transitive",
@@ -367,8 +367,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "9.0.7",
-        "contentHash": "iPK1FxbGFr2Xb+4Y+dTYI8Gupu9pOi8I3JPuPsrogUmEhe2hzZ9LpCmolMEBhVDo2ikcSr7G5zYiwaapHSQTew=="
+        "resolved": "10.0.3",
+        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
       },
       "Microsoft.Extensions.Logging": {
         "type": "Transitive",
@@ -382,10 +382,10 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "9.0.7",
-        "contentHash": "sMM6NEAdUTE/elJ2wqjOi0iBWqZmSyaTByLF9e8XHv6DRJFFnOe0N+s8Uc6C91E4SboQCfLswaBIZ+9ZXA98AA==",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.Extensions.ObjectPool": {
@@ -414,15 +414,15 @@
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.0.1",
-        "contentHash": "qT/mwMcLF9BieRkzOBPL2qCopl8hQu6A1P7JWAoj/FMu5i9vds/7cjbJ/LLtaiwWevWLAeD5v5wjQJ/l6jvhWQ=="
+        "resolved": "18.3.0",
+        "contentHash": "AEIEX2aWdPO9XbtR96eBaJxmXRD9vaI9uQ1T/JbPEKlTAZwYx0ZrMzKyULMdh/HH9Sg03kXCoN7LszQ90o6nPQ=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.0.1",
-        "contentHash": "uDJKAEjFTaa2wHdWlfo6ektyoh+WD4/Eesrwb4FpBFKsLGehhACVnwwTI4qD3FrIlIEPlxdXg3SyrYRIcO+RRQ==",
+        "resolved": "18.3.0",
+        "contentHash": "twmsoelXnp1uWMU3VGip9f0Jr1mZ0PZqgJdF35CIrdYgYrkHIJMV1m8uKyhcdjLdsQDESHAgkR7KhS9i1qpJag==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.0.1",
+          "Microsoft.TestPlatform.ObjectModel": "18.3.0",
           "Newtonsoft.Json": "13.0.3"
         }
       },
@@ -612,18 +612,18 @@
       },
       "ViciOne.Core.Contracts": {
         "type": "Transitive",
-        "resolved": "0.51.0",
-        "contentHash": "3uyq+x3QvdmzgGgep1Z8rUKv+s8fh/Em5RQL3hOquk+WDi9/Y48s7TuErEnPkAAzJN7zaK8NE/dIe4Qxi47U1A==",
+        "resolved": "1.0.0",
+        "contentHash": "AOr1PWoy5LCJWbb73E0+Gywh55DQFQLiJRUGZFEAknCQOZ07TuyiNxkb+f7mh/W+fyhgx1eehdN4H8L9i6s31g==",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3"
         }
       },
       "ViciOne.Core.Runtime": {
         "type": "Transitive",
-        "resolved": "0.51.0",
-        "contentHash": "Fx/lbcNJBM1fFWhHQse0FBJEca7b+wrY52HyR6xNASAol7adkITrXkPD1g8k+7zUoVff/fXlcdb33Z6+ytzloQ==",
+        "resolved": "1.0.0",
+        "contentHash": "if/EBwinB6KOWxGugJj+zhctBhnKyYAFAXhGt2BOFYxPADUrXS2uC1C5Nwkodfz7JbFxmnF+iAXTioX0ap5f7A==",
         "dependencies": {
-          "ViciOne.Core.Contracts": "0.51.0"
+          "ViciOne.Core.Contracts": "1.0.0"
         }
       },
       "xunit.abstractions": {
@@ -672,8 +672,8 @@
           "ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts": "[4.4.0, )",
           "PacketDotNet": "[1.4.8, )",
           "SharpPcap": "[6.3.1, )",
-          "ViciOne.Driver.IoTCore.Contracts": "[1.21.1, )",
-          "ViciOne.Engine.DefaultValidators": "[0.51.0, )",
+          "ViciOne.Driver.IoTCore.Contracts": "[2.0.0, )",
+          "ViciOne.Engine.DefaultValidators": "[1.0.0, )",
           "ifm.IoddParser": "[4.1.2, )",
           "ifm.IoddParser.Helpers": "[4.1.2, )",
           "ifm.diagnostic.VSEIotCore": "[2.2.3, )"
@@ -734,11 +734,11 @@
       },
       "ViciOne.Engine.DefaultValidators": {
         "type": "CentralTransitive",
-        "requested": "[0.51.0, )",
-        "resolved": "0.51.0",
-        "contentHash": "HFs874LZSXDV5/RUUgAS1bpvZPMvv/nd0HqPVe6z1fP5FfHuOetoo8LQJCEHlGMO2m6Sx6PUZx9N4haTTcqt0A==",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "CNfODVnxRLA4mbxDq70NBoM+3WFERRjMXNL8Jp8JaRW5U0vhUjMqddLVqld7mb8C59ptlJ4NMoeEv3GdScOJjg==",
         "dependencies": {
-          "ViciOne.Core.Runtime": "0.51.0"
+          "ViciOne.Core.Runtime": "1.0.0"
         }
       }
     }

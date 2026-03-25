@@ -40,7 +40,7 @@ public sealed partial class RpmAtMinMaxTracker
             SetOutputValue(ProcessDataOutputs.RefValueAtMinimum, _refValueAtMin);
             SetInitialValues(value, rotSpeed, refValue);
         }
-        else if (ProcessDataInputs.Value.Changed)
+        else if (ProcessDataInputs.Value.Changed || cycleInfo.IsFirstCycle)
         {
             if (_firstAssignment)
             {

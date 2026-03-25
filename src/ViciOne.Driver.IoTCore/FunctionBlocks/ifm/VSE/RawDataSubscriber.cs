@@ -72,6 +72,8 @@ public sealed partial class RawDataSubscriber
         if (Settings.Address.Value is null)
             throw new ArgumentException("Invalid address configuration.");
 
+        _recordingIdentifier = GetRecordingIdentifier();
+
         _vseDevice = driver.GetOrAddVseDevice(Settings.Address.Value!);
         _vseDevice.RawDataReceived += OnRawDataReceived;
     }
@@ -109,7 +111,9 @@ public sealed partial class RawDataSubscriber
         if (FunctionBlockEnabled == false)
             return;
 
-        if (_waitingForData is false && ProcessDataInputs.ObjectTrigger.Changed && ProcessDataInputs.ObjectTrigger.Value is not null)
+        if (_waitingForData is false &&
+            (ProcessDataInputs.ObjectTrigger.Changed || cycleInfo.IsFirstCycle) &&
+            ProcessDataInputs.ObjectTrigger.Value is not null)
         {
             foreach (ErrorState errorState in ProcessDataInputs.ObjectTrigger.Value)
                 AddErrorState(errorState);
@@ -121,7 +125,9 @@ public sealed partial class RawDataSubscriber
                     Settings.Duration.Value, Settings.IgnoreTimedValueArray.Value);
             }
         }
-        else if (_waitingForData is false && ProcessDataInputs.Trigger.Changed && ProcessDataInputs.Trigger.Value)
+        else if (_waitingForData is false &&
+            (ProcessDataInputs.Trigger.Changed || cycleInfo.IsFirstCycle) &&
+            ProcessDataInputs.Trigger.Value)
         {
             _waitingForData = true;
             AddErrorState(new ErrorState()

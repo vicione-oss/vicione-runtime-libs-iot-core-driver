@@ -75,7 +75,7 @@ public sealed partial class DeviceTreeSubscriber
         if (FunctionBlockEnabled is false)
             return;
 
-        if (ProcessDataInputs.Trigger.Changed &&
+        if ((ProcessDataInputs.Trigger.Changed || cycleInfo.IsFirstCycle) &&
             ProcessDataInputs.Trigger.Value)
             StartDeviceTreeUpdate();
 
