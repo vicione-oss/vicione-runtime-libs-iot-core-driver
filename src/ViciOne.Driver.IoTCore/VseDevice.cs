@@ -53,6 +53,7 @@ public sealed class VseDevice : IManageableDevice
     string IManageableDevice.Address => DeviceAddress;
     private IServiceElement GetConnectionStateService => _getConnectionStateService ??= (IServiceElement)Core.GetElementByAddress("/Device/Status/ConnectionState/getdata");
     private IServiceElement GetSystemModeService => _getSystemModeService ??= (IServiceElement)Core.GetElementByAddress("/Device/Status/SystemMode/getdata");
+    bool IManageableDevice.IgnoreReleaseDelay => true;
     public bool Initialized => _treeRebuildCount >= 2;
     public bool Measuring => _systemMode == IFM.SDK.VSE.SystemMode.Measure;
     DateTime? IManageableDevice.ReleaseDate { get; set; }

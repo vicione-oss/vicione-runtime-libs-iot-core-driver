@@ -49,6 +49,7 @@ public sealed class IoLinkMaster : IManageableDevice
 
     public IIoTCore Core { get; }
     internal ConditionCache ConditionValueCache { get; } = new();
+    bool IManageableDevice.IgnoreReleaseDelay => false;
     public bool Initialized { get; private set; }
     DateTime? IManageableDevice.ReleaseDate { get; set; }
     public string Address { get; }

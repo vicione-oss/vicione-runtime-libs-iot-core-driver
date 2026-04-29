@@ -86,7 +86,7 @@ public static class DeviceManager
             {
                 foreach (IManageableDevice device in s_releasableDevices.Keys.Where(x => x.ReleaseDate is not null).ToArray())
                 {
-                    if (isUnloading || (device.ReleaseDate.HasValue && DateTime.UtcNow >= device.ReleaseDate))
+                    if (device.IgnoreReleaseDelay || isUnloading || (device.ReleaseDate.HasValue && DateTime.UtcNow >= device.ReleaseDate))
                     {
                         device.Dispose();
                         s_releasableDevices.Remove(device);
