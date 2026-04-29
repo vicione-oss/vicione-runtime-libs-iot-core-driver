@@ -171,7 +171,7 @@ public static partial class IoLinkParser
         }
         catch (Exception ex)
         {
-            logger.LogError($"Failed to scan IO-Link device: {ex.GetType().Name}, {ex.Message} {ex.StackTrace}");
+            logger.ErrorWhileParsingDevice(ioLinkDevice.Address, ex.Message, ex);
             throw;
         }
     }
