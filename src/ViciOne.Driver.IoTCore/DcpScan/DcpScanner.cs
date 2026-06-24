@@ -24,10 +24,7 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
     private static readonly TimeSpan s_noPacketDelay = TimeSpan.FromMilliseconds(50);
     private static readonly TimeSpan s_errorDelay = TimeSpan.FromMilliseconds(5);
 
-    private static readonly Lazy<NetworkInterface[]> s_allNics = new(() =>
-    {
-        try { return NetworkInterface.GetAllNetworkInterfaces(); } catch { return []; }
-    });
+    private static NetworkInterface[] s_allNics = [];
 
     private readonly DcpScannerOptions _opt = NormalizeOptions(options ?? new DcpScannerOptions());
     private readonly ILogger _logger = logger ?? new NullLogger<DcpScanner>();
@@ -59,6 +56,7 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
 
     private async Task<List<DcpDevice>> ScanInternal(CancellationToken cancellationToken = default)
     {
+        RefreshNics();
         await SafeNativeCall(CaptureDeviceList.Instance.Refresh);
 
         List<(int index, ILiveDevice dev)> adapters = EnumerateEthernetAdapters(CaptureDeviceList.Instance, _opt.IncludeLoopbacks);
@@ -100,7 +98,7 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
     {
         List<(int index, ILiveDevice dev)> ethernetAdapters = [];
 
-        foreach (NetworkInterface network in s_allNics.Value)
+        foreach (NetworkInterface network in s_allNics)
         {
             if (network.NetworkInterfaceType != NetworkInterfaceType.Ethernet || network.OperationalStatus != OperationalStatus.Up)
                 continue;
@@ -346,7 +344,7 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
         string name = dev.Name ?? string.Empty;
         try
         {
-            return s_allNics.Value.FirstOrDefault(n => n.Description == desc || n.Name == name);
+            return s_allNics.FirstOrDefault(n => n.Description == desc || n.Name == name);
         }
         catch { return null; }
     }
@@ -394,6 +392,20 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
         }
         catch { }
         return null;
+    }
+
+    private static NetworkInterface[] RefreshNics()
+    {
+        try
+        {
+            s_allNics = NetworkInterface.GetAllNetworkInterfaces();
+        }
+        catch
+        {
+            s_allNics = [];
+        }
+
+        return s_allNics;
     }
 
     private static async Task<T> SafeNativeCall<T>(Func<T> func)
