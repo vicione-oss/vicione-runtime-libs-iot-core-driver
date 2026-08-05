@@ -105,7 +105,7 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
 
             foreach (UnicastIPAddressInformation unicastAddress in network.GetIPProperties().UnicastAddresses)
             {
-                var adapter = liveDevices.FirstOrDefault(d => d.Name == network.Name || d.Description == network.Description);
+                ILiveDevice? adapter = liveDevices.FirstOrDefault(d => d.Name == network.Name || d.Description == network.Description);
 
                 if (adapter is null)
                     continue;
@@ -374,7 +374,7 @@ internal sealed class DcpScanner(DcpScannerOptions? options = null, ILogger? log
         {
             NetworkInterface? ni = GetNicForDevice(dev);
             if (ni == null) return (null, null);
-            UnicastIPAddressInformation? uni = ni.GetIPProperties().UnicastAddresses.FirstOrDefault(u => u.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            UnicastIPAddressInformation? uni = ni.GetIPProperties().UnicastAddresses.FirstOrDefault(u => u.Address.AddressFamily == AddressFamily.InterNetwork);
             if (uni == null) return (null, null);
             return (uni.Address, uni.IPv4Mask);
         }

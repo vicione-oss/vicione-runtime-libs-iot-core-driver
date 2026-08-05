@@ -9,9 +9,10 @@ public sealed class DeviceTreeDevice : IDeviceTreeBase
 
     public required string Name { get; set; }
 
-    public uint DeviceId { get; set; }
     public ushort VendorId { get; set; }
-
+    public uint DeviceId { get; set; }
+    public string? ProductId { get; set; }
+    
     public List<IDeviceTreeBase> Children { get; set; } = [];
     public DeviceTreeNodeDescription? Description { get; set; }
     public required string Id { get; set; }

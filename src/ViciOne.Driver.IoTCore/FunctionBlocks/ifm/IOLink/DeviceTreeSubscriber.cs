@@ -16,6 +16,7 @@ public sealed partial class DeviceTreeSubscriber
     private IoLinkMaster? _device;
     private byte _deviceTreeUpdateRequested;
     private readonly Lock _deviceTreeLock = new();
+    private readonly Lock _startUpdateLock = new();
     private Task _runningTask = Task.CompletedTask;
 
     public override void InitializeI()
@@ -89,7 +90,15 @@ public sealed partial class DeviceTreeSubscriber
             // Wenn ein Baum angefragt wird, während das Gerät im Timeout ist, dann wird ein Baum erzeugt,
             // der das Gerät nicht so repräsentiert, wie es eigentlich ist. Daher wird dieser Baum verworfen
             // und die Offline-Information in den ggf. bestehenden Baum geschrieben.
-            if (tree.IsOffline || (_device is not null && _device.Timeout))
+            // Hinweis: bewusst nur tree.IsOffline, kein zusätzlicher Re-Check von _device.Timeout hier -
+            // das spiegelt den Timeout-Zustand exakt zum Zeitpunkt wider, an dem ParseDeviceAsync
+            // abgeschlossen wurde (siehe IoLinkParser.ParseDeviceAsync). Ein separater erneuter Check an
+            // dieser Stelle könnte den Timeout-Zustand zwischen Parse-Ende und hier erneut abweichend
+            // vorfinden (z.B. durch ein kurzes erneutes Timeout-Flackern) und würde dann einen bereits
+            // fertig und korrekt geparsten Baum verwerfen, ohne dass je ein neuer ChildDevicesChanged mehr
+            // nachträfe, der das korrigieren könnte - der veröffentlichte Baum bliebe dauerhaft auf
+            // IsOffline=true hängen, obwohl der Gerätezustand längst wieder korrekt ist.
+            if (tree.IsOffline)
             {
                 UpdateIsOfflineInCurrentTree(true, tree);
                 return;
@@ -104,18 +113,33 @@ public sealed partial class DeviceTreeSubscriber
         if (_device is null)
             return;
 
-        if (_runningTask.Status == TaskStatus.WaitingForActivation)
+        // The check-then-act below (is a parse already running -> if not, start one) must be
+        // atomic. Without this lock, two calls to StartDeviceTreeUpdate arriving close together
+        // (e.g. two ChildDevicesChanged/TimeoutChanged events, or a new trigger racing the
+        // ContinueWith below) could both observe _runningTask as completed and each start their
+        // own ParseDeviceAsync, instead of the second one coalescing via
+        // _deviceTreeUpdateRequested as intended. With two overlapping parses in flight, whichever
+        // one happens to finish last wins the call to PublishDeviceTree - which is not necessarily
+        // the one reflecting the more recent device state. Since nothing re-triggers a parse once
+        // the device state has actually settled, a stale result winning that race would stay
+        // published indefinitely.
+        Task startedTask;
+        lock (_startUpdateLock)
         {
-            Interlocked.Exchange(ref _deviceTreeUpdateRequested, 1);
-            return;
+            if (_runningTask.IsCompleted is false)
+            {
+                Interlocked.Exchange(ref _deviceTreeUpdateRequested, 1);
+                return;
+            }
+
+            startedTask = _runningTask = Task.Run(async () =>
+                {
+                    try { PublishDeviceTree(await IoLinkParser.ParseDeviceAsync(_device, Logger)); }
+                    catch (Exception ex) { Logger.IoLinkParseDeviceErrorOccurred(ex); }
+                }, _cancellationTokenSource.Token);
         }
 
-        _runningTask = Task.Run(async () =>
-            {
-                try { PublishDeviceTree(await IoLinkParser.ParseDeviceAsync(_device, Logger)); }
-                catch (Exception ex) { Logger.IoLinkParseDeviceErrorOccurred(ex); }
-            }, _cancellationTokenSource.Token);
-        _runningTask.ContinueWith(_ =>
+        startedTask.ContinueWith(_ =>
         {
             if (Interlocked.CompareExchange(ref _deviceTreeUpdateRequested, 0, 1) == 1)
                 StartDeviceTreeUpdate();

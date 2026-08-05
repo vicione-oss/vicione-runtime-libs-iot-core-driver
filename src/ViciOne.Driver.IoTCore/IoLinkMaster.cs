@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -19,6 +20,7 @@ using ifmIoTCore.Profiles.DeviceManagement;
 using ifmIoTCore.Profiles.DeviceManagement.ServiceData.Requests;
 using Microsoft.Extensions.Logging;
 using ViciOne.Driver.IoTCore.Contracts;
+using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
 using ViciOne.Driver.IoTCore.Extensions;
 using ViciOne.Driver.IoTCore.IoddManagement;
 
@@ -36,12 +38,15 @@ public sealed class IoLinkMaster : IManageableDevice
     private readonly DeviceManagementProfileBuilder _deviceProfileBuilder;
     private bool _disposed;
     private readonly Lock _getDataLock = new();
+    private readonly SemaphoreSlim _requestGate = new(1, 1);
     private readonly HttpClientNetAdapterFactory _httpClientNetAdapterFactory;
     private string _lastLoggedMessage = string.Empty;
     private readonly ILogger _logger;
     private readonly ConcurrentDictionary<int, DeviceProcessDataRegistration> _portProcessDataRegistrations = [];
     private bool _mirroringErrorLogged;
     private readonly Task _mirroringTask;
+    // Detected but not-yet-reported change in child device availability, see PollingAsync.
+    private bool _pendingChildDevicesChanged;
     private Task? _pollingTask;
     private PeriodicTimer? _pollingTimer;
     private Dictionary<int, IoLinkMasterPortDeviceInfo>? _portDeviceInfos;
@@ -49,6 +54,10 @@ public sealed class IoLinkMaster : IManageableDevice
 
     public IIoTCore Core { get; }
     internal ConditionCache ConditionValueCache { get; } = new();
+    // Last successfully parsed device tree node per port, keyed by port index. Reused by
+    // ParseDeviceAsync for ports whose IoLinkMasterPortDeviceInfo.NeedsFullRefresh is false, instead
+    // of re-reading that device's IODD data and product info again on every single full parse.
+    internal Dictionary<int, DeviceTreeDevice> CachedPortDeviceNodes { get; } = [];
     bool IManageableDevice.IgnoreReleaseDelay => false;
     public bool Initialized { get; private set; }
     DateTime? IManageableDevice.ReleaseDate { get; set; }
@@ -59,6 +68,21 @@ public sealed class IoLinkMaster : IManageableDevice
     public event Action<Measurement>? BlobDataReceived;
     public event Action? ChildDevicesChanged;
     public event Action? TimeoutChanged;
+
+    /// <summary>
+    /// Acquires exclusive access to the IO-Link Master, pausing the polling loop
+    /// until the returned IDisposable is disposed.
+    /// </summary>
+    internal async Task<IDisposable> AcquireExclusiveAccessAsync(CancellationToken cancellationToken = default)
+    {
+        await _requestGate.WaitAsync(cancellationToken);
+        return new RequestGateReleaser(_requestGate);
+    }
+
+    private sealed class RequestGateReleaser(SemaphoreSlim gate) : IDisposable
+    {
+        public void Dispose() => gate.Release();
+    }
 
     public IoLinkMaster(string address, ILogger logger)
     {
@@ -87,24 +111,39 @@ public sealed class IoLinkMaster : IManageableDevice
         _recordingManager = new Lazy<RecordingManager>(CreateRecordingManager);
     }
 
-    private bool CheckCondition(ICondition condition, string deviceAddress)
+    private bool CheckCondition(ICondition condition, string deviceAddress, ushort vendorId, uint deviceId)
     {
         // If there is no condition use the item.
         if (condition == null) return true;
 
         // Reading variables can be very slow, and reading the same variable multiple times is inefficient.
         // So read the value once and store it in a cache. The variable value will not change during runtime.
-        if (!ConditionValueCache.Get(deviceAddress, condition.Variable.Index, condition.SubIndex, out byte value))
+        if (!ConditionValueCache.Get(deviceAddress, condition.Variable.Index, condition.SubIndex, vendorId, deviceId, out byte value))
         {
             // The variable referenced in the condition must be simple and the value must be convertible to byte.
-            byte[]? readValue = Core.ReadAcyclic(deviceAddress, condition.Variable.Index, condition.SubIndex);
-            value = readValue![0];
+            byte[]? readValue = null;
+            try
+            {
+                readValue = Core.ReadAcyclic(deviceAddress, condition.Variable.Index, condition.SubIndex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Acyclic read failed for condition variable index {Index} subindex {SubIndex} on '{DeviceAddress}'. Using default value from IODD.",
+                    condition.Variable.Index, condition.SubIndex, deviceAddress);
+            }
 
-            // TODO: Alternative take default value from variable.
-            //value = Convert.ToByte(condition.Variable.GetDefaultValue(condition.SubIndex));
+            if (readValue is { Length: > 0 })
+            {
+                value = readValue[0];
+            }
+            else
+            {
+                // Fallback: take default value from IODD variable definition.
+                value = Convert.ToByte(condition.Variable.GetDefaultValue(condition.SubIndex), CultureInfo.InvariantCulture);
+            }
 
             // Store condition value in cache.
-            ConditionValueCache.Add(deviceAddress, condition.Variable.Index, condition.SubIndex, value);
+            ConditionValueCache.Add(deviceAddress, condition.Variable.Index, condition.SubIndex, vendorId, deviceId, value);
         }
 
         // Compare condition value against value 
@@ -160,6 +199,7 @@ public sealed class IoLinkMaster : IManageableDevice
 
         ClearConditionValueCache();
         _httpClientNetAdapterFactory.Dispose();
+        _requestGate.Dispose();
 
         if (_recordingManager.IsValueCreated)
         {
@@ -178,6 +218,9 @@ public sealed class IoLinkMaster : IManageableDevice
 
     internal void ClearConditionValueCache()
         => ConditionValueCache.Clear();
+
+    internal IEnumerable<IoLinkMasterPortDeviceInfo> PortDeviceInfos
+        => _portDeviceInfos?.Values ?? Enumerable.Empty<IoLinkMasterPortDeviceInfo>();
 
     internal IoLinkMasterPortDeviceAvailabilityInfo? GetPortDeviceAvailabilityInfo(int portIndex)
     {
@@ -213,7 +256,14 @@ public sealed class IoLinkMaster : IManageableDevice
         }
     }
 
-    internal VariantValue? GetDataValueAsValue(string elementAddress, bool skipIfInTimeout, out bool skippedBecauseOfTimeout)
+    /// <param name="isConnectivityProbe">
+    /// Only the periodic port mode read in <see cref="PollingAsync"/> is a dedicated master connectivity check
+    /// and is allowed to set this parameter to <see langword="true"/>. A single device's data (vendor/device id, process
+    /// data, IODD fields, ...) can fail to be read for reasons specific to that one device, so those reads must not
+    /// affect the master-wide <see cref="Timeout"/> flag - doing so would mark the whole master offline whenever a
+    /// single sensor is unreachable.
+    /// </param>
+    internal VariantValue? GetDataValueAsValue(string elementAddress, bool skipIfInTimeout, out bool skippedBecauseOfTimeout, bool isConnectivityProbe = false)
     {
         IoTCoreException? timeoutException;
         bool timeoutBefore = Timeout;
@@ -236,7 +286,7 @@ public sealed class IoLinkMaster : IManageableDevice
             {
                 return Core.GetDataValueAsValue(elementAddress);
             }
-            catch (IoTCoreException ex) when (Timeout is false && ex.IsTimeout)
+            catch (IoTCoreException ex) when (isConnectivityProbe && Timeout is false && ex.IsTimeout)
             {
                 Timeout = true;
                 timeoutException = ex;
@@ -313,96 +363,160 @@ public sealed class IoLinkMaster : IManageableDevice
         if (Initialized == false)
             return;
 
-        InitializeRegistrations();
-
-        await Task.Delay(50);
-
-        bool childDevicesChanged = false;
-        foreach (IoLinkMasterPortDeviceInfo portDeviceInfo in _portDeviceInfos!.Values)
+        await _requestGate.WaitAsync();
+        try
         {
-            try
+            InitializeRegistrations();
+
+            await Task.Delay(50);
+
+            // Once a port's processing leaves Timeout set, the master itself is unreachable
+            // (or still is) - stop probing further ports this cycle instead of letting each of
+            // them independently wait out its own HttpClient timeout too. Otherwise a single
+            // PollingAsync cycle could take up to (port count) x HttpClient.Timeout to finish,
+            // which - since it holds the exclusive request gate the whole time - would delay
+            // both offline detection and the next cycle's recovery check by that same amount.
+            bool stopProbingRemainingPorts = false;
+            foreach (IoLinkMasterPortDeviceInfo portDeviceInfo in _portDeviceInfos!.Values)
             {
-                int? portMode = GetDataValueAsValue(portDeviceInfo.PortModeAddress, false, out _)?.GetUInt8();
-                ushort? vendorId = null;
-                uint? deviceId = null;
-                if (portMode == 3) // 3 = IO-Link
+                if (stopProbingRemainingPorts)
+                    break;
+
+                try
                 {
-                    vendorId = GetDataValueAsValue(portDeviceInfo.VendorIdAddress, true, out _)?.GetUInt16();
-                    deviceId = GetDataValueAsValue(portDeviceInfo.DeviceIdAddress, true, out _)?.GetUInt32();
-                }
+                    int? portMode = GetDataValueAsValue(portDeviceInfo.PortModeAddress, false, out _, isConnectivityProbe: true)?.GetUInt8();
 
-                // TODO: Eigentlich müsste man hier auch noch den Status des Sensors (2 = operate) prüfen, das würde aber mehr Zeit kosten.
-
-                childDevicesChanged |= portDeviceInfo.Available.HasValue && portDeviceInfo.VendorId != vendorId;
-                childDevicesChanged |= portDeviceInfo.Available.HasValue && portDeviceInfo.DeviceId != deviceId;
-
-                portDeviceInfo.Available = vendorId.HasValue && deviceId.HasValue;
-                portDeviceInfo.VendorId = vendorId;
-                portDeviceInfo.DeviceId = deviceId;
-
-                if (Timeout)
-                {
-                    Timeout = false;
-                    TimeoutChanged?.Invoke();
-                    LogConnectionReEstablished();
-                }
-
-                if (portDeviceInfo.Available is false ||
-                    _portProcessDataRegistrations.TryGetValue(portDeviceInfo.PortIndex, out DeviceProcessDataRegistration? registration) is false ||
-                    registration.DeviceDefinition is null ||
-                    registration.DeviceId != portDeviceInfo.DeviceId ||
-                    registration.VendorId != portDeviceInfo.VendorId)
-                    continue;
-
-                List<DisplayValue> decodedPdin = ReadAndDecodeProcessDataIn(portDeviceInfo.Address, registration.DeviceDefinition);
-                foreach (DisplayValue entry in decodedPdin)
-                {
-                    if (entry.SubIndex.HasValue is false)
-                        continue;
-
-                    if (registration.SubIndexRegistrations.TryGetValue(entry.SubIndex.Value, out ConcurrentDictionary<IIoLinkSubscriberFunctionBlock, byte>? blocks) is false)
-                        continue;
-
-                    foreach (KeyValuePair<IIoLinkSubscriberFunctionBlock, byte> block in blocks)
+                    // Reset Timeout as soon as the connectivity probe succeeds, before reading this same
+                    // port's vendor/device id below - otherwise those reads (skipIfInTimeout: true) would
+                    // still see Timeout as true and get skipped, leaving this specific port's data stale
+                    // for one extra polling cycle compared to every other port processed this same cycle.
+                    if (Timeout)
                     {
-                        block.Key.SetValue(entry.Value, entry.DisplayFormat);
-                        block.Key.SetUnit(entry.Unit);
+                        Timeout = false;
+                        TimeoutChanged?.Invoke();
+                        LogConnectionReEstablished();
+                    }
+
+                    ushort? vendorId = null;
+                    uint? deviceId = null;
+                    if (portMode == 3) // 3 = IO-Link
+                    {
+                        vendorId = GetDataValueAsValue(portDeviceInfo.VendorIdAddress, true, out _)?.GetUInt16();
+                        deviceId = GetDataValueAsValue(portDeviceInfo.DeviceIdAddress, true, out _)?.GetUInt32();
+                    }
+
+                    // TODO: Eigentlich müsste man hier auch noch den Status des Sensors (2 = operate) prüfen, das würde aber mehr Zeit kosten.
+
+                    bool identityChanged = portDeviceInfo.Available.HasValue &&
+                        (portDeviceInfo.VendorId != vendorId || portDeviceInfo.DeviceId != deviceId);
+                    _pendingChildDevicesChanged |= identityChanged;
+                    // A device that goes away and the exact same device coming back are both identity
+                    // changes here - either way, ParseDeviceAsync must not reuse a cached tree node for
+                    // this port on the next full parse, since something about it actually changed.
+                    portDeviceInfo.NeedsFullRefresh |= identityChanged;
+
+                    portDeviceInfo.Available = vendorId.HasValue && deviceId.HasValue;
+                    portDeviceInfo.VendorId = vendorId;
+                    portDeviceInfo.DeviceId = deviceId;
+                }
+                catch (Exception ex)
+                {
+                    // Detecting the transition to unavailable must not depend on the current Timeout state:
+                    // a device that disappears while the master happens to be in a Timeout window would
+                    // otherwise never be detected (Available silently flips to false here, but by the time
+                    // Timeout clears there is no further change left to compare against). The detected
+                    // change is only actually reported once Timeout is false (see below), so this does not
+                    // cause a full re-parse to be triggered while the whole master is still unreachable.
+                    bool wasAvailable = portDeviceInfo.Available.HasValue && portDeviceInfo.Available.Value;
+                    _pendingChildDevicesChanged |= wasAvailable;
+                    portDeviceInfo.NeedsFullRefresh |= wasAvailable;
+
+                    portDeviceInfo.VendorId = null;
+                    portDeviceInfo.DeviceId = null;
+                    portDeviceInfo.Available = false;
+
+                    LogPollingError(ex);
+                }
+                finally
+                {
+                    stopProbingRemainingPorts = Timeout;
+                }
+            }
+
+            // Only report pending changes once the master itself is confirmed reachable: while Timeout is
+            // true, every port fails at once (not because those devices are individually gone), and a full
+            // re-parse would just be a very slow, doomed attempt to reach an unreachable master. Reporting
+            // this now, before reading process data below, means a newly (re-)available device is announced
+            // immediately instead of only after every port's process data has also been read - a slow or
+            // still-negotiating device's process data read must not delay this notification for everyone.
+            if (_pendingChildDevicesChanged && Timeout is false)
+            {
+                _pendingChildDevicesChanged = false;
+                // Not needed to clear the condition cache here: it is keyed by vendor/device id in
+                // addition to the port address, so a device change naturally produces a cache miss.
+                ChildDevicesChanged?.Invoke();
+            }
+
+            // Process data is read and decoded in its own pass, after availability has already been
+            // determined and reported for every port above: a device can be genuinely present (correct
+            // vendor/device id) but not yet answer process data queries right after (re-)connecting, e.g.
+            // while IO-Link negotiation is still in progress. Reading it here, separately, means neither a
+            // slow/failing read for one device nor its own try/catch can undo the availability that was
+            // just established, or delay reporting it for every other port.
+            if (Timeout is false)
+            {
+                foreach (IoLinkMasterPortDeviceInfo portDeviceInfo in _portDeviceInfos!.Values)
+                {
+                    if (portDeviceInfo.Available is not true ||
+                        _portProcessDataRegistrations.TryGetValue(portDeviceInfo.PortIndex, out DeviceProcessDataRegistration? registration) is false ||
+                        registration.DeviceDefinition is null ||
+                        registration.DeviceId != portDeviceInfo.DeviceId ||
+                        registration.VendorId != portDeviceInfo.VendorId)
+                        continue;
+
+                    try
+                    {
+                        List<DisplayValue> decodedPdin = ReadAndDecodeProcessDataIn(portDeviceInfo.Address, registration.DeviceDefinition, registration.VendorId, registration.DeviceId);
+                        foreach (DisplayValue entry in decodedPdin)
+                        {
+                            if (entry.SubIndex.HasValue is false)
+                                continue;
+
+                            if (registration.SubIndexRegistrations.TryGetValue(entry.SubIndex.Value, out ConcurrentDictionary<IIoLinkSubscriberFunctionBlock, byte>? blocks) is false)
+                                continue;
+
+                            foreach (KeyValuePair<IIoLinkSubscriberFunctionBlock, byte> block in blocks)
+                            {
+                                block.Key.SetValue(entry.Value, entry.DisplayFormat);
+                                block.Key.SetUnit(entry.Unit);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogPollingError(ex);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                if (Timeout is false)
-                {
-                    portDeviceInfo.VendorId = null;
-                    portDeviceInfo.DeviceId = null;
-
-                    childDevicesChanged |= portDeviceInfo.Available.HasValue && portDeviceInfo.Available.Value;
-                }
-
-                portDeviceInfo.Available = false;
-
-                LogPollingError(ex);
-            }
         }
-
-        if (childDevicesChanged)
+        finally
         {
-            // TODO: ist das überhaupt noch notwendig?
-            ClearConditionValueCache();
-            ChildDevicesChanged?.Invoke();
+            _requestGate.Release();
         }
     }
 
-    internal List<DisplayValue> ReadAndDecodeProcessDataIn(string deviceAddress, IDevice device)
+    internal List<DisplayValue> ReadAndDecodeProcessDataIn(string deviceAddress, IDevice device, ushort vendorId, uint deviceId, bool skipIfInTimeout = true)
     {
         string pdinAddress = $"{deviceAddress}{IoddConstants.PdInDataElementInIoLinkDevice}";
-        string? pdinValue = GetDataValueAsValue(pdinAddress, true, out _)?.GetString();
+        string? pdinValue = GetDataValueAsValue(pdinAddress, skipIfInTimeout, out bool skipped)?.GetString();
+        if (skipped || string.IsNullOrEmpty(pdinValue))
+            return [];
+
         return Helpers.DecodeProcessData(Helpers.ProcessDataDirection.Input,
-            Convert.FromHexString(pdinValue!),
+            Convert.FromHexString(pdinValue),
             device,
             null,
-            condition => CheckCondition(condition, deviceAddress));
+            condition => CheckCondition(condition, deviceAddress, vendorId, deviceId));
     }
 
     public DeviceProcessDataRegistration RegisterProcessDataIn(int portIndex, ushort vendorId, uint deviceId, int processDataInIndex, IIoLinkSubscriberFunctionBlock functionBlock)
