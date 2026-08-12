@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ViciOne.Communication.IoTCore.IoddStore;
 using ViciOne.Core.Contracts.Runtime;
+using ViciOne.DeviceTree.Contracts;
+using ViciOne.DeviceTree.Contracts.Extensions;
 using ViciOne.Driver.IoTCore;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree.Extensions;
-using ViciOne.Driver.IoTCore.IoddManagement;
 
 namespace ifm.IOLink;
 
@@ -19,16 +19,18 @@ public sealed partial class DeviceTreeSubscriber
     private readonly Lock _startUpdateLock = new();
     private Task _runningTask = Task.CompletedTask;
 
+    /// <inheritdoc/>
     public override void InitializeI()
     {
         base.InitializeI();
 
         IoLinkParser.Initialize(Settings.IoddDirectory.Value ?? string.Empty, Settings.IoddAutoDownload.Value, Logger);
 
-        // Setzt den Wert auch wenn der Manager schon initialisiert war
-        IoddParserManager.IoddAutoDownload = Settings.IoddAutoDownload.Value;
+        // Sets the value even if the manager was already initialized
+        IoddCatalog.IoddAutoDownload = Settings.IoddAutoDownload.Value;
     }
 
+    /// <inheritdoc/>
     public override void InitializeII()
     {
         base.InitializeII();
@@ -39,11 +41,12 @@ public sealed partial class DeviceTreeSubscriber
         if (Settings.Url.Value is null)
             throw new ArgumentException("Invalid address configuration.");
 
-        _device = driver.GetOrAddIoLinkMaster(Settings.Url.Value);
+        _device = driver.GetOrAddIoLinkMaster(Settings.Url.Value, Settings.Username.Value, Settings.Password.Value);
         _device.ChildDevicesChanged += OnDeviceChildDevicesChanged;
         _device.TimeoutChanged += OnDeviceTimeoutChanged;
     }
 
+    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -57,7 +60,7 @@ public sealed partial class DeviceTreeSubscriber
                 _device = null;
             }
 
-            // TODO: CancellationToken im Callback des Tasks beachten und korrekt auf Beendigung warten
+            // TODO: honor the CancellationToken in the task's callback and wait correctly for completion
             _cancellationTokenSource.Cancel();
             _cancellationTokenSource.Dispose();
             try { _runningTask?.Dispose(); }
@@ -69,8 +72,9 @@ public sealed partial class DeviceTreeSubscriber
         => StartDeviceTreeUpdate();
 
     private void OnDeviceTimeoutChanged()
-        => UpdateIsOfflineInCurrentTree(_device!.Timeout);
+        => UpdateStatusInCurrentTree(IoLinkParser.GetConnectionStatus(_device!));
 
+    /// <inheritdoc/>
     protected override void ProcessCycle(IFunctionBlockCycleInfo cycleInfo)
     {
         if (FunctionBlockEnabled is false)
@@ -80,27 +84,26 @@ public sealed partial class DeviceTreeSubscriber
             ProcessDataInputs.Trigger.Value)
             StartDeviceTreeUpdate();
 
-        SetConnectorValueIfNotEqual(ProcessDataOutputs.IoddDirectory, IoddParserManager.IoddDirectory);
+        SetConnectorValueIfNotEqual(ProcessDataOutputs.IoddDirectory, IoddCatalog.IoddDirectory);
     }
 
     private void PublishDeviceTree(DeviceTreeIoLinkMaster tree)
     {
         lock (_deviceTreeLock)
         {
-            // Wenn ein Baum angefragt wird, während das Gerät im Timeout ist, dann wird ein Baum erzeugt,
-            // der das Gerät nicht so repräsentiert, wie es eigentlich ist. Daher wird dieser Baum verworfen
-            // und die Offline-Information in den ggf. bestehenden Baum geschrieben.
-            // Hinweis: bewusst nur tree.IsOffline, kein zusätzlicher Re-Check von _device.Timeout hier -
-            // das spiegelt den Timeout-Zustand exakt zum Zeitpunkt wider, an dem ParseDeviceAsync
-            // abgeschlossen wurde (siehe IoLinkParser.ParseDeviceAsync). Ein separater erneuter Check an
-            // dieser Stelle könnte den Timeout-Zustand zwischen Parse-Ende und hier erneut abweichend
-            // vorfinden (z.B. durch ein kurzes erneutes Timeout-Flackern) und würde dann einen bereits
-            // fertig und korrekt geparsten Baum verwerfen, ohne dass je ein neuer ChildDevicesChanged mehr
-            // nachträfe, der das korrigieren könnte - der veröffentlichte Baum bliebe dauerhaft auf
-            // IsOffline=true hängen, obwohl der Gerätezustand längst wieder korrekt ist.
-            if (tree.IsOffline)
+            // If a tree is requested while the device is in timeout (or requires authentication we don't
+            // have), a tree gets built that doesn't represent the device the way it actually is. So this tree
+            // is discarded and its status is written into whatever tree already exists instead.
+            // Note: deliberately only tree.Status, no additional re-check of _device here - that reflects the
+            // status exactly as it was at the moment ParseDeviceAsync completed (see
+            // IoLinkParser.ParseDeviceAsync). A separate re-check at this point could find the status has
+            // already changed again between the end of parsing and here (e.g. through a brief renewed timeout
+            // flicker), and would then discard an already fully and correctly parsed tree without any further
+            // ChildDevicesChanged ever following that could correct it - the published tree would stay stuck
+            // off Online forever, even though the device state has long since become correct again.
+            if (tree.Status != ConnectionStatus.Online)
             {
-                UpdateIsOfflineInCurrentTree(true, tree);
+                UpdateStatusInCurrentTree(tree.Status, tree);
                 return;
             }
 
@@ -146,7 +149,7 @@ public sealed partial class DeviceTreeSubscriber
         }, _cancellationTokenSource.Token, TaskContinuationOptions.None, TaskScheduler.Default);
     }
 
-    private void UpdateIsOfflineInCurrentTree(bool isOffline, DeviceTreeIoLinkMaster? fallbackTree = null)
+    private void UpdateStatusInCurrentTree(ConnectionStatus status, DeviceTreeIoLinkMaster? fallbackTree = null)
     {
         lock (_deviceTreeLock)
         {
@@ -156,7 +159,7 @@ public sealed partial class DeviceTreeSubscriber
                 if (ProcessDataOutputs.DeviceTree.Value is null)
                     return;
             }
-            ProcessDataOutputs.DeviceTree.Value.SetIsOffline(isOffline);
+            ProcessDataOutputs.DeviceTree.Value.SetStatus(status);
             ProcessDataOutputs.DeviceTree.MarkAsChanged();
         }
     }

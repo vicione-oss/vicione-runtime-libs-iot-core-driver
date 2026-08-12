@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
+using ViciOne.DeviceTree.Contracts;
 
 namespace ViciOne.Driver.IoTCore.Tests;
 
@@ -18,7 +18,7 @@ public class DeviceTreeSerialization
         Url = new("http://127.0.0.1"),
         MacAddress = "aa:bb:cc::ff",
         Name = "VSE100 - 00179322",
-        NameAlias = "VSE100 - 00179322",
+        Alias = "VSE100 - 00179322",
         Children =
         {
             new DeviceTreeStructureNode()
@@ -36,9 +36,8 @@ public class DeviceTreeSerialization
                         Type = "Warning",
                         Children =
                         {
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Alarms/Alarm02__!__OU02_Warning_02/Name",
                                 Name = "Name",
                                 Value = "OU02_Warning_02",
@@ -51,13 +50,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
-                                DataType = DataType.BooleanT,
+                                DataType = DataType.Flag,
                                 Id = "vse@127.0.0.1//Alarms/Alarm02__!__OU02_Warning_02/Value",
                                 Name = "Value",
-                                Visible = true,
                             }
                         }
                     },
@@ -70,9 +68,8 @@ public class DeviceTreeSerialization
                         Type = "Damage",
                         Children =
                         {
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Alarms//Alarm03__!__IO01_Damage_03/Name",
                                 Name = "Name",
                                 Value = "IO01_Damage_03",
@@ -85,14 +82,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.BooleanT,
+                                DataType = DataType.Flag,
                                 Id = "vse@127.0.0.1//Alarms//Alarm03__!__IO01_Damage_03/Value",
                                 Name = "Value",
-                                Visible = true,
                             }
                         }
                     }
@@ -122,18 +118,16 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.Float32T,
+                                DataType = DataType.Real,
                                 Id = "vse@127.0.0.1//Counters/Counter01__!__OB01_ObjectState_01/Limit",
                                 Name = "Limit",
-                                Visible = true,
                             },
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Counters/Counter01__!__OB01_ObjectState_01/Name",
                                 Name = "Name",
                                 Value = "OB01_ObjectState_01",
@@ -146,14 +140,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.StringT,
+                                DataType = DataType.Text,
                                 Id = "vse@127.0.0.1//Counters/Counter01__!__OB01_ObjectState_01/State",
                                 Name = "State",
-                                Visible = true,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -163,14 +156,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.StringT,
+                                DataType = DataType.Text,
                                 Id = "vse@127.0.0.1//Counters/Counter01__!__OB01_ObjectState_01/Unit",
                                 Name = "Unit",
-                                Visible = true,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -180,14 +172,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.Float32T,
+                                DataType = DataType.Real,
                                 Id = "vse@127.0.0.1//Counters/Counter01__!__OB01_ObjectState_01/Value",
                                 Name = "Value",
-                                Visible = true,
                             }
                         }
                     },
@@ -209,18 +200,16 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.Float32T,
+                                DataType = DataType.Real,
                                 Id = "vse@127.0.0.1//Counters/Counter02__!__OB01_ObjectState_02/Limit",
                                 Name = "Limit",
-                                Visible = true,
                             },
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Counters/Counter02__!__OB01_ObjectState_02/Name",
                                 Name = "Name",
                                 Value = "OB01_ObjectState_02",
@@ -233,14 +222,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.StringT,
+                                DataType = DataType.Text,
                                 Id = "vse@127.0.0.1//Counters/Counter02__!__OB01_ObjectState_02/State",
                                 Name = "State",
-                                Visible = true,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -250,14 +238,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.StringT,
+                                DataType = DataType.Text,
                                 Id = "vse@127.0.0.1//Counters/Counter02__!__OB01_ObjectState_02/Unit",
                                 Name = "Unit",
-                                Visible = true,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -267,14 +254,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.Float32T,
+                                DataType = DataType.Real,
                                 Id = "vse@127.0.0.1//Counters/Counter02__!__OB01_ObjectState_02/Value",
                                 Name = "Value",
-                                Visible = true,
                             }
                         }
                     },
@@ -296,18 +282,16 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.Float32T,
+                                DataType = DataType.Real,
                                 Id = "vse@127.0.0.1//Counters/Counter03__!__OB01_ObjectState_03/Limit",
                                 Name = "Limit",
-                                Visible = true,
                             },
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Counters/Counter03__!__OB01_ObjectState_03/Name",
                                 Name = "Name",
                                 Value = "OB01_ObjectState_03",
@@ -320,14 +304,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.StringT,
+                                DataType = DataType.Text,
                                 Id = "vse@127.0.0.1//Counters/Counter03__!__OB01_ObjectState_03/State",
                                 Name = "State",
-                                Visible = true,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -337,14 +320,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.StringT,
+                                DataType = DataType.Text,
                                 Id = "vse@127.0.0.1//Counters/Counter03__!__OB01_ObjectState_03/Unit",
                                 Name = "Unit",
-                                Visible = true,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -354,14 +336,13 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                         Enabled = true,
                                     }
                                 },
-                                DataType = DataType.Float32T,
+                                DataType = DataType.Real,
                                 Id = "vse@127.0.0.1//Counters/Counter02__!__OB01_ObjectState_02/Value",
                                 Name = "Value",
-                                Visible = true,
                             }
                         }
                     }
@@ -389,9 +370,8 @@ public class DeviceTreeSerialization
                                 Unit = "°C",
                                 Children =
                                 {
-                                    new DeviceTreeConstantData()
+                                    new DeviceTreeAssignedName()
                                     {
-                                        DataType = DataType.StringT,
                                         Id = "vse@127.0.0.1//Inputs/External/Input01__!__External_01/Name",
                                         Name = "Name",
                                         Value = "External_01",
@@ -404,13 +384,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input01__!__External_01/Unit",
                                         Name = "Unit",
-                                        DataType = DataType.StringT,
-                                        Visible = true,
+                                        DataType = DataType.Text,
                                     },
                                     new DeviceTreeProcessData()
                                     {
@@ -420,13 +399,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input01__!__External_01/Value",
                                         Name = "Value",
-                                        DataType = DataType.Float32T,
-                                        Visible = true,
+                                        DataType = DataType.Real,
                                         IsWriteable = true,
                                     }
                                 }
@@ -441,9 +419,8 @@ public class DeviceTreeSerialization
                                 Unit = "°C",
                                 Children =
                                 {
-                                    new DeviceTreeConstantData()
+                                    new DeviceTreeAssignedName()
                                     {
-                                        DataType = DataType.StringT,
                                         Id = "vse@127.0.0.1//Inputs/External/Input02__!__External_02/Name",
                                         Name = "Name",
                                         Value = "External_02",
@@ -456,13 +433,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input02__!__External_02/Unit",
                                         Name = "Unit",
-                                        DataType = DataType.StringT,
-                                        Visible = true,
+                                        DataType = DataType.Text,
                                     },
                                     new DeviceTreeProcessData()
                                     {
@@ -472,13 +448,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input02__!__External_02/Value",
                                         Name = "Value",
-                                        DataType = DataType.Float32T,
-                                        Visible = true,
+                                        DataType = DataType.Real,
                                     }
                                 }
                             },
@@ -492,9 +467,8 @@ public class DeviceTreeSerialization
                                 Unit = "°C",
                                 Children =
                                 {
-                                    new DeviceTreeConstantData()
+                                    new DeviceTreeAssignedName()
                                     {
-                                        DataType = DataType.StringT,
                                         Id = "vse@127.0.0.1//Inputs/External/Input03__!__External_03/Name",
                                         Name = "Name",
                                         Value = "External_03",
@@ -507,13 +481,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input03__!__External_03/Unit",
                                         Name = "Unit",
-                                        DataType = DataType.StringT,
-                                        Visible = true,
+                                        DataType = DataType.Text,
                                     },
                                     new DeviceTreeProcessData()
                                     {
@@ -523,13 +496,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input03__!__External_03/Value",
                                         Name = "Value",
-                                        DataType = DataType.Float32T,
-                                        Visible = true,
+                                        DataType = DataType.Real,
                                     }
                                 }
                             },
@@ -543,9 +515,8 @@ public class DeviceTreeSerialization
                                 Unit = "°C",
                                 Children =
                                 {
-                                    new DeviceTreeConstantData()
+                                    new DeviceTreeAssignedName()
                                     {
-                                        DataType = DataType.StringT,
                                         Id = "vse@127.0.0.1//Inputs/External/Input04__!__External_04/Name",
                                         Name = "Name",
                                         Value = "External_04",
@@ -558,13 +529,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input04__!__External_04/Unit",
                                         Name = "Unit",
-                                        DataType = DataType.StringT,
-                                        Visible = true,
+                                        DataType = DataType.Text,
                                     },
                                     new DeviceTreeProcessData()
                                     {
@@ -574,13 +544,12 @@ public class DeviceTreeSerialization
                                             {
                                                 CompressionTime = 10000,
                                                 DataGroupIdentifier = s_annaIdentifier,
-                                                PoolingMode = PoolingMode.MinMaxAvg,
+                                                Aggregation = AggregationFunction.MinMaxAvg,
                                             }
                                         },
                                         Id = "vse@127.0.0.1//Inputs/External/Input04__!__External_04/Value",
                                         Name = "Value",
-                                        DataType = DataType.Float32T,
-                                        Visible = true,
+                                        DataType = DataType.Real,
                                     }
                                 }
                             }
@@ -615,13 +584,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Average",
                                 Name = "Average",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -631,13 +599,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/AveragingPeriod",
                                 Name = "AveragingPeriod",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -647,13 +614,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/BaseLine",
                                 Name = "BaseLine",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -663,13 +629,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Damage",
                                 Name = "Damage",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -679,13 +644,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Error",
                                 Name = "Error",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -695,13 +659,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Maximum",
                                 Name = "Maximum",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -711,17 +674,15 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Minimum",
                                 Name = "Minimum",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Name",
                                 Name = "Name",
                                 Value = "EX01_UpperLimit_01",
@@ -734,13 +695,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/RefValue",
                                 Name = "RefValue",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -750,13 +710,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/RotSpeed",
                                 Name = "RotSpeed",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -766,13 +725,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Unit",
                                 Name = "Unit",
-                                DataType = DataType.StringT,
-                                Visible = true,
+                                DataType = DataType.Text,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -782,13 +740,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object01__!__EX01_UpperLimit_01/Warning",
                                 Name = "Warning",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                         }
                     },
@@ -813,13 +770,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Average",
                                 Name = "Average",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -829,13 +785,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/AveragingPeriod",
                                 Name = "AveragingPeriod",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -845,13 +800,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/BaseLine",
                                 Name = "BaseLine",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -861,13 +815,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Damage",
                                 Name = "Damage",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -877,13 +830,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Error",
                                 Name = "Error",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -893,13 +845,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Maximum",
                                 Name = "Maximum",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -909,17 +860,15 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Minimum",
                                 Name = "Minimum",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
-                            new DeviceTreeConstantData()
+                            new DeviceTreeAssignedName()
                             {
-                                DataType = DataType.StringT,
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Name",
                                 Name = "Name",
                                 Value = "EX02_UpperLimit_02",
@@ -932,13 +881,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/RefValue",
                                 Name = "RefValue",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -948,13 +896,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/RotSpeed",
                                 Name = "RotSpeed",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -964,13 +911,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Unit",
                                 Name = "Unit",
-                                DataType = DataType.StringT,
-                                Visible = true,
+                                DataType = DataType.Text,
                             },
                             new DeviceTreeProcessData()
                             {
@@ -980,13 +926,12 @@ public class DeviceTreeSerialization
                                     {
                                         CompressionTime = 10000,
                                         DataGroupIdentifier = s_annaIdentifier,
-                                        PoolingMode = PoolingMode.MinMaxAvg,
+                                        Aggregation = AggregationFunction.MinMaxAvg,
                                     }
                                 },
                                 Id = "vse@127.0.0.1//Objects/Object02__!__EX02_UpperLimit_02/Warning",
                                 Name = "Warning",
-                                DataType = DataType.Float32T,
-                                Visible = true,
+                                DataType = DataType.Real,
                             },
                         }
                     }
@@ -1003,7 +948,6 @@ public class DeviceTreeSerialization
                         Id = "vse@127.0.0.1//RawData/Sensor 1",
                         Index = 1,
                         Name = "Sensor 1",
-                        Unit = "m/s²",
                         RawDataConfigurations =
                         {
                             { s_annaIdentifier, new RawDataSettings()
@@ -1072,7 +1016,6 @@ public class DeviceTreeSerialization
                         Id = "vse@127.0.0.1//RawData/Sensor 2",
                         Index = 2,
                         Name = "Sensor 2",
-                        Unit = "m/s²",
                         RawDataConfigurations =
                         {
                             { s_annaIdentifier, new RawDataSettings()
@@ -1152,15 +1095,14 @@ public class DeviceTreeSerialization
                             {
                                 CompressionTime = 10000,
                                 DataGroupIdentifier = s_annaIdentifier,
-                                PoolingMode = PoolingMode.MinMaxAvg,
+                                Aggregation = AggregationFunction.MinMaxAvg,
                                 Enabled = true,
                             }
                         },
-                        DataType = DataType.IntegerT,
+                        DataType = DataType.Whole,
                         Id = "vse@127.0.0.1//Variants/ActiveVariant",
                         IsWriteable = true,
                         Name = "ActiveVariant",
-                        Visible = true,
                     }
                 }
             }
@@ -1178,6 +1120,6 @@ public class DeviceTreeSerialization
         Assert.NotNull(deserialized);
         Assert.IsType<DeviceTreeStructureNode>(deserialized.Children.First());
         Assert.IsType<DeviceTreeVseAlarm>(deserialized.Children.First().Children.First());
-        Assert.IsType<DeviceTreeConstantData>(deserialized.Children.First().Children.First().Children.First());
+        Assert.IsType<DeviceTreeAssignedName>(deserialized.Children.First().Children.First().Children.First());
     }
 }

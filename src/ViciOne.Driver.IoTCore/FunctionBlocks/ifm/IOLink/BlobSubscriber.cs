@@ -1,10 +1,7 @@
-﻿using ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts;
-using System;
+﻿using System;
 using ViciOne.Core.Contracts.Runtime;
+using ViciOne.DeviceTree.Contracts;
 using ViciOne.Driver.IoTCore;
-using ViciOne.Driver.IoTCore.Contracts;
-using ViciOne.Driver.IoTCore.Contracts.Constants;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
 
 namespace ifm.IOLink;
 
@@ -18,6 +15,7 @@ public sealed partial class BlobSubscriber
     private string? _recordingIdentifier;
     private bool _waitingForData;
 
+    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -30,11 +28,18 @@ public sealed partial class BlobSubscriber
     }
 
     private string GetRecordingIdentifier()
-        => Identifiers.GetIoLinkRawDataIdentifier(Settings.Address.Value!,
-            Settings.ApplicationSpecificTag.Value ?? Unknown_ApplicationSpecificTag, Settings.PortIndex.Value,
-            Settings.VendorId.Value, Settings.DeviceId.Value, Settings.ProductName.Value ?? Unknown_ProductName, Identifiers.Recording,
-            DeviceTreeBlobData.ReadBlobDuration, DeviceTreeBlobData.ReadBlobSampleRate);
+        => new IoLinkRawDataIdentifier(
+            Settings.Address.Value!,
+            Settings.ApplicationSpecificTag.Value ?? Unknown_ApplicationSpecificTag,
+            Settings.PortIndex.Value,
+            Settings.VendorId.Value,
+            Settings.DeviceId.Value,
+            Settings.ProductName.Value ?? Unknown_ProductName,
+            "Recording",
+            DeviceTreeBlobData.ReadBlobDuration,
+            DeviceTreeBlobData.ReadBlobSampleRate).ToString();
 
+    /// <inheritdoc/>
     public override void InitializeII()
     {
         base.InitializeII();
@@ -50,7 +55,7 @@ public sealed partial class BlobSubscriber
 
         _recordingIdentifier = GetRecordingIdentifier();
 
-        // Liegt im InitializeII damit der DeviceTreeSubscriber zuerst initialisiert wird und das Gerät mit dem konfigurierten IoddDirectory anlegt
+        // This is in InitializeII so DeviceTreeSubscriber initializes first and creates the device with the configured IoddDirectory
         _device = driver.GetOrAddIoLinkMaster(Settings.Address.Value);
         _device.BlobDataReceived += OnBlobDataReceived;
     }
@@ -60,15 +65,25 @@ public sealed partial class BlobSubscriber
         if (_waitingForData == false || string.Equals(measurement.Identifier, _recordingIdentifier, StringComparison.Ordinal) == false)
             return;
 
-        measurement.RecordReasons = [new ErrorState() { TriggerType = "Interval" }];
-
         _waitingForData = false;
-        SetConnectorValueIfNotEqual(ProcessDataOutputs.Data, measurement);
+
+        SetConnectorValueIfNotEqual(ProcessDataOutputs.Data, new Measurement()
+        {
+            Duration = measurement.Duration,
+            Frequency = measurement.Frequency,
+            Identifier = measurement.Identifier,
+            RawData = measurement.RawData,
+            RecordReasons = [new ErrorState() { TriggerType = "Interval" }],
+            Start = measurement.Start,
+            Values = measurement.Values,
+        });
     }
 
+    /// <inheritdoc/>
     protected override void OnSettingChanged(IRuntimeSetting setting)
         => _recordingIdentifier = GetRecordingIdentifier();
 
+    /// <inheritdoc/>
     protected override void ProcessCycle(IFunctionBlockCycleInfo cycleInfo)
     {
         if (FunctionBlockEnabled is false)

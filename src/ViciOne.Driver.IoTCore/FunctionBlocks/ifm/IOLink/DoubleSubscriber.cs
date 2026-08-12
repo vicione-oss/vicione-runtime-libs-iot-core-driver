@@ -1,41 +1,19 @@
-﻿using System;
-using System.Globalization;
-using ViciOne.Core.Contracts.Runtime;
+﻿using ViciOne.Core.Contracts.Runtime;
 
 namespace ifm.IOLink;
 
 public sealed partial class DoubleSubscriber
 {
+    /// <inheritdoc/>
     protected override IRuntimeConnector<bool> AvailableRuntimeConnector => ProcessDataOutputs.Available;
+
+    /// <inheritdoc/>
     protected override IRuntimeConnector<string> UnitRuntimeConnector => ProcessDataOutputs.Unit;
 
+    /// <inheritdoc/>
     protected override void SetValueToConnectors(object value, string displayFormat)
     {
-        if (value is
-            decimal or
-            double or
-            float or
-            byte or
-            ushort or
-            uint or
-            ulong or
-            sbyte or
-            short or
-            int or
-            long)
-        {
-            // TODO: passen alle Konvertierungen?
-            SetConnectorValue(ProcessDataOutputs.Value, RemoveConversionError(Convert.ToDouble(value, CultureInfo.InvariantCulture)));
-        }
-        else if (value is string stringValue)
-        {
-            if (double.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedDoubleValue))
-            {
-                SetConnectorValue(ProcessDataOutputs.Value, RemoveConversionError(parsedDoubleValue));
-            }
-        }
+        if (TryConvertToDouble(value, out double doubleValue))
+            SetConnectorValue(ProcessDataOutputs.Value, doubleValue);
     }
-
-    private static double RemoveConversionError(double value)
-        => (double)(decimal)value;
 }

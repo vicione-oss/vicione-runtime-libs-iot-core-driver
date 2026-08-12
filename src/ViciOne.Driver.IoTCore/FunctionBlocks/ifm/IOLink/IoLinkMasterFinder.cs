@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using ViciOne.Communication.IoTCore.DcpScan;
 using ViciOne.Core.Contracts.Runtime;
-using ViciOne.Driver.IoTCore.Contracts.Dcp;
-using ViciOne.Driver.IoTCore.DcpScan;
+using ViciOne.DeviceTree.Contracts.Scanning;
 
 namespace ifm.IOLink;
 
@@ -19,13 +20,14 @@ public sealed partial class IoLinkMasterFinder
     private Task _runningTask = Task.CompletedTask;
     private int _scanRunning;
 
+    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
 
         if (disposing)
         {
-            // TODO: CancellationToken im Callback des Tasks beachten und korrekt auf Beendigung warten
+            // TODO: honor the CancellationToken in the task's callback and wait correctly for completion
             _cancellationTokenSource.Cancel();
 
             try
@@ -39,6 +41,7 @@ public sealed partial class IoLinkMasterFinder
         }
     }
 
+    /// <inheritdoc/>
     protected override void ProcessCycle(IFunctionBlockCycleInfo cycleInfo)
     {
         if (FunctionBlockEnabled is false)
@@ -91,7 +94,7 @@ public sealed partial class IoLinkMasterFinder
             using var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutToken.Token);
 
             List<DcpDevice> devices = await scanner.Scan(linkedToken.Token);
-            devices = [.. devices.Where(x => x.DeviceName.StartsWith(IoLinkMasterIdentifier, StringComparison.OrdinalIgnoreCase))];
+            devices = [.. devices.Where(x => x.Identity.Name.StartsWith(IoLinkMasterIdentifier, StringComparison.OrdinalIgnoreCase))];
 
             using var handler = new SocketsHttpHandler
             {
@@ -124,21 +127,44 @@ public sealed partial class IoLinkMasterFinder
 
         try
         {
-            response = await httpClient.GetAsync(new Uri(device.Address, "getidentity"), cancellationToken);
+            response = await httpClient.GetAsync(new Uri(device.Network.Address, "getidentity"), cancellationToken);
             isUnreachable = !(response?.IsSuccessStatusCode ?? false);
+
+            if (isUnreachable is false)
+                device.Security = await GetSecurityInfoAsync(response!, cancellationToken);
         }
         catch (HttpRequestException httpEx)
         {
-            Logger.LogInformation($"Fetching info of device {device.Ip} failed: {httpEx.StatusCode}.");
+            Logger.LogInformation($"Fetching info of device {device.Network.Ip} failed: {httpEx.StatusCode}.");
         }
         catch (Exception ex)
         {
-            Logger.LogWarning($"Error trying to fetch info of device {device.Ip}: {ex.GetType().Name} {ex.Message} {ex.StackTrace}.");
+            Logger.LogWarning($"Error trying to fetch info of device {device.Network.Ip}: {ex.GetType().Name} {ex.Message} {ex.StackTrace}.");
         }
         finally
         {
             response?.Dispose();
         }
         device.IsUnreachable = isUnreachable;
+    }
+
+    /// <summary>
+    /// Reads <paramref name="identityResponse"/>'s body and extracts its <c>security</c> block, if any - not
+    /// every IoTCore firmware reports one (older ones just omit it entirely).
+    /// </summary>
+    /// <param name="identityResponse">The successful response from a <c>getidentity</c> request.</param>
+    /// <param name="cancellationToken">Cancellation token for reading the response body.</param>
+    /// <returns>The device's security info - every property keeps its default if no <c>security</c> block was present.</returns>
+    private static async Task<DcpDeviceSecurity> GetSecurityInfoAsync(HttpResponseMessage identityResponse, CancellationToken cancellationToken)
+    {
+        string content = await identityResponse.Content.ReadAsStringAsync(cancellationToken);
+        JsonNode? security = JsonNode.Parse(content)?["data"]?["security"];
+
+        return new DcpDeviceSecurity
+        {
+            RequiresAuthentication = string.Equals(security?["passwordstatus"]?.GetValue<string>(), "required", StringComparison.OrdinalIgnoreCase),
+            AuthenticationScheme = security?["authscheme"]?.GetValue<string>(),
+            SecurityMode = security?["securitymode"]?.GetValue<string>(),
+        };
     }
 }

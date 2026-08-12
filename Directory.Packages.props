@@ -3,8 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <!-- TODO: drop once ViciOne.Driver.IoTCore and the samples no longer reference these. -->
-    <PackageVersion Include="ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts" Version="4.4.0" />
+    <!-- TODO: drop once the samples no longer reference this. -->
     <PackageVersion Include="ifm.diagnostic.VSEIotCore" Version="2.2.3" />
     <PackageVersion Include="ifm.SDK" Version="1.13.0" />
     <PackageVersion Include="ifm.IoTCore" Version="7.0.0" />

@@ -52,304 +52,108 @@
           "System.Diagnostics.EventLog": "6.0.0"
         }
       },
-      "CommunityToolkit.Diagnostics": {
+      "ifm.Common": {
         "type": "Transitive",
-        "resolved": "8.2.2",
-        "contentHash": "iILVyo7VvzTlQT7b2qOs1ZDcneKsmuy2mTuxCCaBWEfg3tjw35B/ImO9Xw6It7xi2ie8/2PWfXhFn+Prztg03w=="
+        "resolved": "1.0.0",
+        "contentHash": "XlosBh8bb0aohlwLOJXh28LB6ZO+2zkO59RPu75Si5mFnakoCd7RuXM7yAAbfasHAVw3gVhQjQANh87FL8l+dw=="
       },
-      "CommunityToolkit.HighPerformance": {
+      "ifm.DataStore.Contracts": {
         "type": "Transitive",
-        "resolved": "8.2.2",
-        "contentHash": "+zIp8d3sbtYaRbM6hqDs4Ui/z34j7DcUmleruZlYLE4CVxXq+MO8XJyIs42vzeTYFX+k0Iq1dEbBUnQ4z/Gnrw=="
-      },
-      "ifm.CiA301": {
-        "type": "Transitive",
-        "resolved": "1.1.543",
-        "contentHash": "VKhGuptiA52XZDJk6ONY5ZDJXA/mPSiQTG333pIV/x54YaaP6sPr8HdbWuztdl/X/+6NMcg8nliKUgQND7I+sw==",
-        "dependencies": {
-          "Ixxat.Vci4.Core": "4.0.439"
-        }
-      },
-      "ifm.IoddManager": {
-        "type": "Transitive",
-        "resolved": "1.6.9",
-        "contentHash": "g9AdanTs3llrpbPvNnqAs7ab+TPddl8x3mKnc5qAW2AuOzUxCVXjkfwHZupuDLYiXYIFUxSZXE3sKKBPgdc1RQ==",
-        "dependencies": {
-          "ifm.IoddParser": "1.5.7"
-        }
+        "resolved": "2.0.0",
+        "contentHash": "/e3Yhw6R+Zwp2oMA/3jtae05Tdn6nOrVm7Qe1B8Y/g5BrYyd53KDSdCWCsMsIBhe3bHw05oh7W3+TIZ6wH/nMg=="
       },
       "ifm.IoddParser.Contracts": {
         "type": "Transitive",
-        "resolved": "4.1.1",
-        "contentHash": "H045zzpivYeXACP3PW/SF/Z4v63sQEorxXrSGmBTRVpF5jHuBCZMVD7MOYxQP3AHJCUbn+3B3FxReYfU0r1mNw=="
+        "resolved": "5.1.0",
+        "contentHash": "+4rA+NJ8MuK2DNwohYFVwa5BWc+fZYpcUOFa455g7sGHafvvx9xZ1ilBTaevmYtESHLGmMVmd1xO0Vo2NHRhAQ=="
       },
-      "ifm.Network.Scanner.Dcp": {
+      "ifm.IoTCore.Contracts": {
         "type": "Transitive",
-        "resolved": "1.0.11299",
-        "contentHash": "YDZ1Mcc4gAhJkpUB3lfd6HbEBODbRQweZI+FZo/6qCkvyU3fmQFbkuM2iEoeBcqO6Ch9Q2CN/SpCTNovr/KtjQ==",
+        "resolved": "7.0.0",
+        "contentHash": "X5qucQNBMUnPA/YVnKO0gMsG0wBzKQ3z2wX452RfqLN+hC8fXNYLu4MERbC7uKKND4oKQP1GVW8hrlSe9TZrEA==",
         "dependencies": {
-          "PacketDotNet": "1.3.0",
-          "SharpPcap": "6.1.0"
+          "ifm.DataStore.Contracts": "1.0.5",
+          "ifm.IoTCore.ElementManager.Contracts": "7.0.0",
+          "ifm.IoTCore.EventSender.Contracts": "6.1.0",
+          "ifm.IoTCore.MessageDispatcher.Contracts": "6.1.0",
+          "ifm.IoTCore.NetAdapterManager.Contracts": "6.1.0",
+          "ifm.IoTCore.PersistenceManager.Contracts": "6.1.0",
+          "ifm.IoTCore.UserManager.Contracts": "6.1.0",
+          "ifm.Logger.Contracts": "1.1.1"
         }
       },
-      "ifm.Network.Scanner.Eip": {
+      "ifm.IoTCore.ElementManager.Contracts": {
         "type": "Transitive",
-        "resolved": "1.0.11298",
-        "contentHash": "JybhjYj+GvX+dc2mSYt6ZURMCCqPNHFabNbJY68CICpEVvYZ53FxZpZd4KJYbgcwMDk7UIB8UyVPliN1/UgT+g=="
-      },
-      "IFM.SDK": {
-        "type": "Transitive",
-        "resolved": "1.11.1",
-        "contentHash": "wwOnHBDEqDIS4N0M010nN+4jX88sTarjFCiNN0WDsanbh9o7DcwkXzVvP+OoKHnpVWXSI+QF2eXPo0vethZe0A==",
+        "resolved": "7.0.0",
+        "contentHash": "ElklKtV71w36fU9qSrROGAjXfaSPtv++5cr3ea1nPCVoaFFPhSXrh0sExlkEHsILeR1RAhrDS+FpVjk26PGsqw==",
         "dependencies": {
-          "CommunityToolkit.Diagnostics": "8.2.2",
-          "CommunityToolkit.HighPerformance": "8.2.2",
-          "Microsoft.Extensions.Logging": "8.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
-          "Microsoft.Extensions.ObjectPool": "8.0.6",
-          "Nito.AsyncEx.Coordination": "5.1.2"
+          "ifm.Common": "1.0.0",
+          "ifm.IoTCore.Common": "6.1.0"
         }
       },
-      "ifmIoTCore": {
+      "ifm.IoTCore.EventSender.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "HjMSwbjRGBDGOSHBe/TswhJVDl3rUomSS/9ggIUkAfvRih4n/N0BQKbn/if65gtnsD2nPs427UD1KeXI9kcAtA==",
+        "resolved": "6.1.0",
+        "contentHash": "DRjAUWd3oOSNkLhTIZB8Awff080QGTUUVeBRAJ+GB7rlV1ToFVSax81/rvEkyCDQbZ3t34C5YASDx+wfLHhWDQ==",
         "dependencies": {
-          "ifmIoTCore.Common": "2.1.16",
-          "ifmIoTCore.Contracts": "2.1.16"
+          "ifm.Common": "1.0.0",
+          "ifm.IoTCore.Common": "6.1.0"
         }
       },
-      "ifmIoTCore.Common": {
+      "ifm.IoTCore.Message": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "Ot7IliyCYlS850nhb/S+ecwzoAx8mlxPduDJy0qPnhpnYzPabyeYHsvQOVAZeXdBJAnyMMDFN+xvsd6MR8wrNw=="
-      },
-      "ifmIoTCore.Contracts": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "wR2tBset2R1BoqHBtNufYCD2hu213e8hq3QqeEnue0N8ApZtVS7sJ4eFPodE+sZ+FffiGRsziO1tdtZgjOOkAQ==",
+        "resolved": "6.1.0",
+        "contentHash": "gsGOnsYK3d2ZtJPsAU4nFvWUYXDtxkmEy9BxQvIujzm8c5zdMWoiwcEvW+7w1tAuuZSldI6G+9q+k6qmnXAqiQ==",
         "dependencies": {
-          "ifmIoTCore.Common": "2.1.16"
+          "ifm.Common": "1.0.0"
         }
       },
-      "ifmIoTCore.IoddExtender": {
+      "ifm.IoTCore.MessageConverter.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "QPRl+6kW+QqI3XPbYZx3uaXHa6mXlGXK5lWWmD5RMoYiEMiKl5fVXFvGvfVtA/ulJBxQhFiDTxsb5t+8+5ZYNQ==",
+        "resolved": "6.1.0",
+        "contentHash": "oHroYj78OmsLCzTD4CwZpX7DhLLud3L02als2JneRUmOA13AGhuZCgemXoAexnR8AM5olF1nAEtJ4tzBAfCL0A==",
         "dependencies": {
-          "ifm.IoddManager": "1.6.9",
-          "ifmIoTCore": "2.1.16"
+          "ifm.IoTCore.Message": "6.1.0"
         }
       },
-      "ifmIoTCore.Logging.Log4Net": {
+      "ifm.IoTCore.MessageDispatcher.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "WeAdNJgWFnLyn0jwlE+dUTPOPaxk94o6AjWDs6ofKwCAMwsQA8uLs76bJUxNdf0+B/Ne4NNY9I74tpTCH1m2Nw==",
+        "resolved": "6.1.0",
+        "contentHash": "PL8bMDrIJOrmNjySV1zueqN0UgFWe1qWfRCk3qDncFamMmdpli8izBDg5Lsy1wFDbWiTMCu8VIhYPfjQXkwYsw==",
         "dependencies": {
-          "ifmIoTCore.Contracts": "2.1.16",
-          "log4net": "2.0.14"
+          "ifm.IoTCore.Message": "6.1.0"
         }
       },
-      "ifmIoTCore.MessageConverter.Json.Microsoft": {
+      "ifm.IoTCore.NetAdapter.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "zQLS/mitAuS6X6cQ/Q4pq02iHEbRe6FVvBGChGEB1Qsxkw5uveEivVy4IUUCEUiswbSkPAcl6joCgojQsg15Qg==",
+        "resolved": "6.1.0",
+        "contentHash": "n21Vtelg9NGu72ULckthIjolaEPObfyMJ7sPZ8SYiF3/W4dKD3tPkmuzEXeynsGFiPI5RNx8RGBgPiInMVVQbg==",
         "dependencies": {
-          "ifmIoTCore.Contracts": "2.1.16"
+          "ifm.IoTCore.Message": "6.1.0"
         }
       },
-      "ifmIoTCore.MessageConverter.Json.Newtonsoft": {
+      "ifm.IoTCore.NetAdapterManager.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "B0Pw1mhVDFlx37eLDL6BNlypkOvA/Dr+vKomIGXq37Ej9kB3jzUryUDEeQ48KDJqyDG3GtcYjnpI1TJ6DnpD2g==",
+        "resolved": "6.1.0",
+        "contentHash": "78sBPlqWFLLPEWGG7tWBD6647K0qLe5PNrScDdGoPP1ME8bY31fjNfDTL1YE7SSIv/H6qlrLSzcOWg9/PFI95w==",
         "dependencies": {
-          "Newtonsoft.Json": "13.0.1",
-          "Newtonsoft.Json.Bson": "1.0.2",
-          "ifmIoTCore.Contracts": "2.1.16"
+          "ifm.IoTCore.NetAdapter.Contracts": "6.1.0"
         }
       },
-      "ifmIoTCore.NetAdapter.Base": {
+      "ifm.IoTCore.PersistenceManager.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "uDMXKohluBuuPE81XSryLL5743oxriw4OINWbKfDe6e3MF4b4j+YGG2mbYF70/1QXUjoPSgT1Ny6plavGZ2EGA==",
+        "resolved": "6.1.0",
+        "contentHash": "uhyRJpnADT8RohzEjq/SXOEix0Vc79wJfaZENFCa7q23aDMYhqIOd4iF7uLI7Qj85RzeoqjXR7fS+C4WByu2ug==",
         "dependencies": {
-          "ifmIoTCore.Contracts": "2.1.16"
+          "ifm.Common": "1.0.0"
         }
       },
-      "ifmIoTCore.NetAdapter.CanOpen": {
+      "ifm.IoTCore.UserManager.Contracts": {
         "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "iNeT15BRebWNxfhinfq8ze0U9MMdIKcawlroLttg38I4sbX0h0363r4akGSDsoMINn9XrZrAw3gzkuqhQ/UUrw==",
+        "resolved": "6.1.0",
+        "contentHash": "SUs24hHojnY3kkulb1oj1pAFn402u5hn7joZr3Tzd0cTTz0ewUzl1sWuLi1OL6gc7gcElGKi1VtN7IFskw2Q0g==",
         "dependencies": {
-          "ifm.CiA301": "1.1.543",
-          "ifmIoTCore": "2.1.16"
-        }
-      },
-      "ifmIoTCore.NetAdapter.Http": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "+gN4JC9OiF9pSS039G/H0bVDd/U0gA0tXnBlyDorTL25GlqavRILi0XxmfiAaAUyTi1Cup0s3vV6gZw4JpBnMQ==",
-        "dependencies": {
-          "ifmIoTCore.NetAdapter.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.NetAdapter.Mqtt": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "OcQnT2UQYXFlrQc7VkvSFbWK4qFKkZEzVOKk8naDgeLPvnZZu82K3VSuXq5RMzjUrJlElhX7Vhkj8MNoMZJY9Q==",
-        "dependencies": {
-          "MQTTnet": "3.1.0",
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.NetAdapter.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.NetAdapter.Opc": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "/FM73chfJNpam1RiFzWlZAI+rmeqFle2DDbakXyKzovV6H7ymCaSjQV5yzlw2b8FOba7A/voKrEcD70zwAef6A==",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.1",
-          "UnifiedAutomation.UaBase": "3.0.10",
-          "UnifiedAutomation.UaBase.BouncyCastle": "3.0.10",
-          "UnifiedAutomation.UaServer": "3.0.10",
-          "ifm.IoddManager": "1.6.9",
-          "ifmIoTCore": "2.1.16"
-        }
-      },
-      "ifmIoTCore.NetAdapter.Protocol.Serial": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "YORZAKKa9x3uAkeCyR5MhKRLsCQzSE/BXrmReE3ZEtQ2mwaDxSwbQ9YrwfuP7ep3A+McGskZCO/j8SbHhIGCHA==",
-        "dependencies": {
-          "ifmIoTCore": "2.1.16"
-        }
-      },
-      "ifmIoTCore.NetAdapter.Serial": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "Mhwy9YXE4KiaV2GRpub5vPsap1iWXhS+uUEzlqo+WmfZUnssdrrJuVh/YSGluJpEB772y5j30xXHpNn+RAi4pA==",
-        "dependencies": {
-          "System.IO.Ports": "5.0.0",
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.NetAdapter.Base": "2.1.16",
-          "ifmIoTCore.NetAdapter.Protocol.Serial": "2.1.16"
-        }
-      },
-      "ifmIoTCore.NetAdapter.WebSocket": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "n7OMrAg0YN+sNY34jwSp/U/o+iYs5ZBrEMgAp9gC6+Cvt8QlurRilGHHEOc2fu2zt2vEhwe21FxlcmQIpggnHQ==",
-        "dependencies": {
-          "ifmIoTCore.Contracts": "2.1.16",
-          "ifmIoTCore.NetAdapter.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.Base": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "hqU7zqWqH6m9DvSDkR/FR4fosvSSwpsvY4XD5AGaYeSKnJxGGz7y54nOEKS4YWu3zm0NegVJDXvVcyycQzu/WA==",
-        "dependencies": {
-          "System.Configuration.ConfigurationManager": "6.0.0",
-          "ifmIoTCore.Contracts": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.Connection": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "2x5zHUiw6e2B9D4/TN+RthULuqextD9lpOctNQpPupEocxd8SMky9dtyiJ6Zaf3kn449yKrgQwmAkUMpLAh2Aw==",
-        "dependencies": {
-          "ifmIoTCore.Contracts": "2.1.16",
-          "ifmIoTCore.NetAdapter.CanOpen": "2.1.16",
-          "ifmIoTCore.NetAdapter.Http": "2.1.16",
-          "ifmIoTCore.NetAdapter.Mqtt": "2.1.16",
-          "ifmIoTCore.NetAdapter.Opc": "2.1.16",
-          "ifmIoTCore.NetAdapter.Serial": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.DeviceInfo": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "ilizNLiu0Dwd9ksJ4G5wI2S59Ed7uD5ASbjoz0j1QYkwGMFXnUJkLxQOR6IYibduSVAieEIYmP/KZfeXKOy1XA==",
-        "dependencies": {
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.DeviceManagement": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "4gXpcZT46ElQNOuZOKs1H9ayh6qBevo5JFqvVcUUK/PeJMwG1o4wOFNdhbX7UzNWuFMkQfYeRW/R2Xomy6Ff/A==",
-        "dependencies": {
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.DeviceScanner": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "a802t3hqmpgq0k2RHSuruLDTr481741/s+dROKk2BjpvyfkSEee2rZJoIznz1bBJNj3Mtms/bl+ZLLKVXNR4tg==",
-        "dependencies": {
-          "ifm.Network.Scanner.Dcp": "1.0.11299",
-          "ifm.Network.Scanner.Eip": "1.0.11298",
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.IoddExtender": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "hqOkas0qCYrKJgz6xgHusCLtw8cLJ9PUhEzgQ0BLZKp1EYliLdojGvynUGQGoaunsehDTGYmhEumDpbxf2TT3g==",
-        "dependencies": {
-          "ifmIoTCore.IoddExtender": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Profiles.IoTCoreManagement": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "iajWFdSTX3HTlX/YPa+yyxYGKMigOeR+/9EnXmzmn0VxqhXutAKwO985DBYd5E684+vAiIfoEzI/+z4v4aVU/Q==",
-        "dependencies": {
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16"
-        }
-      },
-      "ifmIoTCore.Sdk.2022.Lts": {
-        "type": "Transitive",
-        "resolved": "2.1.16",
-        "contentHash": "b+lFxLkiFUwfBufoc5NHk09Tv0MljF4IUHRYp7a6zwTHzKxuMfNu2GBsT8WM0Bs9S8jA1G013f3V5/5Z1azLWg==",
-        "dependencies": {
-          "ifmIoTCore": "2.1.16",
-          "ifmIoTCore.Common": "2.1.16",
-          "ifmIoTCore.Contracts": "2.1.16",
-          "ifmIoTCore.Logging.Log4Net": "2.1.16",
-          "ifmIoTCore.MessageConverter.Json.Microsoft": "2.1.16",
-          "ifmIoTCore.MessageConverter.Json.Newtonsoft": "2.1.16",
-          "ifmIoTCore.NetAdapter.Base": "2.1.16",
-          "ifmIoTCore.NetAdapter.Http": "2.1.16",
-          "ifmIoTCore.NetAdapter.Mqtt": "2.1.16",
-          "ifmIoTCore.NetAdapter.Opc": "2.1.16",
-          "ifmIoTCore.NetAdapter.WebSocket": "2.1.16",
-          "ifmIoTCore.Profiles.Base": "2.1.16",
-          "ifmIoTCore.Profiles.Connection": "2.1.16",
-          "ifmIoTCore.Profiles.DeviceInfo": "2.1.16",
-          "ifmIoTCore.Profiles.DeviceManagement": "2.1.16",
-          "ifmIoTCore.Profiles.DeviceScanner": "2.1.16",
-          "ifmIoTCore.Profiles.IoTCoreManagement": "2.1.16",
-          "ifmIoTCore.Profiles.IoddExtender": "2.1.16"
-        }
-      },
-      "Ixxat.Vci4.Core": {
-        "type": "Transitive",
-        "resolved": "4.0.439",
-        "contentHash": "pGRLmqRUVs/WvVOu/ydfA0bGfPIGlXy7pU8mFGFLhaU8bebK1BLaY57ixO9ZAAO0YFCSCQ41SOssjvx9+/1+Tg=="
-      },
-      "log4net": {
-        "type": "Transitive",
-        "resolved": "2.0.14",
-        "contentHash": "KevyXUuhOyhx7l1jWwq6ZGVlRC2Aetg0qDp6rJpfSZGcDPKQDwfOE6yEuVkVf0kEP08NQqBDn/TQ/TJv4wgyhw==",
-        "dependencies": {
-          "System.Configuration.ConfigurationManager": "4.5.0"
+          "ifm.IoTCore.Common": "6.1.0"
         }
       },
       "Microsoft.CodeCoverage": {
@@ -357,60 +161,10 @@
         "resolved": "18.3.0",
         "contentHash": "23BNy/vziREC20Wwhb50K7+kZe0m07KlLWDQv4qjJ9tt3QjpDpDIqJFrhYHmMEo9xDkuSp55U/8h4bMF7MiB+g=="
       },
-      "Microsoft.Extensions.DependencyInjection": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "V8S3bsm50ig6JSyrbcJJ8bW2b9QLGouz+G1miK3UTaOWmMtFwNNNzUf4AleyDWUmTrWMLNnFSLEQtxmxgNQnNQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
-        }
-      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
-      },
-      "Microsoft.Extensions.Logging": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "tvRkov9tAJ3xP51LCv3FJ2zINmv1P8Hi8lhhtcKGqM+ImiTCC84uOPEI4z8Cdq2C3o9e+Aa0Gw0rmrsJD77W+w==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection": "8.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.0"
-        }
-      },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
-        }
-      },
-      "Microsoft.Extensions.ObjectPool": {
-        "type": "Transitive",
-        "resolved": "8.0.6",
-        "contentHash": "p/wKtBfxVIP0RVQ9Pmtb3In8rnxWmxetZTiUzREtomnhi+y12I+JJMjAY3eiCd2Mhx+0U060ahP+9Ve/cjEmoA=="
-      },
-      "Microsoft.Extensions.Options": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "JOVOfqpnqlVLUzINQ2fox8evY2SKLYJ3BV8QDe/Jyp21u1T7r45x/R/5QdteURMR5r01GxeJSBBUOCOyaNXA3g==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Primitives": "8.0.0"
-        }
-      },
-      "Microsoft.Extensions.Primitives": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "bXJEZrW9ny8vjMF1JV253WeLhpEVzFo1lyaZu1vQ4ZxWUlVvknZ/+ftFgVheLubb4eZPSwwxBeqS1JkCOjxd8g=="
-      },
-      "Microsoft.NETCore.Platforms": {
-        "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "ok+RPAtESz/9MUXeIEz6Lv5XAGQsaNmEYXMsgVALj4D7kqC8gveKWXWXbufLySR2fWrwZf8smyN5RmHu0e4BHA=="
+        "resolved": "10.0.10",
+        "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
@@ -426,189 +180,10 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
-      "Microsoft.Win32.SystemEvents": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "hqTM5628jSsQiv+HGpiq3WKBl2c8v1KZfby2J6Pr7pEPlK9waPdgEO6b8A/+/xn/yZ9ulv8HuqK71ONy2tg67A=="
-      },
-      "MQTTnet": {
-        "type": "Transitive",
-        "resolved": "3.1.0",
-        "contentHash": "DXrYh/QTOKrKmfEnxATJ1Qc0uw3FwU375+2Z2tlKmiNV6Y1zpEwK9zfjKZriQynrZImadIqczRV5Fuw8GO8+Gg=="
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
-      },
-      "Newtonsoft.Json.Bson": {
-        "type": "Transitive",
-        "resolved": "1.0.2",
-        "contentHash": "QYFyxhaABwmq3p/21VrZNYvCg3DaEoN/wUuw5nmfAf0X3HLjgupwhkEWdgfb9nvGAUIv3osmZoD3kKl4jxEmYQ==",
-        "dependencies": {
-          "Newtonsoft.Json": "12.0.1"
-        }
-      },
-      "Nito.AsyncEx.Coordination": {
-        "type": "Transitive",
-        "resolved": "5.1.2",
-        "contentHash": "QMyUfsaxov//0ZMbOHWr9hJaBFteZd66DV1ay4J5wRODDb8+K/uHC7+3VsOflo6SVw/29mu8OWZp8vMDSuzc0w==",
-        "dependencies": {
-          "Nito.AsyncEx.Tasks": "5.1.2",
-          "Nito.Collections.Deque": "1.1.1"
-        }
-      },
-      "Nito.AsyncEx.Tasks": {
-        "type": "Transitive",
-        "resolved": "5.1.2",
-        "contentHash": "jEkCfR2/M26OK/U4G7SEN063EU/F4LiVA06TtpZILMdX/quIHCg+wn31Zerl2LC+u1cyFancjTY3cNAr2/89PA==",
-        "dependencies": {
-          "Nito.Disposables": "2.2.1"
-        }
-      },
-      "Nito.Collections.Deque": {
-        "type": "Transitive",
-        "resolved": "1.1.1",
-        "contentHash": "CU0/Iuv5VDynK8I8pDLwkgF0rZhbQoZahtodfL0M3x2gFkpBRApKs8RyMyNlAi1mwExE4gsmqQXk4aFVvW9a4Q=="
-      },
-      "Nito.Disposables": {
-        "type": "Transitive",
-        "resolved": "2.2.1",
-        "contentHash": "6sZ5uynQeAE9dPWBQGKebNmxbY4xsvcc5VplB5WkYEESUS7oy4AwnFp0FhqxTSKm/PaFrFqLrYr696CYN8cugg=="
-      },
-      "Portable.BouncyCastle": {
-        "type": "Transitive",
-        "resolved": "1.8.4",
-        "contentHash": "kleoNuRemLFSGPGM0sOp3MAJTHxXEHTujt+wIEffWJ/CqLEzZv8fgyXoE8LHY61dVGRugovDfKEEnkhtUuB48Q=="
-      },
-      "runtime.linux-arm.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "Np6w3r1dSFB930GGZHIKCc5ZClRXZIqOrCAT0pzcd/zXnsZPvGqLZB1MnxAbVhvriJl71B0N0tJaaT1ICWXsyg=="
-      },
-      "runtime.linux-arm64.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "VnGZmQ7pzMNkcTVdmGtXUQIbytK4Xk8F4/mxm0I+n7zbrsW/WNgLrWMTv9pb2Uyq09azXazNDQhZao4R4ebWcw=="
-      },
-      "runtime.linux-x64.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "kvMZgZjtcC6cA8Y8imKpjCpiOJKDtwlNekS86GzUol4Jmzh0FWiRwAj4E9ZKO8R7rTBGIA4rkmra9Ko8j7l6AA=="
-      },
-      "runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0",
-        "contentHash": "ME+/evR+UxVlWyGHUlLBoNTnsTdaylMbnvVwOp0Nl6XIZGGyXdqJqjlEew7e6TcKkJAA0lljhjKi3Kie+vzQ7g==",
-        "dependencies": {
-          "runtime.linux-arm.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
-          "runtime.linux-arm64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
-          "runtime.linux-x64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
-          "runtime.osx-x64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4"
-        }
-      },
-      "runtime.osx-x64.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "N+dbbqhT7JBnPVHa7n2+Z5fHYO4a4UUhm7cQkbuQQoNkjbxLpxYnQ4lpRjr1RuQptqYkPmunKvN5etdFOObaiw=="
-      },
-      "System.Configuration.ConfigurationManager": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "7T+m0kDSlIPTHIkPMIu6m6tV6qsMqJpvQWW2jIc2qi7sn40qxFo0q+7mEQAhMPXZHMKnWrnv47ntGlM/ejvw3g==",
-        "dependencies": {
-          "System.Security.Cryptography.ProtectedData": "6.0.0",
-          "System.Security.Permissions": "6.0.0"
-        }
-      },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
         "resolved": "6.0.0",
         "contentHash": "lcyUiXTsETK2ALsZrX+nWuHSIQeazhqPphLfaRxzdGaG93+0kELqpgEHtwWOlQe7+jSFnKwaCAgL4kjeZCQJnw=="
-      },
-      "System.Drawing.Common": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
-        "dependencies": {
-          "Microsoft.Win32.SystemEvents": "6.0.0"
-        }
-      },
-      "System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0",
-        "contentHash": "MZY/0cgRg5bcuvHR4LKHqWnlxWV7GkoTgBaOdwIoWGZKsfSBC1twDz+BzG0o1Rk46WdRhhV30E2qzsBABHwGUA==",
-        "dependencies": {
-          "runtime.native.System.IO.Ports": "5.0.0"
-        }
-      },
-      "System.Private.ServiceModel": {
-        "type": "Transitive",
-        "resolved": "4.5.3",
-        "contentHash": "ancrQgJagx+yC4SZbuE+eShiEAUIF0E1d21TRSoy1C/rTwafAVcBr/fKibkq5TQzyy9uNil2tx2/iaUxsy0S9g==",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "2.1.0"
-        }
-      },
-      "System.Reflection.TypeExtensions": {
-        "type": "Transitive",
-        "resolved": "4.5.1",
-        "contentHash": "fO8GMEkgoKioJ7cglZbhcnBgkCWWn9poS3G2jevS+fuwW9xJXMx7/1kr7dkwOJfo0pWqxLFWVcxlOr+WeK5ipA=="
-      },
-      "System.Security.Cryptography.ProtectedData": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "rp1gMNEZpvx9vP0JW0oHLxlf8oSiQgtno77Y4PLUBjSiDYoD77Y8uXHr1Ea5XG4/pIKhqAdxZ8v8OTUtqo9PeQ=="
-      },
-      "System.Security.Permissions": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "T/uuc7AklkDoxmcJ7LGkyX1CcSviZuLCa4jg3PekfJ7SU0niF0IVTXwUiNVP9DSpzou2PpxJ+eNY2IfDM90ZCg==",
-        "dependencies": {
-          "System.Windows.Extensions": "6.0.0"
-        }
-      },
-      "System.ServiceModel.Primitives": {
-        "type": "Transitive",
-        "resolved": "4.5.3",
-        "contentHash": "Wc9Hgg4Cmqi416zvEgq2sW1YYCGuhwWzspDclJWlFZqY6EGhFUPZU+kVpl5z9kAgrSOQP7/Uiik+PtSQtmq+5A==",
-        "dependencies": {
-          "System.Private.ServiceModel": "4.5.3"
-        }
-      },
-      "System.Windows.Extensions": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "IXoJOXIqc39AIe+CIR7koBtRGMiCt/LPM3lI+PELtDIy9XdyeSrwXFdWV9dzJ2Awl0paLWUaknLxFQ5HpHZUog==",
-        "dependencies": {
-          "System.Drawing.Common": "6.0.0"
-        }
-      },
-      "UnifiedAutomation.UaBase": {
-        "type": "Transitive",
-        "resolved": "3.0.10",
-        "contentHash": "zxrTiG6AB6Wi5E5kaXyd24i8PZ2WsqgQZhYMUnJ6cDKpPVIaxRyMD/dX2uEuwthUAHW1YL2Mw2Y4qb/JdLpC6w==",
-        "dependencies": {
-          "System.Reflection.TypeExtensions": "4.5.1",
-          "System.ServiceModel.Primitives": "4.5.3"
-        }
-      },
-      "UnifiedAutomation.UaBase.BouncyCastle": {
-        "type": "Transitive",
-        "resolved": "3.0.10",
-        "contentHash": "5Q98/IgQzf9CraR4TIKGX7V6l9dvEHI01dCVU9NxCL+5Z5uNbnWcl/cMWvRylAhTOIQDXrVejldJXql+5ge7MA==",
-        "dependencies": {
-          "Portable.BouncyCastle": "1.8.4",
-          "UnifiedAutomation.UaBase": "3.0.10"
-        }
-      },
-      "UnifiedAutomation.UaServer": {
-        "type": "Transitive",
-        "resolved": "3.0.10",
-        "contentHash": "2fLW2zaRuhAbwtCgcyTOFM2Y8uf2xQ8711WxXOQyUi2YUWcrWW2EAIyw97WzxzTpM9EivSzMJi9cCkWJBQXEcA==",
-        "dependencies": {
-          "UnifiedAutomation.UaBase": "3.0.10"
-        }
       },
       "ViciOne.Core.Contracts": {
         "type": "Transitive",
@@ -666,56 +241,172 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "vicione.communication.iotcore": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )",
+          "Newtonsoft.Json": "[13.0.3, )",
+          "PacketDotNet": "[1.4.8, )",
+          "SharpPcap": "[6.3.1, )",
+          "ViciOne.DeviceTree.Contracts": "[2.0.2, )",
+          "ifm.IoTCore": "[7.0.0, )",
+          "ifm.IoTCore.Common": "[6.1.0, )",
+          "ifm.IoTCore.NetAdapter.Http.Client": "[2.0.1, )",
+          "ifm.IoddParser": "[5.1.0, )",
+          "ifm.IoddParser.Helpers": "[5.1.0, )",
+          "ifm.Logger.Contracts": "[2.0.0, )"
+        }
+      },
+      "vicione.devicetree.contracts": {
+        "type": "Project"
+      },
       "vicione.driver.iotcore": {
         "type": "Project",
         "dependencies": {
-          "ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts": "[4.4.0, )",
-          "PacketDotNet": "[1.4.8, )",
-          "SharpPcap": "[6.3.1, )",
-          "ViciOne.Driver.IoTCore.Contracts": "[2.0.0, )",
+          "ViciOne.Communication.IoTCore": "[2.0.2, )",
+          "ViciOne.DeviceTree.Contracts": "[2.0.2, )",
           "ViciOne.Engine.DefaultValidators": "[1.0.0, )",
-          "ifm.IoddParser": "[4.1.2, )",
-          "ifm.IoddParser.Helpers": "[4.1.2, )",
-          "ifm.diagnostic.VSEIotCore": "[2.2.3, )"
+          "ifm.DataStore": "[2.0.1, )",
+          "ifm.IoTCore": "[7.0.0, )",
+          "ifm.IoTCore.Common": "[6.1.0, )",
+          "ifm.IoTCore.Device.Contracts": "[7.1.1, )",
+          "ifm.IoTCore.Device.IoTCore": "[7.1.3, )",
+          "ifm.IoTCore.MessageConverter.Json": "[6.1.1, )",
+          "ifm.IoTCore.NetAdapter.Http.Client": "[2.0.1, )",
+          "ifm.IoTCore.Profile.DeviceManagement": "[7.4.5, )",
+          "ifm.IoddParser": "[5.1.0, )",
+          "ifm.IoddParser.Helpers": "[5.1.0, )",
+          "ifm.Logger.Contracts": "[2.0.0, )"
         }
       },
-      "vicione.driver.iotcore.contracts": {
-        "type": "Project"
-      },
-      "ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts": {
+      "ifm.DataStore": {
         "type": "CentralTransitive",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "dpwq6W8YiS4tQnfmQgeUWS76GI+FqXMyFE4dA8Pxn5XV9rNVEaazaK1P2C5DsEwsI01YarOzu7qMVb+vTVTw1g=="
-      },
-      "ifm.diagnostic.VSEIotCore": {
-        "type": "CentralTransitive",
-        "requested": "[2.2.3, )",
-        "resolved": "2.2.3",
-        "contentHash": "ocUg1s34gDD26Yxg6q7dxfQE538aRIwTD72T74wf0U1dceEVPvmeoB+WPgEmpu5H6ECvkmQAQEdw6HnneYcGCg==",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "a+xI2qkq+23ILJDfeVS764MPHOr5Spniasl3GtY+6eZ15zeQ7zxO+P658HwaEBl7bpJ03sOwtT/6TNJsd5Yubg==",
         "dependencies": {
-          "IFM.SDK": "1.11.1",
-          "ifmIoTCore.NetAdapter.Http": "2.1.16",
-          "ifmIoTCore.Sdk.2022.Lts": "2.1.16"
+          "ifm.DataStore.Contracts": "2.0.0"
         }
       },
       "ifm.IoddParser": {
         "type": "CentralTransitive",
-        "requested": "[4.1.2, )",
-        "resolved": "4.1.2",
-        "contentHash": "4iXAt8OOiLKqWO7XytKJdaw7UCSTRo/AlVEBsKRKToOvI8cwMWrT0jH//7+RrzO1RErRgnukHOHYpSsQ1FfgBA==",
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "nuIi2VTzyGmWsr/c4RQLfZmcOfbS3HcjTjQy5AM9uTeuE2h+5g30V1vf3MwO9q8xN9ihRAyXPYb4nlbVL0VepQ==",
         "dependencies": {
-          "ifm.IoddParser.Contracts": "4.1.1"
+          "ifm.IoddParser.Contracts": "5.1.0"
         }
       },
       "ifm.IoddParser.Helpers": {
         "type": "CentralTransitive",
-        "requested": "[4.1.2, )",
-        "resolved": "4.1.2",
-        "contentHash": "w90wj5oR/zRnHH2w6aflYUSwyM/NISXTGGWc37xGLQC8eQYCLGnIGNAxmFA4H6jmbSTK1S7Xn07TgkOx3WeC0Q==",
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "5lxUVcCjPR+jsNpILQUUoEwbK764Du3z4/+8MYvOOtD3soKY0wHWsADy3PCvvcWM4ZQ8Y+x5/BNCftSNluj5Dw==",
         "dependencies": {
-          "ifm.IoddParser.Contracts": "4.1.1"
+          "ifm.IoddParser.Contracts": "5.1.0"
         }
+      },
+      "ifm.IoTCore": {
+        "type": "CentralTransitive",
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "2F4J64U48mFpOSZZLILsiBLBm7uYBKUpSacAJ89bYvWOlyDZyYEO9ZUXyPa92KorprJbuI+Cb9MCij0wkRVGWg==",
+        "dependencies": {
+          "ifm.Common": "1.0.0",
+          "ifm.DataStore.Contracts": "1.0.5",
+          "ifm.IoTCore.Common": "6.1.0",
+          "ifm.IoTCore.Contracts": "7.0.0",
+          "ifm.Logger.Contracts": "1.1.1"
+        }
+      },
+      "ifm.IoTCore.Common": {
+        "type": "CentralTransitive",
+        "requested": "[6.1.0, )",
+        "resolved": "6.1.0",
+        "contentHash": "bGRsrRw5EvXYyZmYMBCICgK87Awk8ug8P84Uy4DzD4wf1R105z6bDLakxSNB9XMxBYddMQsbrFa+Iuv3NxuHoA==",
+        "dependencies": {
+          "ifm.Common": "1.0.0"
+        }
+      },
+      "ifm.IoTCore.Device.Contracts": {
+        "type": "CentralTransitive",
+        "requested": "[7.1.1, )",
+        "resolved": "7.1.1",
+        "contentHash": "gQ35lKTjqjpIclbvVrXm2EfKU1Ef18lzO7njT4LClydl5xNvFL7oSNTtppW6rWJWX/3sVxdBh9ZdoYoJ/ap1mg==",
+        "dependencies": {
+          "ifm.IoTCore.ElementManager.Contracts": "7.0.0",
+          "ifm.IoTCore.Message": "6.1.0"
+        }
+      },
+      "ifm.IoTCore.Device.IoTCore": {
+        "type": "CentralTransitive",
+        "requested": "[7.1.3, )",
+        "resolved": "7.1.3",
+        "contentHash": "BD3qF640cI75K/eU97/ztF2Iev6cFnafrUmVnUVC0MRhknmumZ09ZJf43hgsgfzg0iPPM/JzwnPIXfqdnZXpwQ==",
+        "dependencies": {
+          "ifm.Common": "1.0.0",
+          "ifm.IoTCore.Common": "6.1.0",
+          "ifm.IoTCore.Contracts": "7.0.0",
+          "ifm.IoTCore.Device.Contracts": "7.1.1",
+          "ifm.IoTCore.NetAdapterManager.Contracts": "6.1.0"
+        }
+      },
+      "ifm.IoTCore.MessageConverter.Json": {
+        "type": "CentralTransitive",
+        "requested": "[6.1.1, )",
+        "resolved": "6.1.1",
+        "contentHash": "9lcj5MhjhAgSNECZaXZD38AcaSZcXY6UjTam4McWgnHqvF/X39lYch3ADmU0YbR+PRBPKRV8ar1aDhUdNfo3cQ==",
+        "dependencies": {
+          "ifm.IoTCore.Common": "6.1.0",
+          "ifm.IoTCore.MessageConverter.Contracts": "6.1.0"
+        }
+      },
+      "ifm.IoTCore.NetAdapter.Http.Client": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "10hAb1IvW9awOgGbX4j/XY5O1TR2hfgml77fS0UBU0TH2S4cH0QNDEyyxyabdmJaRMIyPAjJr7gBTUIxDSYPOA==",
+        "dependencies": {
+          "ifm.Common": "1.0.0",
+          "ifm.IoTCore.Common": "6.1.0",
+          "ifm.IoTCore.Message": "6.1.0",
+          "ifm.IoTCore.MessageConverter.Contracts": "6.1.0",
+          "ifm.IoTCore.NetAdapter.Contracts": "6.1.0",
+          "ifm.Logger.Contracts": "1.1.1"
+        }
+      },
+      "ifm.IoTCore.Profile.DeviceManagement": {
+        "type": "CentralTransitive",
+        "requested": "[7.4.5, )",
+        "resolved": "7.4.5",
+        "contentHash": "aoxNK4W7WD1zRLXflYfKBtHLKlOrmFKBeVGpcacxTakOdcsemg/V+NCamPo6G6tisjC7jf9JIIqHGf2zHvJ+lg==",
+        "dependencies": {
+          "ifm.DataStore.Contracts": "1.0.5",
+          "ifm.IoTCore.Contracts": "7.0.0",
+          "ifm.IoTCore.Device.Contracts": "7.1.1",
+          "ifm.IoTCore.NetAdapterManager.Contracts": "6.1.0"
+        }
+      },
+      "ifm.Logger.Contracts": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.0, )",
+        "resolved": "2.0.0",
+        "contentHash": "7/HbNJxddztvH6DQfWXX+fHMX5cSK3/nKyDHlqrGueAZxJ8hGsNIr8gW5HmSKBKRhbbrKqs8umKcR/BAupCaPQ=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.10, )",
+        "resolved": "10.0.10",
+        "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
+        }
+      },
+      "Newtonsoft.Json": {
+        "type": "CentralTransitive",
+        "requested": "[13.0.3, )",
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "PacketDotNet": {
         "type": "CentralTransitive",

@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ViciOne.Driver.IoTCore.Contracts\ViciOne.Driver.IoTCore.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\ViciOne.DeviceTree.Contracts\ViciOne.DeviceTree.Contracts.csproj" />
     <ProjectReference Include="..\..\src\ViciOne.Driver.IoTCore\ViciOne.Driver.IoTCore.csproj" />
   </ItemGroup>
 

@@ -106,19 +106,6 @@
         "resolved": "1.0.11298",
         "contentHash": "JybhjYj+GvX+dc2mSYt6ZURMCCqPNHFabNbJY68CICpEVvYZ53FxZpZd4KJYbgcwMDk7UIB8UyVPliN1/UgT+g=="
       },
-      "IFM.SDK": {
-        "type": "Transitive",
-        "resolved": "1.11.1",
-        "contentHash": "wwOnHBDEqDIS4N0M010nN+4jX88sTarjFCiNN0WDsanbh9o7DcwkXzVvP+OoKHnpVWXSI+QF2eXPo0vethZe0A==",
-        "dependencies": {
-          "CommunityToolkit.Diagnostics": "8.2.2",
-          "CommunityToolkit.HighPerformance": "8.2.2",
-          "Microsoft.Extensions.Logging": "8.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
-          "Microsoft.Extensions.ObjectPool": "8.0.6",
-          "Nito.AsyncEx.Coordination": "5.1.2"
-        }
-      },
       "ifmIoTCore": {
         "type": "Transitive",
         "resolved": "2.1.16",
@@ -384,14 +371,6 @@
           "Microsoft.Extensions.Options": "8.0.0"
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
-        }
-      },
       "Microsoft.Extensions.ObjectPool": {
         "type": "Transitive",
         "resolved": "8.0.6",
@@ -425,11 +404,6 @@
         "type": "Transitive",
         "resolved": "3.1.0",
         "contentHash": "DXrYh/QTOKrKmfEnxATJ1Qc0uw3FwU375+2Z2tlKmiNV6Y1zpEwK9zfjKZriQynrZImadIqczRV5Fuw8GO8+Gg=="
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.1",
-        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
       "Newtonsoft.Json.Bson": {
         "type": "Transitive",
@@ -611,8 +585,34 @@
           "ViciOne.Core.Contracts": "1.0.0"
         }
       },
-      "vicione.driver.iotcore.contracts": {
-        "type": "Project"
+      "IFM.SDK": {
+        "type": "CentralTransitive",
+        "requested": "[1.13.0, )",
+        "resolved": "1.11.1",
+        "contentHash": "wwOnHBDEqDIS4N0M010nN+4jX88sTarjFCiNN0WDsanbh9o7DcwkXzVvP+OoKHnpVWXSI+QF2eXPo0vethZe0A==",
+        "dependencies": {
+          "CommunityToolkit.Diagnostics": "8.2.2",
+          "CommunityToolkit.HighPerformance": "8.2.2",
+          "Microsoft.Extensions.Logging": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
+          "Microsoft.Extensions.ObjectPool": "8.0.6",
+          "Nito.AsyncEx.Coordination": "5.1.2"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.10, )",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
+        }
+      },
+      "Newtonsoft.Json": {
+        "type": "CentralTransitive",
+        "requested": "[13.0.3, )",
+        "resolved": "13.0.1",
+        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       }
     },
     "net10.0/linux-arm64": {

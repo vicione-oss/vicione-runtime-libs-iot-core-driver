@@ -20,7 +20,6 @@
     <Project Path="src/ViciOne.Communication.IoTCore/ViciOne.Communication.IoTCore.csproj" />
     <Project Path="src/ViciOne.Communication.Vse/ViciOne.Communication.Vse.csproj" />
     <Project Path="src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj" />
-    <Project Path="src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj" />
     <Project Path="src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj" />
   </Folder>
   <Folder Name="/tests/">
