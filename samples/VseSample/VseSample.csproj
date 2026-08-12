@@ -9,13 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ViciOne.Driver.IoTCore\ViciOne.Driver.IoTCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts">
-      <HintPath>..\..\lib\ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\src\ViciOne.Driver.Vse\ViciOne.Driver.Vse.csproj" />
   </ItemGroup>
 
 </Project>
