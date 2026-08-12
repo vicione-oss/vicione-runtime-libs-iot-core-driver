@@ -7,8 +7,9 @@
   <ItemGroup>
     <PackageReference Include="ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts" />
     <PackageReference Include="ifm.diagnostic.VSEIotCore" />
-    <PackageReference Include="ifm.IoddParser" />
-    <PackageReference Include="ifm.IoddParser.Helpers" />
+    <!-- TODO: drop overrides once this project is migrated onto the new ifm.IoTCore SDK generation. -->
+    <PackageReference Include="ifm.IoddParser" VersionOverride="4.1.2" />
+    <PackageReference Include="ifm.IoddParser.Helpers" VersionOverride="4.1.2" />
     <PackageReference Include="PacketDotNet" />
     <PackageReference Include="SharpPcap" />
     <PackageReference Include="ViciOne.Engine.DefaultValidators" />
