@@ -3,8 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <!-- TODO: drop once the samples no longer reference this. -->
-    <PackageVersion Include="ifm.diagnostic.VSEIotCore" Version="2.2.3" />
     <PackageVersion Include="ifm.SDK" Version="1.13.0" />
     <PackageVersion Include="ifm.IoTCore" Version="7.0.0" />
     <PackageVersion Include="ifm.IoTCore.Common" Version="6.1.0" />
