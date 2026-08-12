@@ -70,7 +70,7 @@
       "ifm.IoTCore.Contracts": {
         "type": "Transitive",
         "resolved": "7.0.0",
-        "contentHash": "X5qucQNBMUnPA/YVnKO0gMsG0wBzKQ3z2wX452RfqLN+hC8fXNYLu4MERbC7uKKND4oKQP1GVW8hrlSe9TZrEA==",
+        "contentHash": "yDTXWlRi4FxzGzex2FZQ1HtGkeGDcWYqc0F/nYur8TAYzNP2/e8I7PmDOCIqVIJkxrxLaRRQ0cxQnbnuatayGQ==",
         "dependencies": {
           "ifm.DataStore.Contracts": "1.0.5",
           "ifm.IoTCore.ElementManager.Contracts": "7.0.0",
@@ -85,7 +85,7 @@
       "ifm.IoTCore.ElementManager.Contracts": {
         "type": "Transitive",
         "resolved": "7.0.0",
-        "contentHash": "ElklKtV71w36fU9qSrROGAjXfaSPtv++5cr3ea1nPCVoaFFPhSXrh0sExlkEHsILeR1RAhrDS+FpVjk26PGsqw==",
+        "contentHash": "r3y5ajMOw6j6v1zAeCdg/0DmsqU6Sopk0WxNXbhQrYEfeka+cY4E3daURNH/jbUxMEF0gvY43SVZqdhnXZoPew==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.IoTCore.Common": "6.1.0"
@@ -266,7 +266,7 @@
         "type": "CentralTransitive",
         "requested": "[7.0.0, )",
         "resolved": "7.0.0",
-        "contentHash": "2F4J64U48mFpOSZZLILsiBLBm7uYBKUpSacAJ89bYvWOlyDZyYEO9ZUXyPa92KorprJbuI+Cb9MCij0wkRVGWg==",
+        "contentHash": "Z2ncOEj/8HXqKt8xQxheBA1FVM2s2eMUg5EmTXZaUXu/9QIIeRALfb+aSX0xk5QITwoVt/58SBJn4bN0YLwQ6A==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.DataStore.Contracts": "1.0.5",
