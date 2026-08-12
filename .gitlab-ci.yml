@@ -12,17 +12,65 @@ Build:
 
 Test:
   extends: .dotnet-test-xunit
-  
-Deploy NuGet Contracts:
+
+Deploy NuGet DeviceTree Contracts:
   extends: .dotnet-deploy-nuget
   variables:
-    PROJECT: 'src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj'
+    PROJECT: 'src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj'
     REPO: 'JFrogViciOne'
 
-Release NuGet Contracts:
+Release NuGet DeviceTree Contracts:
   extends: .dotnet-release-nuget
   variables:
-    PROJECT: 'src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj'
+    PROJECT: 'src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Communication IoTCore:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.IoTCore/ViciOne.Communication.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Communication IoTCore:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.IoTCore/ViciOne.Communication.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Communication Vse:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.Vse/ViciOne.Communication.Vse.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Communication Vse:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.Vse/ViciOne.Communication.Vse.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Driver IoTCore:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Driver IoTCore:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Driver Vse:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Driver Vse:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
     REPO: 'JFrogViciOne'
 
 Prerelease Raw:
