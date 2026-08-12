@@ -17,6 +17,7 @@
     <Project Path="samples/VseSample/VseSample.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj" />
     <Project Path="src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj" />
     <Project Path="src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj" />
   </Folder>
