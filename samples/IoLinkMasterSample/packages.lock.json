@@ -229,7 +229,6 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )",
-          "Newtonsoft.Json": "[13.0.3, )",
           "PacketDotNet": "[1.4.8, )",
           "SharpPcap": "[6.3.1, )",
           "ViciOne.DeviceTree.Contracts": "[2.0.2, )",
@@ -385,12 +384,6 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
         }
-      },
-      "Newtonsoft.Json": {
-        "type": "CentralTransitive",
-        "requested": "[13.0.3, )",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "PacketDotNet": {
         "type": "CentralTransitive",

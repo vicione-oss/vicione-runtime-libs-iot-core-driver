@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace ViciOne.Communication.IoTCore.Recording;
 
@@ -39,7 +39,7 @@ internal static class HttpRequestMessageExtensions
     /// <returns><paramref name="message"/>, for chaining.</returns>
     private static HttpRequestMessage AddJsonContent(this HttpRequestMessage message, object content)
     {
-        message.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+        message.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
         return message;
     }
 
@@ -51,7 +51,7 @@ internal static class HttpRequestMessageExtensions
     /// <returns>The property's value, converted to <typeparamref name="T"/>.</returns>
     public static T GetJsonPropertyValue<T>(this string input, string property)
     {
-        string result = JObject.Parse(input)[property]?.ToString() ?? string.Empty;
+        string result = JsonNode.Parse(input)?[property]?.ToString() ?? string.Empty;
         return (T)Convert.ChangeType(result, typeof(T), CultureInfo.InvariantCulture);
     }
 
@@ -65,7 +65,7 @@ internal static class HttpRequestMessageExtensions
     /// <returns>The nested property's value, converted to <typeparamref name="T"/>.</returns>
     public static T GetJsonPropertyValue<T>(this string input, string property1, string property2)
     {
-        string result = JObject.Parse(input)[property1]?[property2]?.ToString() ?? string.Empty;
+        string result = JsonNode.Parse(input)?[property1]?[property2]?.ToString() ?? string.Empty;
         return (T)Convert.ChangeType(result, typeof(T), CultureInfo.InvariantCulture);
     }
 

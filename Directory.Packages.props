@@ -16,7 +16,6 @@
     <PackageVersion Include="ifm.Logger.Contracts" Version="2.0.0" />
     <PackageVersion Include="ifm.IoddParser" Version="5.1.0" />
     <PackageVersion Include="ifm.IoddParser.Helpers" Version="5.1.0" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.5" />
     <PackageVersion Include="PacketDotNet" Version="1.4.8" />

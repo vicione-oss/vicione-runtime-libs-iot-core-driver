@@ -12,7 +12,6 @@
     <PackageReference Include="ifm.IoTCore.NetAdapter.Http.Client" />
     <PackageReference Include="ifm.Logger.Contracts" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="PacketDotNet" />
     <PackageReference Include="SharpPcap" />
   </ItemGroup>
