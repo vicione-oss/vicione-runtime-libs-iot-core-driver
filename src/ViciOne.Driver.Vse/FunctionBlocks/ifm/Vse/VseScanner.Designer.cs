@@ -12,7 +12,7 @@ namespace ifm.Vse;
 /// </summary>
 [FunctionBlockDesign("e909ab02-03d4-43a8-8af1-dfebf836c5d7", "bba9266c-ac2b-4ebc-a5cd-4bd57c68e80b", "db579e4b-ef94-4721-957d-5088dc566aca")]
 [Description("Scans the local network for VSE devices.")]
-public partial class VseFinder : RuntimeFunctionBlock<VseFinder>
+public partial class VseScanner : RuntimeFunctionBlock<VseScanner>
 {
     /// <summary>
     /// The FunctionBlock's process data inputs.
@@ -20,7 +20,7 @@ public partial class VseFinder : RuntimeFunctionBlock<VseFinder>
     public new Inputs_ ProcessDataInputs { get; } = new Inputs_();
 
     /// <summary>
-    /// The process data inputs of <see cref="VseFinder"/>.
+    /// The process data inputs of <see cref="VseScanner"/>.
     /// </summary>
     [InputConnectorDesigns]
     public class Inputs_
@@ -39,7 +39,7 @@ public partial class VseFinder : RuntimeFunctionBlock<VseFinder>
     public new Outputs_ ProcessDataOutputs { get; } = new Outputs_();
 
     /// <summary>
-    /// The process data outputs of <see cref="VseFinder"/>.
+    /// The process data outputs of <see cref="VseScanner"/>.
     /// </summary>
     [OutputConnectorDesigns]
     public class Outputs_

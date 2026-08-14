@@ -12,7 +12,7 @@ using ViciOne.DeviceTree.Contracts.Scanning;
 
 namespace ifm.IOLink;
 
-public sealed partial class IoLinkMasterFinder
+public sealed partial class IoLinkMasterScanner
 {
     private const string IoLinkMasterIdentifier = "ifm IO-Link Master AL";
 

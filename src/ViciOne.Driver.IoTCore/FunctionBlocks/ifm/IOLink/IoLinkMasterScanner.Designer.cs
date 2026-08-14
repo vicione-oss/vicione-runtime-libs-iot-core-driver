@@ -14,7 +14,7 @@ namespace ifm.IOLink;
 /// </summary>
 [FunctionBlockDesign("87f58ff5-f65a-4572-8e44-b9afe662ef72", "bbf81971-18fb-4e9d-a95f-53844d9ba688", "4b0486b3-3887-40c5-8b10-b17c85db0d34")]
 [Description("Scans the local network for ifm IO-Link masters via PROFINET DCP and checks each found master's HTTP reachability.")]
-public partial class IoLinkMasterFinder : RuntimeFunctionBlock<IoLinkMasterFinder>
+public partial class IoLinkMasterScanner : RuntimeFunctionBlock<IoLinkMasterScanner>
 {
     /// <summary>
     /// The FunctionBlock's process data inputs.
@@ -22,7 +22,7 @@ public partial class IoLinkMasterFinder : RuntimeFunctionBlock<IoLinkMasterFinde
     public new Inputs_ ProcessDataInputs { get; } = new Inputs_();
 
     /// <summary>
-    /// The process data inputs of <see cref="IoLinkMasterFinder"/>.
+    /// The process data inputs of <see cref="IoLinkMasterScanner"/>.
     /// </summary>
     [InputConnectorDesigns]
     public class Inputs_
@@ -41,7 +41,7 @@ public partial class IoLinkMasterFinder : RuntimeFunctionBlock<IoLinkMasterFinde
     public new Outputs_ ProcessDataOutputs { get; } = new Outputs_();
 
     /// <summary>
-    /// The process data outputs of <see cref="IoLinkMasterFinder"/>.
+    /// The process data outputs of <see cref="IoLinkMasterScanner"/>.
     /// </summary>
     [OutputConnectorDesigns]
     public class Outputs_

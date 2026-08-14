@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ifm.Vse;
 
-internal static partial class VseFinderLog
+internal static partial class VseScannerLog
 {
     [LoggerMessage(Level = LogLevel.Error, Message = "An error occurred while scanning for VSE devices.")]
     public static partial void ScanningErrorOccurred(this ILogger logger, Exception ex);

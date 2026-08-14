@@ -10,7 +10,7 @@ using ViciOne.DeviceTree.Contracts.Scanning;
 
 namespace ifm.Vse;
 
-public sealed partial class VseFinder
+public sealed partial class VseScanner
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private Task _runningTask = Task.CompletedTask;
