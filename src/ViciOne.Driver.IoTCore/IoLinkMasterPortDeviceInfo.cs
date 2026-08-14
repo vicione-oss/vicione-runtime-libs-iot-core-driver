@@ -6,6 +6,11 @@
 /// </summary>
 internal sealed class IoLinkMasterPortDeviceInfo
 {
+    /// <summary>
+    /// The value <see cref="DeviceStatusAddress"/> reports while no device is connected to the port.
+    /// </summary>
+    public const int NoDeviceStatus = 0;
+
     /// <summary>The port's element address.</summary>
     public required string Address { get; init; }
 
@@ -32,6 +37,13 @@ internal sealed class IoLinkMasterPortDeviceInfo
 
     /// <summary>The port's index.</summary>
     public required int PortIndex { get; init; }
+
+    /// <summary>
+    /// The element address to read the connected device's IO-Link status from. Unlike the identity elements it
+    /// answers even for an empty port (with <see cref="NoDeviceStatus"/>), so it tells whether reading
+    /// <see cref="VendorIdAddress"/> and <see cref="DeviceIdAddress"/> is worth attempting at all.
+    /// </summary>
+    public required string DeviceStatusAddress { get; init; }
 
     /// <summary>The connected device's vendor ID, if known yet.</summary>
     public ushort? VendorId { get; set; }

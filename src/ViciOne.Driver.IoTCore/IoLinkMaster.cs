@@ -60,7 +60,17 @@ public sealed class IoLinkMaster : IDisposable
     // decoding, not IO-Link master wire addresses) - these three address suffixes are unchanged from the old
     // SDK's IoddConstants, confirmed against the live-tested mirrored device tree (see migration plan).
     private const string DeviceIdAddressSuffix = "/deviceid";
+    private const string DeviceStatusAddressSuffix = "/status";
     private const string VendorIdAddressSuffix = "/vendorid";
+
+    /// <summary>
+    /// The cache lifetime, in seconds, the SDK applies to every value read from a mirrored device. Zero keeps
+    /// the polling loop reading through to the device: anything above it serves process data from the cache
+    /// instead, and the polling loop cannot see values it never fetches. Leaving this unset falls back to the
+    /// factory's own default of 30 seconds, which measurably froze process data (1 of 40 one-second samples
+    /// carried a new value; with zero it was 39 of 40, at the same cost per read).
+    /// </summary>
+    private const int ValueCacheSeconds = 0;
     private const string PdInAddressSuffix = "/pdin";
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -252,6 +262,8 @@ public sealed class IoLinkMaster : IDisposable
         ifm.IoTCore.Device.Contracts.DeviceManager deviceManager = new();
         // Without a registered IoTCoreDeviceFactory, AddDevice below fails with "device type not supported" -
         // this is the new SDK's replacement for what the old SDK handled internally.
+        // The TimeSpan is this factory's fallback value-cache lifetime, used only for devices added without one
+        // of their own. MirroringAsync always passes ValueCacheSeconds explicitly, which overrides it.
         IoTCoreDeviceFactory ioTCoreDeviceFactory = new(
             core.ElementManager, core.PersistenceManager, core.EventSender, ifmLogger,
             core.ClientNetAdapterManager, TimeSpan.FromSeconds(30), new Config());
@@ -324,6 +336,7 @@ public sealed class IoLinkMaster : IDisposable
                 {
                     Address = portDeviceElement.Address,
                     DeviceIdAddress = $"{portDeviceElement.Address}{DeviceIdAddressSuffix}",
+                    DeviceStatusAddress = $"{portDeviceElement.Address}{DeviceStatusAddressSuffix}",
                     PortModeAddress = $"{portDeviceElement.Parent.Address}/mode",
                     PortIndex = portIndex,
                     VendorIdAddress = $"{portDeviceElement.Address}{VendorIdAddressSuffix}",
@@ -572,7 +585,7 @@ public sealed class IoLinkMaster : IDisposable
                 alias: null,
                 persist: false,
                 authentication: authentication,
-                cacheTimeout: null,
+                cacheTimeout: ValueCacheSeconds,
                 // KRITISCH: bei true wird die Verbindung zwar erfolgreich geprueft, aber das Geraet nicht in
                 // den Elementbaum eingehaengt (leerer "remote"-Knoten)
                 checkConnection: false);
@@ -725,11 +738,18 @@ public sealed class IoLinkMaster : IDisposable
                 uint? deviceId = null;
                 if (portMode == 3) // 3 = IO-Link
                 {
-                    vendorId = GetDataValueAsValue(portDeviceInfo.VendorIdAddress, true, out _)?.GetUInt16();
-                    deviceId = GetDataValueAsValue(portDeviceInfo.DeviceIdAddress, true, out _)?.GetUInt32();
+                    // A port can be configured for IO-Link with nothing plugged into it, and the master answers
+                    // the identity reads below with an error in that case - once per port per polling cycle.
+                    // The status element answers either way, so it tells the two apart for the price of one read
+                    // and saves two on an empty port. Only a status of "no device" skips the identity reads: any
+                    // other status means a device is there, even if it is not in operate yet.
+                    int? deviceStatus = GetDataValueAsValue(portDeviceInfo.DeviceStatusAddress, true, out _)?.GetUInt8();
+                    if (deviceStatus != IoLinkMasterPortDeviceInfo.NoDeviceStatus)
+                    {
+                        vendorId = GetDataValueAsValue(portDeviceInfo.VendorIdAddress, true, out _)?.GetUInt16();
+                        deviceId = GetDataValueAsValue(portDeviceInfo.DeviceIdAddress, true, out _)?.GetUInt32();
+                    }
                 }
-
-                // TODO: Strictly speaking the sensor's status (2 = operate) should also be checked here, but that would cost more time.
 
                 bool identityChanged = portDeviceInfo.Available.HasValue &&
                     (portDeviceInfo.VendorId != vendorId || portDeviceInfo.DeviceId != deviceId);
