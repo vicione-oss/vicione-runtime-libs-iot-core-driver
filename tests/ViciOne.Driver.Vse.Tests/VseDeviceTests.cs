@@ -69,6 +69,9 @@ public class VseDeviceTests
             RaiseConnected(sdk);
             WaitUntil(() => device.Initialized);
 
+            // Subscribing reports the current value once; this is about what a later push does.
+            functionBlock.Invocations.Clear();
+
             Mock<ICounterDataSample> sample = new();
             sample.Setup(s => s.Id).Returns(0);
             sample.Setup(s => s.GetValue()).Returns(42f);
@@ -89,6 +92,10 @@ public class VseDeviceTests
 
             Mock<IVseSubscriberFunctionBlock> functionBlock = new();
             device.RegisterAddress(CounterAddress(), functionBlock.Object);
+
+            // Registering after the device is up subscribes right away, which reports the current value; this
+            // is about the push that follows.
+            functionBlock.Invocations.Clear();
 
             Mock<ICounterDataSample> sample = new();
             sample.Setup(s => s.Id).Returns(0);
@@ -113,6 +120,10 @@ public class VseDeviceTests
             RaiseConnected(sdk);
             WaitUntil(() => device.Initialized);
 
+            // Both were reported the current value on subscribe; this is about the push reaching both.
+            first.Invocations.Clear();
+            second.Invocations.Clear();
+
             Mock<ICounterDataSample> sample = new();
             sample.Setup(s => s.Id).Returns(0);
             sample.Setup(s => s.GetValue()).Returns(1f);
@@ -120,6 +131,25 @@ public class VseDeviceTests
 
             first.Verify(f => f.SetValue(It.IsAny<Counter>()), Times.Once);
             second.Verify(f => f.SetValue(It.IsAny<Counter>()), Times.Once);
+        }
+    }
+
+    [Fact]
+    public void RegisterAddress_ReportsTheCurrentValueWithoutWaitingForAChange()
+    {
+        (VseDevice device, Mock<IVSEDevice> sdk, _, _) = CreateDevice();
+        using (device)
+        {
+            Mock<IVseSubscriberFunctionBlock> functionBlock = new();
+            device.RegisterAddress(CounterAddress(), functionBlock.Object);
+
+            RaiseConnected(sdk);
+            WaitUntil(() => device.Initialized);
+
+            // The SDK reports a value only when it changes. A value that sits at its default and stays there -
+            // an alarm that never fires, a counter that never counts - would otherwise never be reported at
+            // all, leaving subscribers unable to tell "nothing happened" from "never heard from".
+            functionBlock.Verify(f => f.SetValue(It.IsAny<Counter>()), Times.Once);
         }
     }
 
@@ -135,6 +165,9 @@ public class VseDeviceTests
             WaitUntil(() => device.Initialized);
 
             device.UnregisterAddress(functionBlock.Object);
+
+            // Subscribing reported the current value; nothing more may arrive after unregistering.
+            functionBlock.Invocations.Clear();
 
             Mock<ICounterDataSample> sample = new();
             sample.Setup(s => s.Id).Returns(0);
@@ -155,6 +188,9 @@ public class VseDeviceTests
             device.RegisterAddress(CounterAddress(), functionBlock.Object);
             RaiseConnected(sdk);
             WaitUntil(() => device.Initialized);
+
+            // Subscribing reported the current value; the measurement below is about the push alone.
+            functionBlock.Invocations.Clear();
 
             Mock<ICounterDataSample> sample = new();
             sample.Setup(s => s.Id).Returns(0);

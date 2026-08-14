@@ -309,6 +309,13 @@ public sealed class VseDevice : IDisposable
 
         lock (_itemUnsubscribersLock)
             _itemUnsubscribersByAddress[address] = unsubscribe;
+
+        // The SDK reports a value only once it changes, so a value that never moves is never reported at all:
+        // an alarm that is false when the device comes up and stays false leaves its subscribers with nothing
+        // but their own defaults, and nothing distinguishes "no alarm" from "never heard from". A measured
+        // value hides this, because it starts moving right away. Report what the device currently holds once
+        // here, so every subscriber begins with the device's state rather than a coincidence.
+        Dispatch(address, item);
     }
 
     private Action SubscribeToCounter(string address, Counter counter)
