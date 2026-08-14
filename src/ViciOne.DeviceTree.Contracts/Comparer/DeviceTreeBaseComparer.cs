@@ -4,6 +4,11 @@
 /// Sorts device tree nodes alphanumerically by display name, preferring an <see cref="IDeviceTreeAliasNode.Alias"/>
 /// over the plain <see cref="IDeviceTreeBase.Name"/> when both sides support one.
 /// </summary>
+/// <remarks>
+/// A node without an alias sorts on a key that starts with the separator, which orders ahead of any digit or
+/// letter. Nodes that carry no alias therefore come first, which is intended - do not "fix" the leading
+/// separator away.
+/// </remarks>
 public sealed class DeviceTreeBaseComparer : IComparer<IDeviceTreeBase>
 {
     /// <summary>
