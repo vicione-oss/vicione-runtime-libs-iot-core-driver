@@ -6,7 +6,7 @@ namespace ViciOne.DeviceTree.Contracts;
 /// A device tree node representing a VSE device.
 /// </summary>
 [DebuggerDisplay("{nameof(Alias),nq}={Alias}")]
-public sealed class DeviceTreeVseDevice : IDeviceTreeMasterNode, IDeviceTreeAliasNode
+public sealed class DeviceTreeVseDevice : IDeviceTreeMasterNode, IDeviceTreeUserAliasNode
 {
     /// <inheritdoc/>
     public string? Alias { get; set; }

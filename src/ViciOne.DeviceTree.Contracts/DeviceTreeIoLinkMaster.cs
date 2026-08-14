@@ -6,7 +6,7 @@ namespace ViciOne.DeviceTree.Contracts;
 /// A device tree node representing an IO-Link master.
 /// </summary>
 [DebuggerDisplay("{nameof(Alias),nq}={Alias}")]
-public sealed class DeviceTreeIoLinkMaster : IDeviceTreeMasterNode, IDeviceTreeAliasNode
+public sealed class DeviceTreeIoLinkMaster : IDeviceTreeMasterNode, IDeviceTreeUserAliasNode
 {
     /// <inheritdoc/>
     public string? Alias { get; set; }

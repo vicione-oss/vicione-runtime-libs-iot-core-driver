@@ -6,7 +6,7 @@ namespace ViciOne.DeviceTree.Contracts;
 /// A device tree node representing a VSE device's digital alarm.
 /// </summary>
 [DebuggerDisplay("{nameof(Name),nq}={Name} {nameof(Topic),nq}={Topic}")]
-public sealed class DeviceTreeVseAlarm : IDeviceTreeVseDataParent, IDeviceTreeAliasNode
+public sealed class DeviceTreeVseAlarm : IDeviceTreeVseDataParent, IDeviceTreeDeviceAliasNode
 {
     /// <inheritdoc/>
     public string? Alias { get; set; }

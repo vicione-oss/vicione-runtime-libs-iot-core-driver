@@ -6,7 +6,7 @@ namespace ViciOne.DeviceTree.Contracts;
 /// A device tree node representing a VSE device's input channel.
 /// </summary>
 [DebuggerDisplay("{nameof(Name),nq}={Name} {nameof(Topic),nq}={Topic}")]
-public sealed class DeviceTreeVseInput : IDeviceTreeVseDataParent, IDeviceTreeAliasNode
+public sealed class DeviceTreeVseInput : IDeviceTreeVseDataParent, IDeviceTreeDeviceAliasNode
 {
     /// <inheritdoc/>
     public string? Alias { get; set; }
