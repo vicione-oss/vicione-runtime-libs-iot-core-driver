@@ -5,22 +5,24 @@ using Microsoft.Extensions.Logging;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All counters of a VSE device, kept live via a single shared monitoring channel (the VSE-SDK
+/// All counters of a Vse device, kept live via a single shared monitoring channel (the Vse-SDK
 /// pushes changed samples to us - there is no need to poll).
 /// </summary>
-public sealed class Counters : IDisposable
+public sealed partial class Counters : IDisposable
 {
     // Null when the device has no counters at all: DataChannelInfoHelpers.AsChannelInfo() throws on an empty
     // collection, and there would be nothing to monitor anyway.
     private readonly IMonitoringChannel<ICounterDataSample>? _channel;
     private readonly Dictionary<int, Counter> _byId;
     private readonly ILogger? _logger;
+    private readonly string _deviceAddress;
 
     public IReadOnlyCollection<Counter> All => _byId.Values;
 
     public Counters(IVSEDevice device, ILogger? logger)
     {
         _logger = logger;
+        _deviceAddress = device.NetworkSettings?.IPAddress ?? string.Empty;
 
         IReadOnlyList<ICounter> counters = device.Parameters.Counters;
         _byId = counters.ToDictionary(c => c.Id, c => new Counter(c));
@@ -50,7 +52,7 @@ public sealed class Counters : IDisposable
         }
         catch (Exception ex)
         {
-            _logger?.StoppingMonitoringChannelFailed(ex, "counter");
+            LogStoppingMonitoringChannelFailed(ex);
         }
         finally
         {

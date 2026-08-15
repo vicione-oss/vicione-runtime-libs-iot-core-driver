@@ -4,7 +4,7 @@ using ViciOne.Communication.Vse.EventManager;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All variants configured on a VSE device, plus the currently active one.
+/// All variants configured on a Vse device, plus the currently active one.
 /// </summary>
 public sealed class Variants : IDisposable
 {

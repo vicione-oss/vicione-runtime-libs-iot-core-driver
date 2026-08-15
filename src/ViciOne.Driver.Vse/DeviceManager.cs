@@ -25,7 +25,7 @@ internal static class DeviceManager
     /// as one of its current requesters, so a later <see cref="ReleaseDevices"/> call for a different requester
     /// does not tear it down while this one is still using it.</para>
     /// </summary>
-    /// <param name="address">The VSE device's address.</param>
+    /// <param name="address">The Vse device's address.</param>
     /// <param name="requestingInstance">An identifier for the requesting <see cref="VseDriver"/> instance.</param>
     /// <param name="logger">The logger to pass to a newly created device.</param>
     /// <returns>The shared <see cref="VseDevice"/> instance.</returns>

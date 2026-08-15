@@ -15,12 +15,12 @@ using ViciOne.Driver.Vse.Interfaces;
 namespace ViciOne.Driver.Vse;
 
 /// <summary>
-/// Owns the connection to one VSE device: dispatches newly received counter/object/input/alarm/variant values to
+/// Owns the connection to one Vse device: dispatches newly received counter/object/input/alarm/variant values to
 /// whichever <see cref="IVseSubscriberFunctionBlock"/>s are registered for them, and batches outgoing writes.
 /// <para>Shared across multiple driver instances via <see cref="DeviceManager"/> rather than owned by any one
 /// of them.</para>
 /// </summary>
-public sealed class VseDevice : IDisposable
+public sealed partial class VseDevice : IDisposable
 {
     /// <summary>
     /// The default TCP port for a device address with none specified.
@@ -45,7 +45,7 @@ public sealed class VseDevice : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// The underlying VSE-SDK connection.
+    /// The underlying Vse-SDK connection.
     /// </summary>
     internal VseConnection Connection { get; }
 
@@ -123,7 +123,7 @@ public sealed class VseDevice : IDisposable
     /// <summary>
     /// Creates a new device connection and starts connecting in the background.
     /// </summary>
-    /// <param name="address">The VSE device's address.</param>
+    /// <param name="address">The Vse device's address.</param>
     /// <param name="logger">The logger to report connection issues to.</param>
     public VseDevice(string address, ILogger logger)
         : this(address, RequireConnection(address, logger), logger)
@@ -161,7 +161,7 @@ public sealed class VseDevice : IDisposable
     }
 
     /// <summary>
-    /// Stops the connection, unsubscribes from every item, and releases the underlying VSE-SDK connection.
+    /// Stops the connection, unsubscribes from every item, and releases the underlying Vse-SDK connection.
     /// </summary>
     public void Dispose()
     {
@@ -202,23 +202,6 @@ public sealed class VseDevice : IDisposable
     public void GetRecordingRawData(string identifier, int sensorIndex, int sampleRate, int duration, bool ignoreTimedValueArray)
         => VseRawDataCollector.CollectRawData(this, identifier, sensorIndex, sampleRate, duration, ignoreTimedValueArray,
             (ex) => _logger.RawDataPullingErrorOccurred(ex, DeviceAddress));
-
-    private void LogConnectionReEstablished(ref string lastLoggedMessage)
-    {
-        if (string.IsNullOrWhiteSpace(lastLoggedMessage))
-            return;
-        lastLoggedMessage = string.Empty;
-        _logger.ConnectionReEstablished(DeviceAddress);
-    }
-
-    private void LogError(ref string lastLoggedMessage, Exception ex, string action)
-    {
-        string error = ex.Message;
-        if (string.Equals(lastLoggedMessage, error, StringComparison.OrdinalIgnoreCase))
-            return;
-        lastLoggedMessage = error;
-        _logger.ExecutionErrorOccurred(ex, action, DeviceAddress);
-    }
 
     /// <summary>
     /// Rebuilds the node-path-to-item lookup after the underlying connection rebuilds its device tree, and

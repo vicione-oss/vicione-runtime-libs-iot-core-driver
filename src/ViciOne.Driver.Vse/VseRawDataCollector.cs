@@ -9,7 +9,7 @@ using ViciOne.DeviceTree.Contracts;
 namespace ViciOne.Driver.Vse;
 
 /// <summary>
-/// Queues raw-data recording requests across all connected VSE devices onto a single background worker thread
+/// Queues raw-data recording requests across all connected Vse devices onto a single background worker thread
 /// (recordings from different devices/sensors are never run concurrently) and shapes the result into the cloud
 /// adapter's <see cref="Measurement"/> contract. The actual recording mechanics (mode switch, blob read/clear)
 /// live in <see cref="RawDataRecorder"/> - this class only queues, dispatches and reshapes.

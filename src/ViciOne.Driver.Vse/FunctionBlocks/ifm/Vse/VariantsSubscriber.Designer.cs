@@ -9,7 +9,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Subscribes to a VSE device's active variant selection, allowing it to be written from the runtime as well as read.
+/// Subscribes to a Vse device's active variant selection, allowing it to be written from the runtime as well as read.
 /// </summary>
 [FunctionBlockDesign("dcffafe9-51c4-4a42-82e8-7516edf7b837", "535fbb7b-7991-46f4-8d35-d85cedcee5f3", "1eb3a2c7-3803-49f7-94c3-eb12ad108755")]
 [Driver<VseDriver>]

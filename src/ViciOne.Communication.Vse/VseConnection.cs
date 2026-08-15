@@ -7,7 +7,7 @@ using ViciOne.Communication.Vse.EventManager;
 namespace ViciOne.Communication.Vse;
 
 /// <summary>
-/// Owns the connection to a single VSE device and the lifecycle of its live data categories (<see cref="Counters"/>,
+/// Owns the connection to a single Vse device and the lifecycle of its live data categories (<see cref="Counters"/>,
 /// <see cref="DeviceObjects"/>, <see cref="Inputs"/>, <see cref="DigitalAlarms"/>/<see cref="AnalogAlarms"/>,
 /// <see cref="Variants"/>). Those are rebuilt from scratch whenever the device (re)connects, reports its
 /// parameters have changed (e.g. after a teach-in or a variant switch), or returns to Supervise mode after a raw
@@ -80,7 +80,7 @@ public sealed class VseConnection : IDisposable
     // The IFM-SDK builder and DeviceEventManager both want an ILoggerFactory, but callers only ever have a single
     // ILogger (matching the rest of this codebase's logging convention) - wrap it so every category it creates a
     // logger for ends up writing to that same sink.
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Objekte verwerfen, bevor Bereich verloren geht", Justification = "ForwardLoggerProvider.Dispose() is a no-op (nothing to release) - ownership genuinely transfers into the returned LoggerFactory, which the constructor stores in _loggerFactory and disposes in Dispose().")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "ForwardLoggerProvider.Dispose() is a no-op (nothing to release) - ownership genuinely transfers into the returned LoggerFactory, which the constructor stores in _loggerFactory and disposes in Dispose().")]
     private static LoggerFactory? CreateLoggerFactory(ILogger? logger)
         => logger is null ? null : new LoggerFactory([new ForwardLoggerProvider(logger)], s_sdkLoggerFilterOptions);
 

@@ -11,7 +11,7 @@ public sealed partial class RawDataSubscriber
 {
     private readonly List<ErrorState> _errorStates = new();
     private string _recordingIdentifier = string.Empty;
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Verwerfbare Felder verwerfen", Justification = "Wird vom DeviceManager freigegeben.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Released by the DeviceManager.")]
     private VseDevice? _vseDevice;
     private bool _waitingForData;
 

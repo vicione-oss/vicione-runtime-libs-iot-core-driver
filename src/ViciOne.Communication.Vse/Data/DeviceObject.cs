@@ -5,8 +5,8 @@ using ViciOne.Communication.Vse.DataProcessing;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// A single VSE object (a monitored vibration/frequency source), kept up to date by <see cref="DeviceObjects"/>
-/// from the VSE-SDK's own monitoring channel push. Average/Maximum/Minimum are derived from a sliding window
+/// A single Vse object (a monitored vibration/frequency source), kept up to date by <see cref="DeviceObjects"/>
+/// from the Vse-SDK's own monitoring channel push. Average/Maximum/Minimum are derived from a sliding window
 /// of received samples rather than read directly from the device.
 /// </summary>
 public sealed class DeviceObject : IDisposable

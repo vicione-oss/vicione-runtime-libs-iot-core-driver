@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 namespace ViciOne.Communication.Vse.EventManager;
 
 /// <summary>
-/// Subscribes to all events the VSE-SDK <see cref="IVSEDevice"/> raises and re-dispatches them, one at a time,
+/// Subscribes to all events the Vse-SDK <see cref="IVSEDevice"/> raises and re-dispatches them, one at a time,
 /// on a dedicated background task. This decouples the (potentially expensive) event handlers from the SDK's own
 /// callback thread and gives every event a single, consistent processing order.
 /// </summary>
-public sealed class DeviceEventManager : IDisposable
+public sealed partial class DeviceEventManager : IDisposable
 {
     private readonly IVSEDevice _device;
     private readonly ConcurrentQueue<IDeviceEvent> _evtQueue = new();
@@ -23,6 +23,10 @@ public sealed class DeviceEventManager : IDisposable
     private readonly Lock _lock = new();
     private readonly ILogger? _logger;
 
+    // Read live rather than captured at construction: this manager is built before the device first connects, and
+    // the network settings are only populated once a connection has been established.
+    private string DeviceAddress => _device.NetworkSettings?.IPAddress ?? string.Empty;
+
     public IDeviceEvent? CurrentEvent { get { lock (_lock) { return _currentEvent; } } }
     public IDeviceEvent? LastEvent { get { lock (_lock) { return _lastEvent; } } }
 
@@ -32,12 +36,12 @@ public sealed class DeviceEventManager : IDisposable
     public bool TreeStable { get; private set; }
 
     /// <summary>
-    /// The device connection event. Send when the connection status has changed.
+    /// The device connection event. Sent when the connection status has changed.
     /// </summary>
     public event Action<ConnectionEvent>? ConnectionStatusChanged;
 
     /// <summary>
-    /// The device connected event. Send when the connection status has changed to connected.
+    /// The device connected event. Sent when the connection status has changed to connected.
     /// </summary>
     public event Action<IVSEDevice>? Connected;
 
@@ -47,7 +51,7 @@ public sealed class DeviceEventManager : IDisposable
     public event Action<ResetCountersEvent>? CountersResetEvent;
 
     /// <summary>
-    /// The device event triggered by device when the device parameters has been changed.
+    /// The device event triggered by the device when the device parameters have been changed.
     /// </summary>
     public event Action<ParameterChangedEvent>? ParametersChanged;
 
@@ -57,7 +61,7 @@ public sealed class DeviceEventManager : IDisposable
     public event Action<RebootEvent>? RebootEvent;
 
     /// <summary>
-    /// The device event triggered by resetting it's date/time.
+    /// The device event triggered by resetting its date/time.
     /// </summary>
     public event Action<ResetDateTimeEvent>? ResetDateTimeEvent;
 
@@ -72,7 +76,7 @@ public sealed class DeviceEventManager : IDisposable
     public event Action<SelfTestCompletedEvent>? SelfTestCompleted;
 
     /// <summary>
-    /// The device system mode event. Send when the device mode has changed (e.g. Supervise &lt;-&gt; Measure).
+    /// The device system mode event. Sent when the device mode has changed (e.g. Supervise &lt;-&gt; Measure).
     /// </summary>
     public event Action<ModeChangedEvent>? SystemModeChanged;
 
@@ -117,17 +121,17 @@ public sealed class DeviceEventManager : IDisposable
                     if (_evtQueue.TryDequeue(out IDeviceEvent? evt))
                     {
                         SetCurrentEvent(evt);
-                        _logger?.EventDequeued(evt.GetType());
+                        LogEventDequeued(evt.GetType());
                         switch (evt)
                         {
                             case ConnectionEvent connectionEvent:
                                 TreeStable = false;
-                                _logger?.EventDataConnectionState(connectionEvent.Status);
+                                LogEventDataConnectionState(connectionEvent.Status);
                                 ProcessConnectionStatusChange(connectionEvent);
                                 break;
                             case ModeChangedEvent modeChangedEventEvent:
                                 TreeStable = false;
-                                _logger?.EventDataModeChanged(modeChangedEventEvent.Mode, modeChangedEventEvent.Origin);
+                                LogEventDataModeChanged(modeChangedEventEvent.Mode, modeChangedEventEvent.Origin);
                                 ProcessModeChange(modeChangedEventEvent);
                                 break;
                             case RebootEvent rebootEvent:
@@ -170,7 +174,7 @@ public sealed class DeviceEventManager : IDisposable
             }
             catch (Exception ex)
             {
-                _logger?.ProcessEventQueueFailed(ex);
+                LogProcessEventQueueFailed(ex);
             }
         }
     }
@@ -214,14 +218,14 @@ public sealed class DeviceEventManager : IDisposable
     {
         try
         {
-            _logger?.ProcessingEvent(evt.GetType());
+            LogProcessingEvent(evt.GetType());
             DateTime startTime = DateTime.Now;
             invocation();
-            _logger?.ProcessingTook(evt.GetType(), (DateTime.Now - startTime).TotalMilliseconds);
+            LogProcessingTook(evt.GetType(), (DateTime.Now - startTime).TotalMilliseconds);
         }
         catch (Exception ex)
         {
-            _logger?.ProcessingEventFailed(ex, evt.GetType());
+            LogProcessingEventFailed(ex, evt.GetType());
         }
     }
 
@@ -257,7 +261,7 @@ public sealed class DeviceEventManager : IDisposable
 
     private void Enqueue(IDeviceEvent evt)
     {
-        _logger?.EventEnqueued(evt.GetType());
+        LogEventEnqueued(evt.GetType());
         _evtQueue.Enqueue(evt);
         _evtTrigger.Set();
     }

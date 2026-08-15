@@ -3,7 +3,7 @@ using IFM.SDK.VSE;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// Static identity information for a VSE device - type, serial number, firmware and hardware revision. Unlike
+/// Static identity information for a Vse device - type, serial number, firmware and hardware revision. Unlike
 /// <see cref="Status"/>, none of this changes while the device is connected.
 /// </summary>
 public sealed class DeviceInfo(IVSEDevice device)

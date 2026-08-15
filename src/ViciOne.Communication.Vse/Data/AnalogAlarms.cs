@@ -5,19 +5,21 @@ using Microsoft.Extensions.Logging;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All analog alarms of a VSE device. Each alarm gets its own monitoring channel, same as <see cref="DigitalAlarms"/>.
+/// All analog alarms of a Vse device. Each alarm gets its own monitoring channel, same as <see cref="DigitalAlarms"/>.
 /// </summary>
-public sealed class AnalogAlarms : IDisposable
+public sealed partial class AnalogAlarms : IDisposable
 {
     private readonly List<IMonitoringChannel<IIODataSample>> _channels;
     private readonly Dictionary<int, AnalogAlarm> _byId;
     private readonly ILogger? _logger;
+    private readonly string _deviceAddress;
 
     public IReadOnlyCollection<AnalogAlarm> All => _byId.Values;
 
     public AnalogAlarms(IVSEDevice device, ILogger? logger)
     {
         _logger = logger;
+        _deviceAddress = device.NetworkSettings?.IPAddress ?? string.Empty;
 
         IReadOnlyList<IAnalogAlarm> instances = device.Parameters.AnalogAlarms;
 
@@ -49,7 +51,7 @@ public sealed class AnalogAlarms : IDisposable
             }
             catch (Exception ex)
             {
-                _logger?.StoppingMonitoringChannelFailed(ex, "analog alarm");
+                LogStoppingMonitoringChannelFailed(ex);
             }
             finally
             {

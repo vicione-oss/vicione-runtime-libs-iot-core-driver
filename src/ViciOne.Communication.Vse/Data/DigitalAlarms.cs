@@ -5,20 +5,22 @@ using Microsoft.Extensions.Logging;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All digital alarms of a VSE device. Unlike <see cref="Counters"/>/<see cref="Inputs"/>, each alarm gets its
+/// All digital alarms of a Vse device. Unlike <see cref="Counters"/>/<see cref="Inputs"/>, each alarm gets its
 /// own monitoring channel - the SDK has no bulk-subscribe helper for alarms.
 /// </summary>
-public sealed class DigitalAlarms : IDisposable
+public sealed partial class DigitalAlarms : IDisposable
 {
     private readonly List<IMonitoringChannel<IIODataSample>> _channels;
     private readonly Dictionary<int, DigitalAlarm> _byId;
     private readonly ILogger? _logger;
+    private readonly string _deviceAddress;
 
     public IReadOnlyCollection<DigitalAlarm> All => _byId.Values;
 
     public DigitalAlarms(IVSEDevice device, ILogger? logger)
     {
         _logger = logger;
+        _deviceAddress = device.NetworkSettings?.IPAddress ?? string.Empty;
 
         IReadOnlyList<IDigitalAlarm> instances = device.Parameters.DigitalAlarms;
 
@@ -50,7 +52,7 @@ public sealed class DigitalAlarms : IDisposable
             }
             catch (Exception ex)
             {
-                _logger?.StoppingMonitoringChannelFailed(ex, "digital alarm");
+                LogStoppingMonitoringChannelFailed(ex);
             }
             finally
             {

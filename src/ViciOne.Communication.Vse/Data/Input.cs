@@ -5,7 +5,7 @@ using IFM.SDK.VSE.Parameters;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// A single VSE input. Only <see cref="InputType.External"/> inputs carry a value at all (VSE writes external
+/// A single Vse input. Only <see cref="InputType.External"/> inputs carry a value at all (Vse writes external
 /// speed/reference values in through them rather than measuring them itself) - Dynamic/Analog/Digital inputs
 /// feed into <see cref="DeviceObject"/>s instead and have no value of their own here.
 /// </summary>
@@ -40,7 +40,7 @@ public sealed class Input
     }
 
     /// <summary>
-    /// Raised whenever the VSE-SDK monitoring channel delivers a new sample that changes <see cref="Value"/>.
+    /// Raised whenever the Vse-SDK monitoring channel delivers a new sample that changes <see cref="Value"/>.
     /// </summary>
     public event Action? Changed;
 

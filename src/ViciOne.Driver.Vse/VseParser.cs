@@ -552,7 +552,7 @@ public static class VseParser
         }
         catch (Exception ex)
         {
-            logger.ParsingVseCategoryFailed(categoryName, vse.Url, ex.Message, ex.StackTrace!);
+            logger.ParsingVseCategoryFailed(categoryName, vse.Url, ex);
         }
     }
 }

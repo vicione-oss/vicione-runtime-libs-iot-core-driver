@@ -7,11 +7,11 @@ using ViciOne.Communication.Vse.EventManager;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All objects of a VSE device. Unlike <see cref="Counters"/>, only objects with
+/// All objects of a Vse device. Unlike <see cref="Counters"/>, only objects with
 /// <see cref="DeviceObject.DynamicValuesMonitoring"/> enabled are subscribed on the shared monitoring channel -
 /// that set can change at runtime, so the channel subscription is updated live rather than fixed at construction.
 /// </summary>
-public sealed class DeviceObjects : IDisposable
+public sealed partial class DeviceObjects : IDisposable
 {
     // The original adapter left this at 0 until some external system wrote a valid value through the (never
     // actually wired up in ViciOne) writable tree node - meaning the sliding window's TimespanInMs was 0 and
@@ -28,6 +28,7 @@ public sealed class DeviceObjects : IDisposable
     private readonly Dictionary<int, DeviceObject> _dynamicallyMonitored;
     private readonly Lock _dynamicallyMonitoredLock = new();
     private readonly ILogger? _logger;
+    private readonly string _deviceAddress;
     private uint _averagingPeriod = AveragingPeriodMin;
 
     public IReadOnlyList<DeviceObject> All => _objects;
@@ -52,6 +53,7 @@ public sealed class DeviceObjects : IDisposable
         _device = device;
         _eventManager = eventManager;
         _logger = logger;
+        _deviceAddress = device.NetworkSettings?.IPAddress ?? string.Empty;
 
         ObjectChannelInfo channelInfo = new([]);
         List<DeviceObject> objects = [];
@@ -117,7 +119,7 @@ public sealed class DeviceObjects : IDisposable
         }
         catch (Exception ex)
         {
-            _logger?.UpdatingMonitoringChannelFailed(ex, "object", deviceObject.Id);
+            LogUpdatingMonitoringChannelFailed(ex, deviceObject.Id);
         }
     }
 
@@ -144,7 +146,7 @@ public sealed class DeviceObjects : IDisposable
             }
             catch (Exception ex)
             {
-                _logger?.StoppingMonitoringChannelFailed(ex, "object");
+                LogStoppingMonitoringChannelFailed(ex);
             }
         }
 

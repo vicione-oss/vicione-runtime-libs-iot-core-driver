@@ -3,7 +3,7 @@ using IFM.SDK.VSE;
 namespace ViciOne.Communication.Vse.EventManager;
 
 /// <summary>
-/// Raised when a VSE device's counter was reset.
+/// Raised when a Vse device's counter was reset.
 /// </summary>
 public sealed class ResetCountersEvent(IVSEDevice? device, int counter) : BaseDeviceEvent(device)
 {

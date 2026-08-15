@@ -475,8 +475,8 @@ public class VseParserTests
             logger.Verify(l => l.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("boom", StringComparison.Ordinal) && v.ToString()!.Contains("AddInfos", StringComparison.Ordinal)),
-                It.IsAny<InvalidOperationException>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("AddInfos", StringComparison.Ordinal)),
+                It.Is<InvalidOperationException>(e => e.Message.Contains("boom", StringComparison.Ordinal)),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
         }
     }

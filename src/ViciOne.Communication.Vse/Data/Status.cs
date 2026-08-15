@@ -4,7 +4,7 @@ using ViciOne.Communication.Vse.EventManager;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// The VSE device's live connection/mode state - unlike <see cref="DeviceInfo"/>, everything here can change
+/// The Vse device's live connection/mode state - unlike <see cref="DeviceInfo"/>, everything here can change
 /// while the device is connected.
 /// </summary>
 public sealed class Status : IDisposable

@@ -14,7 +14,7 @@ internal static class VseTestDevice
 {
     public const string Address = "http://10.100.11.132:3321";
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Objekte verwerfen, bevor Bereich verloren geht", Justification = "Ownership transfers into the returned VseDevice, which disposes its Connection - the caller disposes the VseDevice.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Ownership transfers into the returned VseDevice, which disposes its Connection - the caller disposes the VseDevice.")]
     public static (VseDevice Device, Mock<IVSEDevice> Sdk, Mock<ICommands> Commands, Action<ICounterDataSample> PushCounter) CreateDevice(
         ConnectionStatus connectionStatus = ConnectionStatus.Connected,
         SystemMode systemMode = SystemMode.Supervise,

@@ -9,7 +9,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Subscribes to a VSE device's digital alarm.
+/// Subscribes to a Vse device's digital alarm.
 /// </summary>
 [FunctionBlockDesign("dbe6a560-f406-44f6-8551-d6d566cb54ed", "1db9323f-8f0d-4d0e-8ca8-f69711c84949", "fff156d5-b382-4c76-abaa-76fac593ff20")]
 [Driver<VseDriver>]

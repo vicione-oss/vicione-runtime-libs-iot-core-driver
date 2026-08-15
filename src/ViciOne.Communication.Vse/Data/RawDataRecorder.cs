@@ -7,12 +7,12 @@ using ViciOne.Communication.Vse.EventManager;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// Records raw (unprocessed) sample data from one of a VSE device's external sensors. Starting a recording
+/// Records raw (unprocessed) sample data from one of a Vse device's external sensors. Starting a recording
 /// switches the device into <see cref="SystemMode.Measure"/>, which is mutually exclusive with normal
 /// process-data monitoring (<see cref="SystemMode.Supervise"/>) - counters, objects, inputs and alarms stop
 /// receiving fresh samples for the duration of a recording.
 /// </summary>
-public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventManager, ILogger? logger, int eventQueueSettleTimeoutMs = 5000, int eventQueueSettleWindowMs = 50) : IDisposable
+public sealed partial class RawDataRecorder(IVSEDevice device, DeviceEventManager eventManager, ILogger? logger, int eventQueueSettleTimeoutMs = 5000, int eventQueueSettleWindowMs = 50) : IDisposable
 {
     private sealed class SensorData(byte sensor)
     {
@@ -38,6 +38,10 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
     private long _stopRequested;
     private SensorData? _currentSensor;
     private Task? _recordingTask;
+
+    // Read live rather than captured at construction: the recorder outlives reconnects and is built before the
+    // device first connects, whereas its log messages only fire once a recording is under way (device connected).
+    private string DeviceAddress => device.NetworkSettings?.IPAddress ?? string.Empty;
 
     // No caller outside this class/its tests observes recording state directly - CaptureBlocking is the only
     // real entry point (VseRawDataCollector never inspects IsRecording/StateChanged, nor calls
@@ -149,7 +153,7 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
 
             if (device.SystemMode != SystemMode.Measure)
             {
-                logger?.CannotSwitchToMeasureMode(sensor, device.SystemMode);
+                LogCannotSwitchToMeasureMode(sensor, device.SystemMode);
                 StopChannelBestEffort(channel);
                 return false;
             }
@@ -202,7 +206,7 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
             Interlocked.Exchange(ref _stopRequested, 1);
             if (_recordingTask is null || !_recordingTask.Wait(2000))
             {
-                logger?.StoppingRecordingTimedOut(_currentSensor?.Sensor ?? 0);
+                LogStoppingRecordingTimedOut(_currentSensor?.Sensor ?? 0);
                 throw new TimeoutException("Raw data recording could not be stopped within the required time.");
             }
         }
@@ -314,16 +318,16 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
         catch (Exception ex)
         {
             sensorData.LastRecordingResult = $"Raw data recording was interrupted by an exception ({ex.Message}).";
-            logger?.RawDataRecordingFailed(ex, sensorData.Sensor);
+            LogRawDataRecordingFailed(ex, sensorData.Sensor);
         }
 
         await StopChannelBestEffortAsync(channel).ConfigureAwait(false);
         TryRestoreSuperviseMode();
 
         if (string.IsNullOrEmpty(sensorData.LastRecordingResult))
-            logger?.RawDataRecordingFinished(sensorData.Sensor, sensorData.DataPoints.Count);
+            LogRawDataRecordingFinished(sensorData.Sensor, sensorData.DataPoints.Count);
         else
-            logger?.RawDataRecordingInterrupted(sensorData.Sensor, sensorData.LastRecordingResult);
+            LogRawDataRecordingInterrupted(sensorData.Sensor, sensorData.LastRecordingResult);
 
         Interlocked.Exchange(ref _isRecording, 0);
         _currentSensor = null;
@@ -338,7 +342,7 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
         }
         catch (Exception ex)
         {
-            logger?.StoppingMonitoringChannelFailed(ex, "raw data");
+            LogStoppingMonitoringChannelFailed(ex);
         }
         finally
         {
@@ -354,7 +358,7 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
         }
         catch (Exception ex)
         {
-            logger?.StoppingMonitoringChannelFailed(ex, "raw data");
+            LogStoppingMonitoringChannelFailed(ex);
         }
         finally
         {
@@ -377,7 +381,7 @@ public sealed class RawDataRecorder(IVSEDevice device, DeviceEventManager eventM
         }
         catch (Exception ex)
         {
-            logger?.RestoringSuperviseModeFailed(ex);
+            LogRestoringSuperviseModeFailed(ex);
         }
     }
 

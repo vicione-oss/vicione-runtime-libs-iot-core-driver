@@ -8,7 +8,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Scans the local network for VSE devices.
+/// Scans the local network for Vse devices.
 /// </summary>
 [FunctionBlockDesign("e909ab02-03d4-43a8-8af1-dfebf836c5d7", "bba9266c-ac2b-4ebc-a5cd-4bd57c68e80b", "db579e4b-ef94-4721-957d-5088dc566aca")]
 [Description("Scans the local network for VSE devices.")]

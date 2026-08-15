@@ -11,7 +11,7 @@ namespace ifm.Vse;
 public sealed partial class DeviceTreeSubscriber
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Verwerfbare Felder verwerfen", Justification = "Wird vom DeviceManager freigegeben.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Released by the DeviceManager.")]
     private VseDevice? _device;
     private Task _runningTask = Task.CompletedTask;
 
@@ -128,7 +128,7 @@ public sealed partial class DeviceTreeSubscriber
         _runningTask = Task.Run(async () =>
             {
                 try { SetConnectorValueIfNotEqual(ProcessDataOutputs.DeviceTree, await VseParser.ParseDeviceAsync(_device, Logger)); }
-                catch (Exception ex) { Logger.ParsingErrorOccurred(ex); }
+                catch (Exception ex) { LogParsingError(ex); }
             }, _cancellationTokenSource.Token);
     }
 }

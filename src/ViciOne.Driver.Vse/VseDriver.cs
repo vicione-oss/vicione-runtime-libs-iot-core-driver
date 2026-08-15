@@ -4,7 +4,7 @@ using ViciOne.Core.Runtime;
 namespace ViciOne.Driver.Vse;
 
 /// <summary>
-/// The Engine runtime driver for VSE devices - owns no device state itself, only the identity used to
+/// The Engine runtime driver for Vse devices - owns no device state itself, only the identity used to
 /// share/release <see cref="VseDevice"/> instances through <see cref="DeviceManager"/>.
 /// </summary>
 public sealed class VseDriver : RuntimeDriver<VseDriver>

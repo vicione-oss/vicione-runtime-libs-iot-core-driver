@@ -8,7 +8,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Subscribes to a VSE device's counter.
+/// Subscribes to a Vse device's counter.
 /// </summary>
 [FunctionBlockDesign("6312e770-3c86-45ee-90d5-1e417929dbbc", "2f85af17-bc7a-4f32-bbc5-77507baecf01", "f9b53f5e-706d-45e1-ace1-0f64cae76a97")]
 [Driver<VseDriver>]

@@ -3,7 +3,7 @@ using IFM.SDK.VSE;
 namespace ViciOne.Communication.Vse.EventManager;
 
 /// <summary>
-/// Raised when a VSE device's date/time was reset.
+/// Raised when a Vse device's date/time was reset.
 /// </summary>
 public sealed class ResetDateTimeEvent(IVSEDevice? device, DateTime date) : BaseDeviceEvent(device)
 {

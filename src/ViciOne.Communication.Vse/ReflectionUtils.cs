@@ -3,7 +3,7 @@ using IFM.SDK.VSE;
 namespace ViciOne.Communication.Vse;
 
 /// <summary>
-/// Maps VSE-SDK enums to human-readable string identifiers.
+/// Maps Vse-SDK enums to human-readable string identifiers.
 /// </summary>
 internal static class ReflectionUtils
 {

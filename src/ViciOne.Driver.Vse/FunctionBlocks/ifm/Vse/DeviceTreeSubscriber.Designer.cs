@@ -9,7 +9,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Builds and publishes a VSE device's device tree, refreshing it when the device's parameters, system mode, or
+/// Builds and publishes a Vse device's device tree, refreshing it when the device's parameters, system mode, or
 /// timeout state change.
 /// </summary>
 [FunctionBlockDesign("8a3246e7-c0a1-44df-8e1e-0acdad717432", "897607f9-1f26-4b0c-ac94-980717cb4dec", "c77f0993-38ed-40e0-922c-5991debd4c2b")]
@@ -67,7 +67,7 @@ public partial class DeviceTreeSubscriber : RuntimeFunctionBlock<DeviceTreeSubsc
     public class Settings_
     {
         /// <summary>
-        /// The VSE device's address.
+        /// The Vse device's address.
         /// </summary>
         [SettingDesign("64b80988-b76e-41e9-ba47-8f0884b0e90e", "5dcf4a09-b9f2-4e6a-9af2-1ac7d9f95de4", "3d9b635c-b8ad-43f0-b342-da14011719ed")]
         [Description("The VSE device's address.")]

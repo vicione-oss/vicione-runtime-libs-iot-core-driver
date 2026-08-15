@@ -10,7 +10,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Subscribes to a VSE device's monitored vibration/frequency object.
+/// Subscribes to a Vse device's monitored vibration/frequency object.
 /// </summary>
 [FunctionBlockDesign("e20d1fa9-ec9e-46cc-b697-bd475090ec1a", "d45bc887-0a96-4201-aef6-00fc1c5911f3", "75217a92-19cc-4d2e-a6db-482d66c6007f")]
 [Driver<VseDriver>]

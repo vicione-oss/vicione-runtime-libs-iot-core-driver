@@ -1,7 +1,7 @@
 namespace ViciOne.Communication.Vse.DataProcessing;
 
 /// <summary>
-/// A single timestamped value sampled from a VSE data channel, with room for algorithm-specific
+/// A single timestamped value sampled from a Vse data channel, with room for algorithm-specific
 /// extra attributes (see <see cref="ObjectDataSample"/>).
 /// </summary>
 internal class DataSample<T> where T : new()

@@ -5,22 +5,24 @@ using Microsoft.Extensions.Logging;
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All inputs of a VSE device. Only the <see cref="Input.DynamicValueMonitoring"/> subset (External inputs) is
+/// All inputs of a Vse device. Only the <see cref="Input.DynamicValueMonitoring"/> subset (External inputs) is
 /// subscribed on a shared monitoring channel - there is nothing to push for the rest.
 /// </summary>
-public sealed class Inputs : IDisposable
+public sealed partial class Inputs : IDisposable
 {
     // Null when no input is dynamically monitored (no External inputs on this device) - there would be nothing
     // to create a channel for.
     private readonly IMonitoringChannel<IIODataSample>? _channel;
     private readonly Dictionary<int, Input> _dynamicallyMonitored;
     private readonly ILogger? _logger;
+    private readonly string _deviceAddress;
 
     public IReadOnlyList<Input> All { get; }
 
     public Inputs(IVSEDevice device, ILogger? logger)
     {
         _logger = logger;
+        _deviceAddress = device.NetworkSettings?.IPAddress ?? string.Empty;
 
         List<Input> inputs = [];
         List<Tuple<InputType, int>> toMonitor = [];
@@ -63,7 +65,7 @@ public sealed class Inputs : IDisposable
         }
         catch (Exception ex)
         {
-            _logger?.StoppingMonitoringChannelFailed(ex, "input");
+            LogStoppingMonitoringChannelFailed(ex);
         }
         finally
         {

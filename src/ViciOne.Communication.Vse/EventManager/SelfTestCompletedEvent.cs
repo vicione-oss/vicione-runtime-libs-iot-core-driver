@@ -3,7 +3,7 @@ using IFM.SDK.VSE;
 namespace ViciOne.Communication.Vse.EventManager;
 
 /// <summary>
-/// Raised when a VSE device completed a self-test.
+/// Raised when a Vse device completed a self-test.
 /// </summary>
 public sealed class SelfTestCompletedEvent(IVSEDevice? device, SelfTestResult result) : BaseDeviceEvent(device)
 {

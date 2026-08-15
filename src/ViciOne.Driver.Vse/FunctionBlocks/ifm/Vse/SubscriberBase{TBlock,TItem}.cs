@@ -7,7 +7,7 @@ using ViciOne.Driver.Vse.Interfaces;
 namespace ifm.Vse;
 
 /// <summary>
-/// Base class for FunctionBlocks that subscribe to one VSE node path, handling device registration, availability
+/// Base class for FunctionBlocks that subscribe to one Vse node path, handling device registration, availability
 /// tracking, and dispatching newly received values to the derived block's connectors.
 /// </summary>
 public abstract class SubscriberBase<TBlock, TItem> : RuntimeFunctionBlock<TBlock>, IVseSubscriberFunctionBlock
@@ -30,12 +30,12 @@ public abstract class SubscriberBase<TBlock, TItem> : RuntimeFunctionBlock<TBloc
     protected bool IsWriting { get; set; }
 
     /// <summary>
-    /// This block's VSE subscription settings.
+    /// This block's Vse subscription settings.
     /// </summary>
     public new abstract IVseSubscriberSettings Settings { get; }
 
     /// <summary>
-    /// The VSE device this block is subscribed through, once initialized.
+    /// The Vse device this block is subscribed through, once initialized.
     /// </summary>
     protected VseDevice? Device { get; private set; }
 
@@ -64,7 +64,7 @@ public abstract class SubscriberBase<TBlock, TItem> : RuntimeFunctionBlock<TBloc
     }
 
     /// <summary>
-    /// Acquires the configured VSE device and registers this block's node path subscription.
+    /// Acquires the configured Vse device and registers this block's node path subscription.
     /// </summary>
     public override void InitializeI()
     {
@@ -98,7 +98,7 @@ public abstract class SubscriberBase<TBlock, TItem> : RuntimeFunctionBlock<TBloc
     private void SetAvailable(bool available)
         => SetConnectorValue(AvailableRuntimeConnector, available);
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Schnittstellenmethoden müssen von untergeordneten Typen aufgerufen werden können", Justification = "The derived blocks do not need to call the method.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "The derived blocks do not need to call the method.")]
     void IVseSubscriberFunctionBlock.SetValue(object item)
     {
         if (IsWriting)

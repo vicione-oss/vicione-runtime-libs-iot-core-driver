@@ -9,7 +9,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Subscribes to a VSE device's external input, allowing its value to be written from the runtime as well as read.
+/// Subscribes to a Vse device's external input, allowing its value to be written from the runtime as well as read.
 /// </summary>
 [FunctionBlockDesign("bda228ee-19ca-4293-a94a-49ffab71c76d", "c453173b-73bd-4653-9c6b-6b01b800a2c2", "fa6cb1c7-050e-4f24-ba7c-3fe83b4153e8")]
 [Driver<VseDriver>]

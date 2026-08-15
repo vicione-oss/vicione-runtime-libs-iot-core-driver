@@ -10,7 +10,7 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.Vse;
 
 /// <summary>
-/// Triggers and receives a raw-data recording from a VSE device's sensor.
+/// Triggers and receives a raw-data recording from a Vse device's sensor.
 /// </summary>
 [FunctionBlockDesign("882057a8-2316-4bb4-8ca7-46840f44ddd6", "2ec4a300-e4b7-4e75-9bb5-1832346a78a3", "251a7d3a-8cf7-44af-8e71-ed8498662e83")]
 [Driver<VseDriver>]
@@ -76,7 +76,7 @@ public partial class RawDataSubscriber : RuntimeFunctionBlock<RawDataSubscriber>
     public class Settings_
     {
         /// <summary>
-        /// The VSE device's address.
+        /// The Vse device's address.
         /// </summary>
         [SettingDesign("344d17fd-7d62-4341-b05c-7621a4af0dd1", "2474d831-68ac-4354-8ba8-bf68ef52c074", "8ba022b5-a663-4d0e-a245-22571b1ff506")]
         [Description("The VSE device's address.")]
