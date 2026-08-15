@@ -65,18 +65,11 @@ public partial class BlobSubscriber : RuntimeFunctionBlock<BlobSubscriber>
     public class Settings_
     {
         /// <summary>
-        /// The IO-Link master's address.
+        /// The identifier of the IoTCoreConfiguration this subscriber reads through.
         /// </summary>
         [SettingDesign("25229950-3fd8-4a80-95b7-9d6534215de0", "70f2817f-e8dc-4ba7-82d2-1f51cc3d11e7", "ab8938f9-0574-4c58-9e49-321396c04c10")]
-        [Description("The IO-Link master's address.")]
-        public IRuntimeSetting<string> Address { get; internal set; }
-
-        /// <summary>
-        /// An optional free-text tag identifying this specific configuration.
-        /// </summary>
-        [SettingDesign("6e9eb289-1cff-499c-a070-9fe81b73562e", "f041b8ee-1a5b-4640-8ca9-f37759ca8775", "c5a7e476-3018-44c8-9e53-a4615c9b484c")]
-        [Description("An optional free-text tag identifying this specific configuration.")]
-        public IRuntimeSetting<string> ApplicationSpecificTag { get; internal set; }
+        [Description("The identifier of the IoTCoreConfiguration this subscriber reads through.")]
+        public IRuntimeSetting<string> Identifier { get; internal set; }
 
         /// <summary>
         /// The expected connected device's vendor ID.

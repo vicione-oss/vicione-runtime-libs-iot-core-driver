@@ -17,7 +17,7 @@ public sealed class DcpScannerOptions
 
     /// <summary>
     /// Use narrow BPF filter limited to PN-DCP Identify (FrameId 0xFEFE/0xFEFF).
-    /// <para>If the filter fails to apply, scanner falls back to broad EtherType filter and suppresses noisy
+    /// <para>If the filter fails to apply, the scanner falls back to a broad EtherType filter and suppresses noisy
     /// logs. (default: true)</para>
     /// </summary>
     public bool NarrowFilter { get; set; } = true;

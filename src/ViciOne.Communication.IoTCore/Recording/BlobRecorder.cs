@@ -11,7 +11,7 @@ namespace ViciOne.Communication.IoTCore.Recording;
 /// job, not this class's.</para>
 /// <para>Owns the HTTP connection to <paramref name="address"/> for its whole lifetime.</para>
 /// </summary>
-public sealed class BlobRecorder(string address) : IDisposable
+public sealed partial class BlobRecorder(string address) : IDisposable
 {
     private readonly BlobHttpClient _device = new(new Uri($"http://{address}"));
 
@@ -80,7 +80,7 @@ public sealed class BlobRecorder(string address) : IDisposable
             // Last Segment of BLOB
             if (firstByte == (byte)BlobFunction.BLOB_Last_Segment)
             {
-                logger.ReceivedWholeBlob(DateTime.UtcNow.Subtract(startTime));
+                LogReceivedWholeBlob(logger, DateTime.UtcNow.Subtract(startTime));
                 break;
             }
 

@@ -57,7 +57,7 @@ public static class IoddCatalog
         using (MemoryStream archiveStream = IoddDownloader.DownloadIoddArchiveFile(vendorId, deviceId))
             ZipFile.ExtractToDirectory(archiveStream, destinationDirectory);
 
-        // Rechte setzen
+        // Set permissions
         SetUnixFileMode(vendorDirectory);
         SetUnixFileMode(destinationDirectory);
 

@@ -6,7 +6,6 @@
 /// </summary>
 public readonly record struct IoLinkRawDataIdentifier(
     string Address,
-    string ApplicationSpecificTag,
     int Port,
     ushort VendorId,
     uint DeviceId,
@@ -19,5 +18,5 @@ public readonly record struct IoLinkRawDataIdentifier(
     /// Formats this identifier the way it's stored in <see cref="Measurement.Identifier"/>.
     /// </summary>
     public override string ToString()
-        => $"//iolink//{Address}//{ApplicationSpecificTag}//{Port}//{VendorId}//{DeviceId}//{ProductName}//{ProcessName}//{Duration}//{Frequency}";
+        => $"//iolink//{Address}//{Port}//{VendorId}//{DeviceId}//{ProductName}//{ProcessName}//{Duration}//{Frequency}";
 }

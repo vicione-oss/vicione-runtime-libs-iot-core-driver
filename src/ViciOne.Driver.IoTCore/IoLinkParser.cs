@@ -120,7 +120,7 @@ public static partial class IoLinkParser
         }
         catch (Exception ex)
         {
-            logger.ErrorWhileReadingDataFromIoLinkMaster(elementAddress, ex.Message, ex);
+            logger.ErrorWhileReadingDataFromIoLinkMaster(elementAddress, ex);
             return null;
         }
     }
@@ -136,7 +136,7 @@ public static partial class IoLinkParser
         }
         catch (Exception ex)
         {
-            logger.ErrorWhileReadingDataFromIoLinkMaster($"{address}/productid", ex.Message, ex);
+            logger.ErrorWhileReadingDataFromIoLinkMaster($"{address}/productid", ex);
             return null;
         }
     }
@@ -232,7 +232,7 @@ public static partial class IoLinkParser
         }
         catch (Exception ex)
         {
-            logger.ErrorWhileParsingDevice(ioLinkDevice.Address, ex.Message, ex);
+            logger.ErrorWhileParsingDevice(ioLinkDevice.Address, ex);
             throw;
         }
     }
@@ -369,7 +369,7 @@ public static partial class IoLinkParser
             {
                 if (attempt >= ProcessDataReadRetries)
                 {
-                    logger.ErrorWhileReadingAndDecodingProcessData(address, ex.Message, ex);
+                    logger.ErrorWhileReadingAndDecodingProcessData(address, ex);
                     return [];
                 }
 
@@ -397,12 +397,12 @@ public static partial class IoLinkParser
                     if (device is null && IoddCatalog.IoddAutoDownload)
                     {
                         try { IoddCatalog.DownloadIodd(deviceNode.VendorId, deviceNode.DeviceId, false, false); }
-                        catch (Exception ex) { logger.ErrorWhileDownloadingIodd(deviceNode.VendorId, deviceNode.DeviceId, ex.Message, ex); }
+                        catch (Exception ex) { logger.ErrorWhileDownloadingIodd(masterDevice.Address, deviceNode.VendorId, deviceNode.DeviceId, ex); }
                         device = IoddCatalog.GetIoddDevice(deviceNode.VendorId, deviceNode.DeviceId);
                     }
                 }
             }
-            catch (Exception ex) { logger.ErrorWhileLoadingIodd(deviceNode.VendorId, deviceNode.DeviceId, ex.Message, ex); }
+            catch (Exception ex) { logger.ErrorWhileLoadingIodd(masterDevice.Address, deviceNode.VendorId, deviceNode.DeviceId, ex); }
 
             if (device is null)
             {

@@ -9,10 +9,10 @@ using ViciOne.Driver.IoTCore;
 
 namespace ifm.IOLink;
 
-public sealed partial class DeviceTreeSubscriber
+public sealed partial class IoTCoreConfiguration
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Verwerfbare Felder verwerfen", Justification = "Wird vom DeviceManager freigegeben.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Released by the DeviceManager.")]
     private IoLinkMaster? _device;
     private byte _deviceTreeUpdateRequested;
     private readonly Lock _deviceTreeLock = new();
@@ -28,20 +28,21 @@ public sealed partial class DeviceTreeSubscriber
 
         // Sets the value even if the manager was already initialized
         IoddCatalog.IoddAutoDownload = Settings.IoddAutoDownload.Value;
-    }
-
-    /// <inheritdoc/>
-    public override void InitializeII()
-    {
-        base.InitializeII();
 
         if (Driver is not IoTCoreDriver driver)
             throw new InvalidCastException($"Could not cast to {nameof(IoTCoreDriver)}.");
 
-        if (Settings.Url.Value is null)
+        if (string.IsNullOrWhiteSpace(Settings.Identifier.Value))
+            throw new ArgumentException("Invalid identifier configuration.");
+
+        if (Settings.Address.Value is null)
             throw new ArgumentException("Invalid address configuration.");
 
-        _device = driver.GetOrAddIoLinkMaster(Settings.Url.Value, Settings.Username.Value, Settings.Password.Value);
+        // Registers the master under this connection's identifier, so the subscribers that read through it
+        // reach it by that label in their own InitializeII. Creating it here in InitializeI, before those run,
+        // is also what gives them the authenticated connection: the master is shared, and whoever creates it
+        // first supplies the credentials - a credential-less subscriber must not get there first.
+        _device = driver.GetOrAddIoLinkMaster(Settings.Identifier.Value, Settings.Address.Value, Settings.Username.Value, Settings.Password.Value, Settings.UseGetDataMulti.Value);
         _device.ChildDevicesChanged += OnDeviceChildDevicesChanged;
         _device.TimeoutChanged += OnDeviceTimeoutChanged;
     }
@@ -80,8 +81,8 @@ public sealed partial class DeviceTreeSubscriber
         if (FunctionBlockEnabled is false)
             return;
 
-        if ((ProcessDataInputs.Trigger.Changed || cycleInfo.IsFirstCycle) &&
-            ProcessDataInputs.Trigger.Value)
+        if ((ProcessDataInputs.RebuildDeviceTree.Changed || cycleInfo.IsFirstCycle) &&
+            ProcessDataInputs.RebuildDeviceTree.Value)
             StartDeviceTreeUpdate();
 
         SetConnectorValueIfNotEqual(ProcessDataOutputs.IoddDirectory, IoddCatalog.IoddDirectory);
@@ -138,7 +139,7 @@ public sealed partial class DeviceTreeSubscriber
             startedTask = _runningTask = Task.Run(async () =>
                 {
                     try { PublishDeviceTree(await IoLinkParser.ParseDeviceAsync(_device, Logger)); }
-                    catch (Exception ex) { Logger.IoLinkParseDeviceErrorOccurred(ex); }
+                    catch (Exception ex) { Logger.IoLinkParseDeviceErrorOccurred(_device.Address, ex); }
                 }, _cancellationTokenSource.Token);
         }
 

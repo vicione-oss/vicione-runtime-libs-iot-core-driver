@@ -135,11 +135,11 @@ public sealed partial class IoLinkMasterScanner
         }
         catch (HttpRequestException httpEx)
         {
-            Logger.LogInformation($"Fetching info of device {device.Network.Ip} failed: {httpEx.StatusCode}.");
+            Logger.DeviceInfoFetchFailed(device.Network.Ip, httpEx.StatusCode);
         }
         catch (Exception ex)
         {
-            Logger.LogWarning($"Error trying to fetch info of device {device.Network.Ip}: {ex.GetType().Name} {ex.Message} {ex.StackTrace}.");
+            Logger.DeviceInfoFetchErrorOccurred(ex, device.Network.Ip);
         }
         finally
         {

@@ -9,14 +9,9 @@ namespace ViciOne.Driver.IoTCore.Interfaces;
 public interface IIoLinkSubscriberSettings
 {
     /// <summary>
-    /// The IO-Link master's address.
+    /// The identifier of the IoTCoreConfiguration this subscriber reads through.
     /// </summary>
-    IRuntimeSetting<string> Address { get; }
-
-    /// <summary>
-    /// An optional free-text tag identifying this specific configuration.
-    /// </summary>
-    IRuntimeSetting<string> ApplicationSpecificTag { get; }
+    IRuntimeSetting<string> Identifier { get; }
 
     /// <summary>
     /// The expected connected device's device ID.
@@ -32,9 +27,6 @@ public interface IIoLinkSubscriberSettings
     /// The ISDU index of the process data to subscribe to.
     /// </summary>
     IRuntimeSetting<ushort> ProcessDataInIndex { get; }
-
-    // TODO: check what this is relevant for
-    IRuntimeSetting<string> ProductName { get; }
 
     /// <summary>
     /// The expected connected device's vendor ID.

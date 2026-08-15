@@ -2,27 +2,19 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ifm.Common.Variant;
-using ifm.DataStore;
 using ifm.IoddParser.Contracts;
 using ifm.IoddParser.Helpers;
-using ifm.IoTCore;
-using ifm.IoTCore.Common;
 using ifm.IoTCore.Common.Exceptions;
 using ifm.IoTCore.Contracts;
-using ifm.IoTCore.Device.IoTCore;
 using ifm.IoTCore.ElementManager.Contracts.Elements;
-using ifm.IoTCore.MessageConverter.Json;
-using ifm.IoTCore.NetAdapter.Http.Client;
 using ifm.IoTCore.Profile.DeviceManagement;
 using ifm.IoTCore.Profile.DeviceManagement.ServiceData.Requests;
 using Microsoft.Extensions.Logging;
-using ViciOne.Communication.IoTCore;
 using ViciOne.Communication.IoTCore.Extensions;
 using ViciOne.Communication.IoTCore.IoddStore;
 using ViciOne.DeviceTree.Contracts;
@@ -37,7 +29,7 @@ namespace ViciOne.Driver.IoTCore;
 /// <para>Shared across multiple driver instances via <see cref="DeviceManager"/> rather than owned by any one
 /// of them.</para>
 /// </summary>
-public sealed class IoLinkMaster : IDisposable
+public sealed partial class IoLinkMaster : IDisposable
 {
     /// <summary>
     /// The default display name for a connected IO-Link device with no name of its own yet.
@@ -79,7 +71,7 @@ public sealed class IoLinkMaster : IDisposable
     private bool _disposed;
     private readonly Lock _getDataLock = new();
     private readonly SemaphoreSlim _requestGate = new(1, 1);
-    private readonly HttpClientNetAdapterFactory _httpClientNetAdapterFactory;
+    private readonly IDisposable _clientNetAdapterFactory;
     private string _lastLoggedMessage = string.Empty;
     private readonly ILogger _logger;
     private readonly ConcurrentDictionary<int, DeviceProcessDataRegistration> _portProcessDataRegistrations = [];
@@ -97,6 +89,12 @@ public sealed class IoLinkMaster : IDisposable
     private PeriodicTimer? _pollingTimer;
     private Dictionary<int, IoLinkMasterPortDeviceInfo>? _portDeviceInfos;
     private readonly Lazy<RecordingManager> _recordingManager;
+    // When set, every port's cyclic data is read in a single "getdatamulti" request per polling cycle instead
+    // of one request per element - see PollingAsync/PrefetchPortData.
+    private readonly bool _useGetDataMulti;
+    // The values read by the current cycle's single "getdatamulti" request, keyed by full element address, or
+    // null outside a prefetched cycle - GetDataValueAsValue serves reads from here while it is set.
+    private Dictionary<string, VariantValue>? _prefetchedValues;
 
     /// <summary>
     /// The underlying ifm.IoTCore SDK connection.
@@ -185,21 +183,36 @@ public sealed class IoLinkMaster : IDisposable
     /// <param name="logger">The logger to report connection and polling issues to.</param>
     /// <param name="username">The username to authenticate with, or <see langword="null"/> for no authentication.</param>
     /// <param name="password">The password to authenticate with, ignored if <paramref name="username"/> is <see langword="null"/>.</param>
-    public IoLinkMaster(string address, ILogger logger, string? username = null, string? password = null)
+    /// <param name="useGetDataMulti">Whether to read every port's cyclic data in one "getdatamulti" request per polling cycle instead of one request per element.</param>
+    public IoLinkMaster(string address, ILogger logger, string? username = null, string? password = null, bool useGetDataMulti = false)
     {
         if (string.IsNullOrWhiteSpace(address))
             throw new ArgumentException($"{nameof(Address)} cannot be null or empty.", nameof(address));
 
         Address = address;
-        Uri = new UriBuilder(address).Uri;
         _logger = logger;
         Username = username;
         Password = password;
+        _useGetDataMulti = useGetDataMulti;
 
-        ifm.Logger.Contracts.ILogger ifmLogger = new MicrosoftLoggerAdapter(logger);
-        ConnectionComponents connection = BuildConnection(Uri, ifmLogger);
+        // A master accepts credentials on no transport but HTTPS, so a master reached with a user name is
+        // reached over HTTPS on the standard secure port; one reached without is left on the address as given.
+        // The presence of a user name is what decides this: it is only ever set for a master that asked for
+        // one, so no separate check against the master is needed - and none that could fail while it is
+        // unreachable.
+        bool authenticate = !string.IsNullOrWhiteSpace(username);
+        UriBuilder uriBuilder = new(address);
+        if (authenticate)
+        {
+            uriBuilder.Scheme = "https";
+            if (uriBuilder.Port is 80 or -1)
+                uriBuilder.Port = 443;
+        }
+        Uri = uriBuilder.Uri;
+
+        ConnectionComponents connection = IoLinkMasterConnectionFactory.Build(Uri, logger, TimeSpan.FromSeconds(30));
         Core = connection.Core;
-        _httpClientNetAdapterFactory = connection.HttpClientNetAdapterFactory;
+        _clientNetAdapterFactory = connection.ClientNetAdapterFactory;
         _deviceManager = connection.DeviceManager;
         _deviceType = connection.DeviceType;
         _deviceProfileBuilder = connection.ProfileBuilder;
@@ -224,64 +237,6 @@ public sealed class IoLinkMaster : IDisposable
     }
 
     /// <summary>
-    /// The new SDK types that make up one master connection, bundled together so <see cref="BuildConnection"/>
-    /// can be a single, self-contained step in the constructor instead of a dozen loose local variables.
-    /// </summary>
-    private readonly record struct ConnectionComponents(
-        IIoTCore Core,
-        HttpClientNetAdapterFactory HttpClientNetAdapterFactory,
-        ifm.IoTCore.Device.Contracts.DeviceManager DeviceManager,
-        string DeviceType,
-        DeviceManagementProfileBuilder ProfileBuilder);
-
-    /// <summary>
-    /// Wires up a new, unmirrored <see cref="IIoTCore"/> connection: data store, HTTP net adapter, device
-    /// factory registration, and device-management profile builder - everything needed before
-    /// <see cref="MirroringAsync"/> can call <c>AddDevice</c>.
-    /// </summary>
-    /// <param name="uri">The master's address, used to derive the connection's data store file and SDK identifier.</param>
-    /// <param name="ifmLogger">The new SDK's own logger type (see <see cref="MicrosoftLoggerAdapter"/>), passed to every SDK component that needs one.</param>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Objekte verwerfen, bevor Bereich verloren geht", Justification = "Ownership of the created disposables transfers to the returned ConnectionComponents; the constructor stores them in fields and disposes them in Dispose().")]
-    private static ConnectionComponents BuildConnection(Uri uri, ifm.Logger.Contracts.ILogger ifmLogger)
-    {
-        string iotCoreName = $"IoTCore-{uri.DnsSafeHost}-{uri.Port}";
-        // The new SDK's element identifiers reject characters like the dots in an IP-address host (throws
-        // ArgumentException from BaseElement's ctor) - sanitize before use as the IoTCore's own identifier.
-        // The unsanitized name is still used below for the (unrelated) data store file name.
-        string sanitizedIotCoreName = AddressParser.ReplaceInvalidCharacters(iotCoreName, "_");
-
-        string dataStorePath = Path.Combine(Path.GetTempPath(), $"{iotCoreName}-datastore.json");
-        DataStore dataStore = new(dataStorePath);
-
-        IIoTCore core = IoTCoreFactory.Create(sanitizedIotCoreName, dataStore, ifmLogger);
-
-        HttpClientNetAdapterFactory httpClientNetAdapterFactory = new(
-            new MessageConverter(), TimeSpan.FromSeconds(10), true, ifmLogger);
-        core.ClientNetAdapterManager.RegisterClientNetAdapterFactory(httpClientNetAdapterFactory);
-
-        ifm.IoTCore.Device.Contracts.DeviceManager deviceManager = new();
-        // Without a registered IoTCoreDeviceFactory, AddDevice below fails with "device type not supported" -
-        // this is the new SDK's replacement for what the old SDK handled internally.
-        // The TimeSpan is this factory's fallback value-cache lifetime, used only for devices added without one
-        // of their own. MirroringAsync always passes ValueCacheSeconds explicitly, which overrides it.
-        IoTCoreDeviceFactory ioTCoreDeviceFactory = new(
-            core.ElementManager, core.PersistenceManager, core.EventSender, ifmLogger,
-            core.ClientNetAdapterManager, TimeSpan.FromSeconds(30), new Config());
-        deviceManager.RegisterDeviceFactory(ioTCoreDeviceFactory);
-
-        ifm.IoTCore.Profile.DeviceManagement.Config.DeviceManagement settings = new(
-            // The 3-parameter DeviceMonitor ctor (heartbeat, treeChanged, interval) throws
-            // "Invalid value '0' for parameter 'interval'" internally - use the parameterless ctor instead.
-            new ifm.IoTCore.Profile.DeviceManagement.Config.DeviceMonitor(), []);
-
-        DeviceManagementProfileBuilder profileBuilder = new(
-            core.ElementManager, core.ClientNetAdapterManager, core.DataStore, deviceManager, ifmLogger, settings);
-        profileBuilder.Build();
-
-        return new ConnectionComponents(core, httpClientNetAdapterFactory, deviceManager, ioTCoreDeviceFactory.Type, profileBuilder);
-    }
-
-    /// <summary>
     /// Evaluates whether an IODD <paramref name="condition"/> is met for the given device, reading and caching
     /// the referenced condition variable's value on the master if not already cached.
     /// </summary>
@@ -302,8 +257,7 @@ public sealed class IoLinkMaster : IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Acyclic read failed for condition variable index {Index} subindex {SubIndex} on '{DeviceAddress}'. Using default value from IODD.",
-                    condition.Variable.Index, condition.SubIndex, deviceAddress);
+                _logger.AcyclicReadFailed(ex, condition.Variable.Index, condition.SubIndex, deviceAddress);
             }
 
             if (readValue is { Length: > 0 })
@@ -388,7 +342,7 @@ public sealed class IoLinkMaster : IDisposable
         }
 
         ClearConditionValueCache();
-        _httpClientNetAdapterFactory.Dispose();
+        _clientNetAdapterFactory.Dispose();
         _deviceManager.Dispose();
         _requestGate.Dispose();
 
@@ -428,7 +382,7 @@ public sealed class IoLinkMaster : IDisposable
     /// </returns>
     internal IoLinkMasterPortDeviceAvailabilityInfo? GetPortDeviceAvailabilityInfo(int portIndex)
     {
-        //TODO: verriegeln?
+        //TODO: lock?
         if (_portDeviceInfos is null || _portDeviceInfos.TryGetValue(portIndex, out IoLinkMasterPortDeviceInfo? portDeviceInfo) is false)
             return null;
 
@@ -454,10 +408,10 @@ public sealed class IoLinkMaster : IDisposable
 
             IDevice? device = null;
             try { device = IoddCatalog.GetIoddDevice(registration.Value.VendorId, registration.Value.DeviceId); }
-            catch (Exception ex) { _logger.ErrorWhileLoadingIodd(registration.Value.VendorId, registration.Value.DeviceId, ex.Message, ex); }
+            catch (Exception ex) { _logger.ErrorWhileLoadingIodd(Address, registration.Value.VendorId, registration.Value.DeviceId, ex); }
             if (device is null)
             {
-                _logger.UnknownDeviceFound(registration.Value.VendorId, registration.Value.DeviceId, Uri);
+                LogUnknownDeviceFound(registration.Value.VendorId, registration.Value.DeviceId);
                 continue;
             }
 
@@ -485,6 +439,15 @@ public sealed class IoLinkMaster : IDisposable
     /// <returns>The element's value, or <see langword="null"/> if skipped.</returns>
     internal VariantValue? GetDataValueAsValue(string elementAddress, bool skipIfInTimeout, out bool skippedBecauseOfTimeout, bool isConnectivityProbe = false)
     {
+        // Inside a prefetched cycle every value was already read in one batch request (see PrefetchPortData),
+        // which also resolved the master-wide Timeout - so serve from that batch instead of a live request.
+        Dictionary<string, VariantValue>? prefetched = _prefetchedValues;
+        if (prefetched is not null)
+        {
+            skippedBecauseOfTimeout = false;
+            return prefetched.GetValueOrDefault(elementAddress);
+        }
+
         IoTCoreException? timeoutException;
         bool timeoutBefore = Timeout;
 
@@ -519,8 +482,66 @@ public sealed class IoLinkMaster : IDisposable
             TimeoutChanged?.Invoke();
 
         ExceptionDispatchInfo.Capture(timeoutException).Throw();
-        // Compiler zufriedenstellen...
+        // Satisfy the compiler...
         return null;
+    }
+
+    /// <summary>
+    /// Reads every port's cyclic data (mode, device status, vendor/device id and process-data-in) in a single
+    /// "getdatamulti" request and stores it in <see cref="_prefetchedValues"/> for the rest of the polling cycle,
+    /// so <see cref="ProbePorts"/> and <see cref="ReadAndDispatchProcessData"/> serve their reads from it.
+    /// <para>This one request is also the cycle's connectivity check: a transport timeout sets the master-wide
+    /// <see cref="Timeout"/> (and skips probing this cycle), a success clears it. Non-timeout failures are logged
+    /// and skip the cycle too.</para>
+    /// </summary>
+    /// <returns><see langword="true"/> if the batch succeeded and probing should proceed, <see langword="false"/> if the master was unreachable.</returns>
+    private bool PrefetchPortData()
+    {
+        List<string> addresses = [];
+        foreach (IoLinkMasterPortDeviceInfo portDeviceInfo in _portDeviceInfos!.Values)
+        {
+            addresses.Add(portDeviceInfo.PortModeAddress);
+            addresses.Add(portDeviceInfo.DeviceStatusAddress);
+            addresses.Add(portDeviceInfo.VendorIdAddress);
+            addresses.Add(portDeviceInfo.DeviceIdAddress);
+            addresses.Add($"{portDeviceInfo.Address}{PdInAddressSuffix}");
+        }
+
+        try
+        {
+            _prefetchedValues = GetDataMulti(addresses);
+        }
+        catch (Exception ex)
+        {
+            _prefetchedValues = null;
+            if (ex is IoTCoreException { IsTimeout: true } && Timeout is false)
+            {
+                Timeout = true;
+                TimeoutChanged?.Invoke();
+            }
+            LogPollingError(ex);
+            return false;
+        }
+
+        if (Timeout)
+        {
+            Timeout = false;
+            TimeoutChanged?.Invoke();
+            LogConnectionReEstablished();
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Reads the given element addresses from the master in a single "getdatamulti" request, serialized against
+    /// the master's other requests.
+    /// </summary>
+    /// <param name="elementAddresses">The element addresses to read, in this master's mirrored address space.</param>
+    /// <returns>The read values keyed by their (full) element address; an address the master did not answer is absent.</returns>
+    private Dictionary<string, VariantValue> GetDataMulti(IReadOnlyCollection<string> elementAddresses)
+    {
+        lock (_getDataLock)
+            return PortDataBatchReader.Read(Core, _mirroredDeviceAddress!, elementAddresses);
     }
 
     /// <summary>
@@ -531,30 +552,6 @@ public sealed class IoLinkMaster : IDisposable
     /// <param name="ignoreTimedValueArray">Whether to skip decoding the recorded raw data into timed values.</param>
     public void GetRecordingBlobData(string identifier, int portIndex, bool ignoreTimedValueArray)
         => _recordingManager.Value.GetRecordingBlobData(identifier, portIndex, ignoreTimedValueArray);
-
-    /// <summary>
-    /// Logs that the connection was re-established, if a connection error was previously logged.
-    /// </summary>
-    private void LogConnectionReEstablished()
-    {
-        if (string.IsNullOrWhiteSpace(_lastLoggedMessage))
-            return;
-        _lastLoggedMessage = string.Empty;
-        _logger.ConnectionReEstablished(Uri);
-    }
-
-    /// <summary>
-    /// Logs a polling-cycle exception, suppressing repeats of the same message to avoid flooding the log while
-    /// a condition persists across many polling cycles.
-    /// </summary>
-    private void LogPollingError(Exception ex)
-    {
-        string error = ex.Message;
-        if (string.Equals(_lastLoggedMessage, error, StringComparison.OrdinalIgnoreCase))
-            return;
-        _lastLoggedMessage = error;
-        _logger.PollingErrorOccurred(ex, Uri);
-    }
 
     /// <summary>
     /// Repeatedly attempts <see cref="MirroringAsync"/> until it succeeds or this master is disposed.
@@ -574,9 +571,14 @@ public sealed class IoLinkMaster : IDisposable
     {
         try
         {
-            AuthenticationRequestServiceData? authentication = Username is null
+            // A master with security enabled expects the user name and password Base64-encoded in the request,
+            // so they are encoded here before being sent.
+            static string EncodeBase64(string? value)
+                => Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(value ?? string.Empty));
+
+            AuthenticationRequestServiceData? authentication = string.IsNullOrWhiteSpace(Username)
                 ? null
-                : new AuthenticationRequestServiceData(Username, Password);
+                : new AuthenticationRequestServiceData(EncodeBase64(Username), EncodeBase64(Password));
 
             AddDeviceRequestServiceData addRequest = new(
                 type: _deviceType,
@@ -586,8 +588,8 @@ public sealed class IoLinkMaster : IDisposable
                 persist: false,
                 authentication: authentication,
                 cacheTimeout: ValueCacheSeconds,
-                // KRITISCH: bei true wird die Verbindung zwar erfolgreich geprueft, aber das Geraet nicht in
-                // den Elementbaum eingehaengt (leerer "remote"-Knoten)
+                // CRITICAL: with true the connection is verified successfully, but the device is not mounted
+                // into the element tree (empty "remote" node)
                 checkConnection: false);
 
             _deviceProfileBuilder.AddDevice(Core.Root, addRequest, acquireLock: true);
@@ -603,7 +605,7 @@ public sealed class IoLinkMaster : IDisposable
             _portDeviceInfos = CreatePortInfos(deviceElement);
             Security = QuerySecurity(deviceElement);
 
-            _logger.MirroringCompleted(Uri);
+            LogMirroringCompleted();
             Initialized = true;
 
             _pollingTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(PollingWaitTime));
@@ -614,7 +616,7 @@ public sealed class IoLinkMaster : IDisposable
             if (_mirroringErrorLogged == false)
             {
                 _mirroringErrorLogged = true;
-                _logger.MirroringErrorOccurred(ex, Uri);
+                LogMirroringError(ex);
             }
             await DelayAndIgnoreCancellation(ErrorWaitTime);
         }
@@ -650,7 +652,7 @@ public sealed class IoLinkMaster : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Could not query security information for '{Uri}'.", Uri);
+            LogSecurityQueryFailed(ex);
         }
 
         return new DeviceTreeIoLinkMasterSecurity();
@@ -661,10 +663,10 @@ public sealed class IoLinkMaster : IDisposable
     /// </summary>
     private async Task PollingTaskAsync(PeriodicTimer timer)
     {
-        _logger.PollingStarted(Uri);
+        LogPollingStarted();
         while (await timer.WaitForNextTickAsync(CancellationToken.None))
             await PollingAsync();
-        _logger.PollingStopped(Uri);
+        LogPollingStopped();
     }
 
     /// <summary>
@@ -684,15 +686,28 @@ public sealed class IoLinkMaster : IDisposable
             InitializeRegistrations();
             await Task.Delay(50);
 
-            ProbePorts();
-            ReportPendingChildDevicesChanged();
+            // When reading in batches, the single getdatamulti request is both this cycle's connectivity check
+            // and the source every port read below is served from - if it fails the master is unreachable and
+            // there is nothing to probe this cycle.
+            if (_useGetDataMulti && PrefetchPortData() is false)
+                return;
 
-            // A device can be genuinely present (correct vendor/device id) but not yet answer process data
-            // queries right after (re-)connecting, e.g. while IO-Link negotiation is still in progress -
-            // reading it only once the master itself is confirmed reachable means neither a slow/failing
-            // read for one device nor its own try/catch can undo the availability just established above.
-            if (Timeout is false)
-                ReadAndDispatchProcessData();
+            try
+            {
+                ProbePorts();
+                ReportPendingChildDevicesChanged();
+
+                // A device can be genuinely present (correct vendor/device id) but not yet answer process data
+                // queries right after (re-)connecting, e.g. while IO-Link negotiation is still in progress -
+                // reading it only once the master itself is confirmed reachable means neither a slow/failing
+                // read for one device nor its own try/catch can undo the availability just established above.
+                if (Timeout is false)
+                    ReadAndDispatchProcessData();
+            }
+            finally
+            {
+                _prefetchedValues = null;
+            }
         }
         finally
         {

@@ -19,6 +19,11 @@ public static class IoTCoreExtensions
     // verified live against a real IO-Link master that these literal wire identifiers are unchanged.
     private const string IolReadAcyclicIdentifier = "iolreadacyclic";
     private const string ValueKey = "value";
+    // The "getdatamulti" request lists the addresses to read under "datatosend"; each answered address maps to
+    // an object carrying the read value under "data" - verified live against a real IO-Link master.
+    private const string GetDataMultiIdentifier = "getdatamulti";
+    private const string DataToSendKey = "datatosend";
+    private const string DataKey = "data";
 
     extension(IIoTCore core)
     {
@@ -62,6 +67,36 @@ public static class IoTCoreExtensions
         /// <returns>The current value, or <see langword="null"/> if it couldn't be read.</returns>
         public VariantObject? GetDataValueAsObject(string elementAddress)
             => ExtractValue<VariantObject>(core.GetData(elementAddress));
+
+        /// <summary>
+        /// Reads several element values in one "getdatamulti" request instead of one request per element.
+        /// </summary>
+        /// <param name="deviceAddress">The address of the device whose "getdatamulti" service to invoke.</param>
+        /// <param name="elementAddresses">The element addresses to read, in the space the invoked service expects.</param>
+        /// <returns>The read values keyed by their element address; an address the service did not answer with a value is absent.</returns>
+        /// <exception cref="InvalidOperationException"><paramref name="deviceAddress"/> exposes no "getdatamulti" service.</exception>
+        public Dictionary<string, VariantValue> GetDataMulti(string deviceAddress, IReadOnlyCollection<string> elementAddresses)
+        {
+            string serviceAddress = $"{deviceAddress}/{GetDataMultiIdentifier}";
+            IServiceElement service = GetServiceElement(core, serviceAddress)
+                ?? throw new InvalidOperationException($"No '{GetDataMultiIdentifier}' service exists at '{serviceAddress}'.");
+
+            VariantArray addressesToSend = [];
+            foreach (string elementAddress in elementAddresses)
+                addressesToSend.Add(new VariantValue(elementAddress));
+            VariantObject request = new() { { DataToSendKey, addressesToSend } };
+
+            VariantObject response = service.Invoke(request, new ServiceInfo()).AsVariantObject();
+            Dictionary<string, VariantValue> values = new(StringComparer.Ordinal);
+            foreach (string elementAddress in elementAddresses)
+            {
+                if (response.TryGetValue(elementAddress, out Variant? entry) &&
+                    entry.AsVariantObject().TryGetValue(DataKey, out Variant? data) &&
+                    data is VariantValue value)
+                    values[elementAddress] = value;
+            }
+            return values;
+        }
 
         /// <summary>
         /// Reads an ISDU value from <paramref name="deviceAddress"/> via its "iolreadacyclic" service.

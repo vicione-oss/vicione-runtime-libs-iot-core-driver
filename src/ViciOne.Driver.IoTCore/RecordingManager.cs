@@ -13,7 +13,7 @@ namespace ViciOne.Driver.IoTCore;
 /// <summary>
 /// Queues and executes BLOB-channel raw-data recordings for one IO-Link master, one port at a time.
 /// </summary>
-public sealed class RecordingManager : IDisposable
+public sealed partial class RecordingManager : IDisposable
 {
     private readonly BlobRecorder _blobRecorder;
     private bool _disposed;
@@ -126,10 +126,10 @@ public sealed class RecordingManager : IDisposable
 
                         BlobDataReceived?.Invoke(measurement);
 
-                        _logger.RecordingDataReceived(pair.PortIndex, _address);
+                        LogRecordingDataReceived(pair.PortIndex);
                     }
                     else
-                        _logger.RecordingDataWarningOccurred(pair.PortIndex, _address, errorMessage!);
+                        LogRecordingDataWarning(pair.PortIndex, errorMessage!);
                 }
             }
             catch (ObjectDisposedException)
@@ -138,7 +138,7 @@ public sealed class RecordingManager : IDisposable
             { }
             catch (Exception ex)
             {
-                _logger.RecordingDataErrorOccurred(ex, pair.PortIndex, _address);
+                LogRecordingDataError(ex, pair.PortIndex);
             }
             finally
             {

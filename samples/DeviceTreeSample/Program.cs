@@ -52,7 +52,7 @@ internal sealed class Program
         IoLinkParser.Initialize(ioddDirectory, true, logger);
 
         var instanceHandle = Guid.NewGuid();
-        IoLinkMaster device = DeviceManager.GetOrAddIoLinkMaster(deviceAddress, instanceHandle, logger);
+        IoLinkMaster device = DeviceManager.GetOrAddIoLinkMaster(deviceAddress, deviceAddress, instanceHandle, logger);
         DeviceTreeIoLinkMaster deviceTree = await IoLinkParser.ParseDeviceAsync(device, logger);
         DeviceManager.ReleaseDevices(instanceHandle);
 

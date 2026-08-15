@@ -7,10 +7,9 @@ namespace ifm.IOLink;
 
 public sealed partial class BlobSubscriber
 {
-    private const string Unknown_ApplicationSpecificTag = "unknown";
     private const string Unknown_ProductName = "unknown";
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Verwerfbare Felder verwerfen", Justification = "Wird vom DeviceManager freigegeben.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Released by the DeviceManager.")]
     private IoLinkMaster? _device;
     private string? _recordingIdentifier;
     private bool _waitingForData;
@@ -29,8 +28,7 @@ public sealed partial class BlobSubscriber
 
     private string GetRecordingIdentifier()
         => new IoLinkRawDataIdentifier(
-            Settings.Address.Value!,
-            Settings.ApplicationSpecificTag.Value ?? Unknown_ApplicationSpecificTag,
+            _device?.Address ?? string.Empty,
             Settings.PortIndex.Value,
             Settings.VendorId.Value,
             Settings.DeviceId.Value,
@@ -47,17 +45,15 @@ public sealed partial class BlobSubscriber
         if (Driver is not IoTCoreDriver driver)
             throw new InvalidCastException($"Could not cast to {nameof(IoTCoreDriver)}.");
 
-        if (Settings.Address.Value is null)
-            throw new ArgumentException("Invalid address configuration.");
+        if (string.IsNullOrWhiteSpace(Settings.Identifier.Value))
+            throw new ArgumentException("Invalid identifier configuration.");
 
-        if (Settings.ProductName.Value is null)
-            throw new ArgumentException("Invalid product name configuration.");
+        // This is in InitializeII so the IoTCoreConfiguration for this identifier has run its InitializeI first,
+        // creating (and authenticating) the master this subscriber now reads through.
+        _device = driver.GetIoLinkMaster(Settings.Identifier.Value);
+        _device.BlobDataReceived += OnBlobDataReceived;
 
         _recordingIdentifier = GetRecordingIdentifier();
-
-        // This is in InitializeII so DeviceTreeSubscriber initializes first and creates the device with the configured IoddDirectory
-        _device = driver.GetOrAddIoLinkMaster(Settings.Address.Value);
-        _device.BlobDataReceived += OnBlobDataReceived;
     }
 
     private void OnBlobDataReceived(Measurement measurement)

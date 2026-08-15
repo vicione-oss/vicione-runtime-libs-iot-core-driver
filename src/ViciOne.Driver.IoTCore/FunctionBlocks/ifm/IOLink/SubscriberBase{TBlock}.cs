@@ -79,14 +79,12 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
         if (Driver is not IoTCoreDriver driver)
             throw new InvalidCastException($"Could not cast to {nameof(IoTCoreDriver)}.");
 
-        if (Settings.Address.Value is null)
-            throw new ArgumentException("Invalid address configuration.");
+        if (string.IsNullOrWhiteSpace(Settings.Identifier.Value))
+            throw new ArgumentException("Invalid identifier configuration.");
 
-        if (Settings.ProductName.Value is null)
-            throw new ArgumentException("Invalid product name configuration.");
-
-        // This is in InitializeII so DeviceTreeSubscriber initializes first and creates the device with the configured IoddDirectory
-        Device = driver.GetOrAddIoLinkMaster(Settings.Address.Value);
+        // This is in InitializeII so the IoTCoreConfiguration for this identifier has run its InitializeI first,
+        // creating (and authenticating) the master this subscriber now reads through.
+        Device = driver.GetIoLinkMaster(Settings.Identifier.Value);
         Device.ChildDevicesChanged += OnDeviceTimeoutChanged;
         Device.TimeoutChanged += OnDeviceChildDevicesChanged;
         Device.RegisterProcessDataIn(Settings.PortIndex.Value, Settings.VendorId.Value, Settings.DeviceId.Value, Settings.ProcessDataInIndex.Value, this);
@@ -101,7 +99,7 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
     private void SetAvailable(bool available)
         => SetConnectorValue(AvailableRuntimeConnector, available);
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Schnittstellenmethoden müssen von untergeordneten Typen aufgerufen werden können", Justification = "The derived blocks do not need to call the method.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "The derived blocks do not need to call the method.")]
     void IIoLinkSubscriberFunctionBlock.SetValue(object value, string displayFormat)
     {
         if (FunctionBlockEnabled)
@@ -117,7 +115,7 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Schnittstellenmethoden müssen von untergeordneten Typen aufgerufen werden können", Justification = "The derived blocks do not need to call the method.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "The derived blocks do not need to call the method.")]
     void IIoLinkSubscriberFunctionBlock.SetUnit(string unit)
         => SetConnectorValue(UnitRuntimeConnector, unit);
 

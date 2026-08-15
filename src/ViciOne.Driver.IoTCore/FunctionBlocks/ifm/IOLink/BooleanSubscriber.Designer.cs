@@ -66,13 +66,8 @@ public partial class BooleanSubscriber : SubscriberBase<BooleanSubscriber>
     {
         /// <inheritdoc/>
         [SettingDesign("1952d10d-df1d-4d78-8d62-71b38c6f13f0", "e02cd08c-17fe-4cd0-89a7-4dd887a15258", "b03da5d9-dd28-4378-849c-fdeae68576bd")]
-        [Description("The IO-Link master's address.")]
-        public IRuntimeSetting<string> Address { get; internal set; }
-
-        /// <inheritdoc/>
-        [SettingDesign("8129883e-5df3-429b-8d9c-7b18f191f381", "f8e259b0-cef6-4c4d-82b2-6c8f6fa3e2db", "c3d3af24-100d-4564-91ae-2167155f12cc")]
-        [Description("An optional free-text tag identifying this specific configuration.")]
-        public IRuntimeSetting<string> ApplicationSpecificTag { get; internal set; }
+        [Description("The identifier of the IoTCoreConfiguration this subscriber reads through.")]
+        public IRuntimeSetting<string> Identifier { get; internal set; }
 
         /// <inheritdoc/>
         [SettingDesign("d3c2f6e2-9f4c-4153-88ef-91b33bf3326a", "4bafaaac-3fc9-4e77-957c-825bf9d5b73a", "cad4d671-9f0d-4139-b856-12026c87e453")]
@@ -83,10 +78,6 @@ public partial class BooleanSubscriber : SubscriberBase<BooleanSubscriber>
         [SettingDesign("9ce0c188-1f51-423c-9e21-de9da593dcf7", "0a9ea5b2-fc38-4c8c-9ba5-7dde68fead2d", "53812c52-abfd-4bee-bd35-edad06a0e766")]
         [Description("The expected connected device's device ID.")]
         public IRuntimeSetting<uint> DeviceId { get; internal set; }
-
-        /// <inheritdoc/>
-        [SettingDesign("06e858fb-f9ff-4b89-859b-6063898acba7", "aef878a0-bcd3-4a0a-8487-87f4f5e8afb7", "4a5c55a7-ded6-4f75-946f-a4ea73c22b41")]
-        public IRuntimeSetting<string> ProductName { get; internal set; }
 
         /// <inheritdoc/>
         [SettingDesign("8eb74be8-63a6-470c-8eca-3b8fcedcd7a7", "201762d5-d6b3-4ec7-9b0d-cd9f297193f8", "2bf240ce-0375-4af4-b332-04b36e503456")]

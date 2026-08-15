@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace ViciOne.Driver.IoTCore;
 
 /// <summary>
-/// Caches the values IODD <c>Condition</c> elements read from a device while decoding process data.
+/// Caches the values of IODD <c>Condition</c> elements read from a device while decoding process data.
 /// <para>A condition variable's value never changes at runtime, so once read it can be reused for every later
 /// decode instead of being re-read from the device each time.</para>
 /// </summary>

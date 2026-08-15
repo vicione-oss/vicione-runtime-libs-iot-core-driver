@@ -8,13 +8,14 @@ using Description = System.ComponentModel.DescriptionAttribute;
 namespace ifm.IOLink;
 
 /// <summary>
-/// Builds and publishes the IO-Link master's device tree, refreshing it whenever a port's connected device
-/// changes or reconnects.
+/// The connection to one IO-Link master: reaches it at the configured address, with the configured
+/// credentials when it requires them, builds and publishes its device tree, and refreshes the tree whenever a
+/// port's connected device changes or reconnects.
 /// </summary>
 [FunctionBlockDesign("d43d0507-5f31-4e56-aaed-4ca76a44d971", "102c8c74-6b78-48bb-ab78-c92eacb85f6a", "e34ecfd3-d1ff-431b-909d-e894343ff667")]
 [Driver<IoTCoreDriver>]
-[Description("Builds and publishes the IO-Link master's device tree, refreshing it whenever a port's connected device changes or reconnects.")]
-public partial class DeviceTreeSubscriber : RuntimeFunctionBlock<DeviceTreeSubscriber>
+[Description("The connection to one IO-Link master: reaches it at the configured address, with the configured credentials when it requires them, and publishes its device tree, refreshing it whenever a port's connected device changes or reconnects.")]
+public partial class IoTCoreConfiguration : RuntimeFunctionBlock<IoTCoreConfiguration>
 {
     /// <summary>
     /// The FunctionBlock's process data inputs.
@@ -22,17 +23,17 @@ public partial class DeviceTreeSubscriber : RuntimeFunctionBlock<DeviceTreeSubsc
     public new Inputs_ ProcessDataInputs { get; } = new Inputs_();
 
     /// <summary>
-    /// The process data inputs of <see cref="DeviceTreeSubscriber"/>.
+    /// The process data inputs of <see cref="IoTCoreConfiguration"/>.
     /// </summary>
     [InputConnectorDesigns]
     public class Inputs_
     {
         /// <summary>
-        /// Set to force a device tree rebuild.
+        /// Set to rebuild the device tree.
         /// </summary>
         [InputConnectorDesign("0ae3d21f-0797-4949-bed9-2e885934753e")]
-        [Description("Set to force a device tree rebuild.")]
-        public IRuntimeConnector<bool> Trigger { get; internal set; }
+        [Description("Set to rebuild the device tree.")]
+        public IRuntimeConnector<bool> RebuildDeviceTree { get; internal set; }
     }
 
     /// <summary>
@@ -41,7 +42,7 @@ public partial class DeviceTreeSubscriber : RuntimeFunctionBlock<DeviceTreeSubsc
     public new Outputs_ ProcessDataOutputs { get; } = new Outputs_();
 
     /// <summary>
-    /// The process data outputs of <see cref="DeviceTreeSubscriber"/>.
+    /// The process data outputs of <see cref="IoTCoreConfiguration"/>.
     /// </summary>
     [OutputConnectorDesigns]
     public class Outputs_
@@ -67,17 +68,38 @@ public partial class DeviceTreeSubscriber : RuntimeFunctionBlock<DeviceTreeSubsc
     public new Settings_ Settings { get; } = new Settings_();
 
     /// <summary>
-    /// The configuration settings of <see cref="DeviceTreeSubscriber"/>.
+    /// The configuration settings of <see cref="IoTCoreConfiguration"/>.
     /// </summary>
     [SettingDesigns]
     public class Settings_
     {
         /// <summary>
+        /// A free-form label for this master's connection, by which other FunctionBlocks reference it.
+        /// </summary>
+        [SettingDesign("42ae537b-ec07-4b6d-9bf7-e2aa10e84f73", "59f7b0c2-89bf-46ca-8c4e-aa49fc18f8aa", "71d4209d-6a72-48ad-9784-2c16c53dab51")]
+        [Description("A free-form label for this master's connection, by which other FunctionBlocks reference it.")]
+        public IRuntimeSetting<string> Identifier { get; internal set; }
+
+        /// <summary>
         /// The IO-Link master's address.
         /// </summary>
         [SettingDesign("588d363b-0823-47c9-adf7-37db039ac408", "d9247849-fe00-4abb-97db-8267ed227a3a", "4d3c8be5-e3a2-4a38-9e3e-3119c4958c8e")]
         [Description("The IO-Link master's address.")]
-        public IRuntimeSetting<string> Url { get; internal set; }
+        public IRuntimeSetting<string> Address { get; internal set; }
+
+        /// <summary>
+        /// The username to authenticate with, or empty for no authentication.
+        /// </summary>
+        [SettingDesign("95edbd0b-68b9-4837-b843-5d3ef47e1391", "70c97b0a-d5a4-4ae3-b5e3-2a97a3cea510", "0251c6e4-19aa-4e18-9ebb-09b6dd428ef2")]
+        [Description("The username to authenticate with, or empty for no authentication.")]
+        public IRuntimeSetting<string> Username { get; internal set; }
+
+        /// <summary>
+        /// The password to authenticate with, ignored if <see cref="Username"/> is empty.
+        /// </summary>
+        [SettingDesign("ed4a3e98-09dd-4037-bf95-2765264c943f", "4ba1c935-88bc-45f7-b18a-48c2aba3c80f", "f7f7aafc-73e8-4114-92f0-c2cd2a46b188")]
+        [Description("The password to authenticate with, ignored if Username is empty.")]
+        public IRuntimeSetting<string> Password { get; internal set; }
 
         /// <summary>
         /// The directory IODD files are loaded from (and downloaded into, if <see cref="IoddAutoDownload"/> is set).
@@ -94,17 +116,12 @@ public partial class DeviceTreeSubscriber : RuntimeFunctionBlock<DeviceTreeSubsc
         public IRuntimeSetting<bool> IoddAutoDownload { get; internal set; }
 
         /// <summary>
-        /// The username to authenticate with, or empty for no authentication.
+        /// Whether to read several data points in a single request where the master supports it, instead of one
+        /// request per data point.
         /// </summary>
-        [SettingDesign("95edbd0b-68b9-4837-b843-5d3ef47e1391", "70c97b0a-d5a4-4ae3-b5e3-2a97a3cea510", "0251c6e4-19aa-4e18-9ebb-09b6dd428ef2")]
-        [Description("The username to authenticate with, or empty for no authentication.")]
-        public IRuntimeSetting<string> Username { get; internal set; }
-
-        /// <summary>
-        /// The password to authenticate with, ignored if <see cref="Username"/> is empty.
-        /// </summary>
-        [SettingDesign("ed4a3e98-09dd-4037-bf95-2765264c943f", "4ba1c935-88bc-45f7-b18a-48c2aba3c80f", "f7f7aafc-73e8-4114-92f0-c2cd2a46b188")]
-        [Description("The password to authenticate with, ignored if Username is empty.")]
-        public IRuntimeSetting<string> Password { get; internal set; }
+        [SettingDesign("0156985f-7efe-44e0-900f-88e2c008b891", "f15eedda-c6a9-469b-9430-016f33d8c9e4", "1a501da9-e358-4111-9510-839dce7e637e")]
+        [Description("Whether to read several data points in a single request where the master supports it, instead of one request per data point.")]
+        [DefaultValue(true)]
+        public IRuntimeSetting<bool> UseGetDataMulti { get; internal set; }
     }
 }
