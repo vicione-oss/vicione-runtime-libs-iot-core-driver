@@ -1,4 +1,4 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 
 namespace ViciOne.Communication.Vse.EventManager;

@@ -10,15 +10,23 @@ namespace ViciOne.Driver.IoTCore;
 /// </summary>
 internal sealed class DeviceProcessDataRegistration
 {
-    /// <summary>The connected device's parsed IODD, once known.</summary>
+    /// <summary>
+    /// The connected device's parsed IODD, once known.
+    /// </summary>
     public IDevice? DeviceDefinition { get; set; }
 
-    /// <summary>The connected device's device ID.</summary>
+    /// <summary>
+    /// The connected device's device ID.
+    /// </summary>
     public required uint DeviceId { get; init; }
 
-    /// <summary>The function blocks registered for process data, keyed by ISDU index.</summary>
+    /// <summary>
+    /// The function blocks registered for process data, keyed by ISDU index.
+    /// </summary>
     public ConcurrentDictionary<int, ConcurrentDictionary<IIoLinkSubscriberFunctionBlock, byte>> SubIndexRegistrations { get; } = [];
 
-    /// <summary>The connected device's vendor ID.</summary>
+    /// <summary>
+    /// The connected device's vendor ID.
+    /// </summary>
     public required ushort VendorId { get; init; }
 }

@@ -48,15 +48,14 @@ public sealed partial class IoLinkMaster : IDisposable
 
     private const int ErrorWaitTime = 5000;
     private const int PollingWaitTime = 1000;
-    // Not exposed as constants by the new SDK's own IoddParser packages (which only cover generic IODD
-    // decoding, not IO-Link master wire addresses) - these three address suffixes are unchanged from the old
-    // SDK's IoddConstants, confirmed against the live-tested mirrored device tree (see migration plan).
+    // The IO-Link master exposes each connected device's identity and status under these fixed address
+    // suffixes on its mirrored device element.
     private const string DeviceIdAddressSuffix = "/deviceid";
     private const string DeviceStatusAddressSuffix = "/status";
     private const string VendorIdAddressSuffix = "/vendorid";
 
     /// <summary>
-    /// The cache lifetime, in seconds, the SDK applies to every value read from a mirrored device. Zero keeps
+    /// The cache lifetime, in seconds, applied to every value read from a mirrored device. Zero keeps
     /// the polling loop reading through to the device: anything above it serves process data from the cache
     /// instead, and the polling loop cannot see values it never fetches. Leaving this unset falls back to the
     /// factory's own default of 30 seconds, which measurably froze process data (1 of 40 one-second samples
@@ -77,11 +76,11 @@ public sealed partial class IoLinkMaster : IDisposable
     private readonly ConcurrentDictionary<int, DeviceProcessDataRegistration> _portProcessDataRegistrations = [];
     private bool _mirroringErrorLogged;
     private readonly Task _mirroringTask;
-    // The "type" string the new SDK's DeviceManagementProfileBuilder expects in AddDeviceRequestServiceData -
+    // The "type" string the DeviceManagementProfileBuilder expects in AddDeviceRequestServiceData -
     // read off the registered IoTCoreDeviceFactory rather than hardcoded, since it's not otherwise documented.
     private readonly string _deviceType;
     // Set once mirroring succeeds (see MirroringAsync) - the actual mounted element's address, needed for
-    // RemoveDevice in Dispose since the new SDK's AddDevice does not reliably report it back (see MirroringAsync).
+    // RemoveDevice in Dispose since AddDevice does not reliably report it back (see MirroringAsync).
     private string? _mirroredDeviceAddress;
     // Detected but not-yet-reported change in child device availability, see PollingAsync.
     private bool _pendingChildDevicesChanged;
@@ -97,7 +96,7 @@ public sealed partial class IoLinkMaster : IDisposable
     private Dictionary<string, VariantValue>? _prefetchedValues;
 
     /// <summary>
-    /// The underlying ifm.IoTCore SDK connection.
+    /// The underlying ifm.IoTCore connection.
     /// </summary>
     public IIoTCore Core { get; }
 
@@ -319,8 +318,8 @@ public sealed partial class IoLinkMaster : IDisposable
     }
 
     /// <summary>
-    /// Stops the mirroring/polling loops, unmirrors the device tree if mirrored, and releases the underlying SDK
-    /// and recording resources.
+    /// Stops the mirroring/polling loops, unmirrors the device tree if mirrored, and releases the underlying
+    /// connection and recording resources.
     /// </summary>
     public void Dispose()
     {

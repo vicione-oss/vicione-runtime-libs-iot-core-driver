@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace ViciOne.Communication.Vse.EventManager;
 
 /// <summary>
-/// Subscribes to all events the Vse-SDK <see cref="IVSEDevice"/> raises and re-dispatches them, one at a time,
-/// on a dedicated background task. This decouples the (potentially expensive) event handlers from the SDK's own
+/// Subscribes to all events the <see cref="IVSEDevice"/> raises and re-dispatches them, one at a time,
+/// on a dedicated background task. This decouples the (potentially expensive) event handlers from the device's own
 /// callback thread and gives every event a single, consistent processing order.
 /// </summary>
 public sealed partial class DeviceEventManager : IDisposable

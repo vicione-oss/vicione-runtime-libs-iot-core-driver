@@ -24,7 +24,7 @@ public abstract class SubscriberBase<TBlock, TItem> : RuntimeFunctionBlock<TBloc
     protected bool IsFirstValueFromDevice { get; private set; } = true;
 
     /// <summary>
-    /// Set before writing a value to the device, so the resulting SDK push-back is recognized as an echo of this
+    /// Set before writing a value to the device, so the resulting push-back is recognized as an echo of this
     /// block's own write and does not get processed as a new externally received value.
     /// </summary>
     protected bool IsWriting { get; set; }
@@ -112,7 +112,7 @@ public abstract class SubscriberBase<TBlock, TItem> : RuntimeFunctionBlock<TBloc
             SetAvailable(true);
 
             // No need to dedupe against the previous push here (unlike the old polling model, which re-sent the
-            // current value every tick regardless of change): the VSE-SDK-facing side only fires a push when a
+            // current value every tick regardless of change): the device-facing side only fires a push when a
             // watched value has actually changed.
             SetItemToConnectors((TItem)item);
             IsFirstValueFromDevice = false;

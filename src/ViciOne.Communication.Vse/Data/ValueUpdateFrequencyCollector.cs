@@ -1,4 +1,4 @@
-namespace ViciOne.Communication.Vse.Data;
+﻿namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
 /// Tracks how often <see cref="AddValue"/> is called, to derive a rolling incoming-value frequency

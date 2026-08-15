@@ -45,7 +45,7 @@ public sealed partial class VseDevice : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// The underlying Vse-SDK connection.
+    /// The underlying Vse connection.
     /// </summary>
     internal VseConnection Connection { get; }
 
@@ -161,7 +161,7 @@ public sealed partial class VseDevice : IDisposable
     }
 
     /// <summary>
-    /// Stops the connection, unsubscribes from every item, and releases the underlying Vse-SDK connection.
+    /// Stops the connection, unsubscribes from every item, and releases the underlying Vse connection.
     /// </summary>
     public void Dispose()
     {
@@ -293,7 +293,7 @@ public sealed partial class VseDevice : IDisposable
         lock (_itemUnsubscribersLock)
             _itemUnsubscribersByAddress[address] = unsubscribe;
 
-        // The SDK reports a value only once it changes, so a value that never moves is never reported at all:
+        // The device reports a value only once it changes, so a value that never moves is never reported at all:
         // an alarm that is false when the device comes up and stays false leaves its subscribers with nothing
         // but their own defaults, and nothing distinguishes "no alarm" from "never heard from". A measured
         // value hides this, because it starts moving right away. Report what the device currently holds once

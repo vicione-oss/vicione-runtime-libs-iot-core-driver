@@ -6,12 +6,18 @@
 /// </summary>
 internal record IoLinkMasterPortDeviceAvailabilityInfo
 {
-    /// <summary>Whether a device is currently connected and reporting a valid status.</summary>
+    /// <summary>
+    /// Whether a device is currently connected and reporting a valid status.
+    /// </summary>
     public required bool Available { get; init; }
 
-    /// <summary>The connected device's device ID.</summary>
+    /// <summary>
+    /// The connected device's device ID.
+    /// </summary>
     public required uint DeviceId { get; init; }
 
-    /// <summary>The connected device's vendor ID.</summary>
+    /// <summary>
+    /// The connected device's vendor ID.
+    /// </summary>
     public required ushort VendorId { get; init; }
 }

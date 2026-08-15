@@ -138,7 +138,7 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
     protected abstract void SetValueToConnectors(object value, string displayFormat);
 
     /// <summary>
-    /// Converts a decoded process-data value (<see cref="ifm.IoddParser.Helpers.DisplayValue.Value"/>, which is
+    /// Converts a decoded process-data value (<see cref="IoddParser.Helpers.DisplayValue.Value"/>, which is
     /// untyped) to <see cref="double"/>.
     /// <para>Accepts every numeric CLR type IODD decoding can produce, converting straight to <see cref="decimal"/>
     /// and back rather than via <see cref="double"/> - a <c>float</c> source (IODD <c>Float32T</c>) converted
@@ -162,7 +162,7 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
     }
 
     /// <summary>
-    /// Converts a decoded process-data value (<see cref="ifm.IoddParser.Helpers.DisplayValue.Value"/>, which is
+    /// Converts a decoded process-data value (<see cref="IoddParser.Helpers.DisplayValue.Value"/>, which is
     /// untyped) to <see cref="long"/>.
     /// <para>Accepts every integral CLR type IODD decoding can produce, plus a numeric string in case a value
     /// ever arrives already formatted as text.</para>
@@ -183,7 +183,7 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
     }
 
     /// <summary>
-    /// Converts a decoded process-data value (<see cref="ifm.IoddParser.Helpers.DisplayValue.Value"/>, which is
+    /// Converts a decoded process-data value (<see cref="IoddParser.Helpers.DisplayValue.Value"/>, which is
     /// untyped) to <see cref="bool"/>, also accepting "True"/"False" in case a value ever arrives already
     /// formatted as text.
     /// </summary>

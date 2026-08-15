@@ -1,4 +1,4 @@
-namespace ViciOne.Communication.IoTCore.DcpScan;
+﻿namespace ViciOne.Communication.IoTCore.DcpScan;
 
 /// <summary>
 /// Options for DcpScanner; no ILogger dependency.

@@ -1,4 +1,4 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 using Microsoft.Extensions.Logging;
 

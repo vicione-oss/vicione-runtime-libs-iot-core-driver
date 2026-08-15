@@ -1,9 +1,9 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 
 namespace ViciOne.Communication.Vse;
 
 /// <summary>
-/// Maps Vse-SDK enums to human-readable string identifiers.
+/// Maps Vse device enums to human-readable string identifiers.
 /// </summary>
 internal static class ReflectionUtils
 {

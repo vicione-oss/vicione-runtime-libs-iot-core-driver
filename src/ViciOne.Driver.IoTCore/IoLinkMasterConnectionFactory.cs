@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using ifm.DataStore;
 using ifm.IoTCore;
@@ -8,12 +8,11 @@ using ifm.IoTCore.Device.IoTCore;
 using ifm.IoTCore.Profile.DeviceManagement;
 using Microsoft.Extensions.Logging;
 using ViciOne.Communication.IoTCore;
-using ViciOne.DeviceTree.Contracts;
 
 namespace ViciOne.Driver.IoTCore;
 
 /// <summary>
-/// The new SDK types that make up one master connection, bundled together so building a connection is a single,
+/// The types that make up one master connection, bundled together so building a connection is a single,
 /// self-contained step in <see cref="IoLinkMaster"/>'s constructor instead of a dozen loose local variables.
 /// </summary>
 internal readonly record struct ConnectionComponents(
@@ -34,7 +33,7 @@ internal static class IoLinkMasterConnectionFactory
     /// call <c>AddDevice</c>.
     /// </summary>
     /// <param name="uri">The master's address, whose scheme decides the transport: an HTTPS address is reached over HTTPS accepting the master's self-signed certificate, any other over plain HTTP.</param>
-    /// <param name="logger">The logger every SDK component is given, adapted to the new SDK's own logger type.</param>
+    /// <param name="logger">The logger every component is given, adapted to the logger type they require.</param>
     /// <param name="valueCacheTimeout">The device factory's fallback value-cache lifetime, used for devices added without one of their own.</param>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Ownership of the created disposables transfers to the returned ConnectionComponents; IoLinkMaster stores them in fields and disposes them in Dispose().")]
     public static ConnectionComponents Build(Uri uri, ILogger logger, TimeSpan valueCacheTimeout)
@@ -43,7 +42,7 @@ internal static class IoLinkMasterConnectionFactory
         bool useHttps = uri.Scheme == Uri.UriSchemeHttps;
 
         string iotCoreName = $"IoTCore-{uri.DnsSafeHost}-{uri.Port}";
-        // The new SDK's element identifiers reject characters like the dots in an IP-address host (throws
+        // The element identifiers reject characters like the dots in an IP-address host (throws
         // ArgumentException from BaseElement's ctor) - sanitize before use as the IoTCore's own identifier.
         // The unsanitized name is still used below for the (unrelated) data store file name.
         string sanitizedIotCoreName = AddressParser.ReplaceInvalidCharacters(iotCoreName, "_");
@@ -56,8 +55,7 @@ internal static class IoLinkMasterConnectionFactory
         IDisposable clientNetAdapterFactory = ClientNetAdapters.Register(core, useHttps, TimeSpan.FromSeconds(10), ifmLogger);
 
         ifm.IoTCore.Device.Contracts.DeviceManager deviceManager = new();
-        // Without a registered IoTCoreDeviceFactory, AddDevice fails with "device type not supported" - this is
-        // the new SDK's replacement for what the old SDK handled internally.
+        // Without a registered IoTCoreDeviceFactory, AddDevice fails with "device type not supported".
         IoTCoreDeviceFactory ioTCoreDeviceFactory = new(
             core.ElementManager, core.PersistenceManager, core.EventSender, ifmLogger,
             core.ClientNetAdapterManager, valueCacheTimeout, new Config());

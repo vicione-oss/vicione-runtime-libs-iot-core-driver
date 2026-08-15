@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using IFM.SDK.VSE;
 using IFM.SDK.VSE.Monitoring;
 using IFM.SDK.VSE.Parameters;
@@ -146,7 +146,7 @@ public class RawDataRecorderTests
         _ = Task.Run(() => sut.StartRecording(sensor: 1, sampleRate: 50_000, duration: 100, waitUntilFinished: false));
         await WaitUntilAsync(() => sut.IsRecording);
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         // No recording task exists yet at this point (Measure mode hasn't been confirmed), so stopping fails
         // fast instead of succeeding - the point being tested is that it fails fast rather than blocking.
         Assert.Throws<TimeoutException>(sut.StopRecording);

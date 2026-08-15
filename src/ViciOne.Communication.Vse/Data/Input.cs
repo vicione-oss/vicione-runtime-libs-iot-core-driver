@@ -1,4 +1,4 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.DataChannels;
 using IFM.SDK.VSE.Parameters;
 
@@ -40,7 +40,7 @@ public sealed class Input
     }
 
     /// <summary>
-    /// Raised whenever the Vse-SDK monitoring channel delivers a new sample that changes <see cref="Value"/>.
+    /// Raised whenever the device's monitoring channel delivers a new sample that changes <see cref="Value"/>.
     /// </summary>
     public event Action? Changed;
 

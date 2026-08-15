@@ -1,10 +1,10 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// A single analog Vse alarm, kept up to date by <see cref="AnalogAlarms"/> from the Vse-SDK's own monitoring
+/// A single analog Vse alarm, kept up to date by <see cref="AnalogAlarms"/> from the device's own monitoring
 /// channel push.
 /// </summary>
 public sealed class AnalogAlarm(IAnalogAlarm instance)

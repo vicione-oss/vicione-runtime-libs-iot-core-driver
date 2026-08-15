@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,7 +110,7 @@ public sealed partial class RecordingManager : IDisposable
                     (bool success, string? errorMessage, BlobCapture? capture) = await _blobRecorder.ExecuteAsync(pair.PortIndex, _logger, CancellationToken.None);
                     if (success)
                     {
-                        BlobCapture blobCapture = capture!.Value;
+                        BlobCapture blobCapture = capture!;
                         Measurement measurement = new()
                         {
                             Duration = blobCapture.Duration,

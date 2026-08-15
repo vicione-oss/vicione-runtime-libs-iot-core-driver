@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using ifm.Common.Variant;
 using ifm.IoTCore.Contracts;

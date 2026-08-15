@@ -1,11 +1,11 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 using Microsoft.Extensions.Logging;
 
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// All counters of a Vse device, kept live via a single shared monitoring channel (the Vse-SDK
+/// All counters of a Vse device, kept live via a single shared monitoring channel (the device
 /// pushes changed samples to us - there is no need to poll).
 /// </summary>
 public sealed partial class Counters : IDisposable

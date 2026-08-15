@@ -1,4 +1,4 @@
-using ViciOne.Communication.Vse.Interfaces;
+﻿using ViciOne.Communication.Vse.Interfaces;
 
 namespace ViciOne.Communication.Vse.DataProcessing;
 

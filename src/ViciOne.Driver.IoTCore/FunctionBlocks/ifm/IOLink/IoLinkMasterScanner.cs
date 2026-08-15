@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using ViciOne.Communication.IoTCore.DcpScan;
 using ViciOne.Core.Contracts.Runtime;
 using ViciOne.DeviceTree.Contracts.Scanning;

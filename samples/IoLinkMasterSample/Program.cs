@@ -60,7 +60,7 @@ internal sealed partial class Program
         Console.WriteLine("    (each line = one getdatamulti snapshot; '----' = no device on that port)");
         Console.WriteLine();
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         while (stopwatch.Elapsed.TotalSeconds < seconds)
         {
             string elapsed = ((int)stopwatch.Elapsed.TotalSeconds).ToString(CultureInfo.InvariantCulture).PadLeft(3);
@@ -81,7 +81,7 @@ internal sealed partial class Program
                 Console.WriteLine($"t+{elapsed}s  getdatamulti failed: {ex.Message}");
             }
 
-            Thread.Sleep(1000);
+            await Task.Delay(1000);
         }
     }
 
@@ -110,7 +110,7 @@ internal sealed partial class Program
             mirroredAddresses.Add($"{port.Id}/iolinkdevice/deviceid");
             mirroredAddresses.Add($"{port.Id}/iolinkdevice/pdin");
         }
-        List<string> addressesToSend = mirroredAddresses.Select(address => address[deviceRoot.Length..]).ToList();
+        var addressesToSend = mirroredAddresses.Select(address => address[deviceRoot.Length..]).ToList();
 
         // Warm up both paths so the timings below don't include one-off costs (element resolution, JIT).
         foreach (string address in mirroredAddresses)
@@ -229,7 +229,7 @@ internal sealed partial class Program
                 vendorIdResult = "(skipped, mode != 3)";
             }
 
-            Console.WriteLine($"{port.Name}: mode={mode?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "(failed)"}, {vendorIdResult}");
+            Console.WriteLine($"{port.Name}: mode={mode?.ToString(CultureInfo.InvariantCulture) ?? "(failed)"}, {vendorIdResult}");
         }
         Console.WriteLine("===== END PORT DIAGNOSTICS =====");
         Console.WriteLine();

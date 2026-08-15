@@ -1,4 +1,4 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 using Moq;
 using ViciOne.Communication.Vse.Data;

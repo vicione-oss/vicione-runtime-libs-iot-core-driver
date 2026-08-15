@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ViciOne.Communication.Vse.Data;
@@ -8,7 +8,7 @@ namespace ViciOne.Communication.Vse.Data;
 /// (<see cref="Duration"/>/<see cref="SampleRate"/>) so the capture is self-contained - a caller doesn't need to
 /// separately track what it originally asked for alongside what it got back.
 /// </summary>
-public readonly struct RawDataCapture(DateTime start, uint duration, uint sampleRate, byte[] rawData)
+public sealed class RawDataCapture(DateTime start, uint duration, uint sampleRate, byte[] rawData)
 {
     public DateTime Start { get; } = start;
     public uint Duration { get; } = duration;

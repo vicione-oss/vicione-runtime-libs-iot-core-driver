@@ -1,4 +1,4 @@
-namespace ViciOne.Communication.Vse.Data;
+﻿namespace ViciOne.Communication.Vse.Data;
 
 internal static class FloatExtensions
 {

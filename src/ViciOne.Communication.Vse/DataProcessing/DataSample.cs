@@ -1,4 +1,4 @@
-namespace ViciOne.Communication.Vse.DataProcessing;
+﻿namespace ViciOne.Communication.Vse.DataProcessing;
 
 /// <summary>
 /// A single timestamped value sampled from a Vse data channel, with room for algorithm-specific

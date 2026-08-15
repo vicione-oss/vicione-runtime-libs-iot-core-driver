@@ -6,7 +6,7 @@ namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
 /// All digital alarms of a Vse device. Unlike <see cref="Counters"/>/<see cref="Inputs"/>, each alarm gets its
-/// own monitoring channel - the SDK has no bulk-subscribe helper for alarms.
+/// own monitoring channel - there is no bulk-subscribe helper for alarms.
 /// </summary>
 public sealed partial class DigitalAlarms : IDisposable
 {

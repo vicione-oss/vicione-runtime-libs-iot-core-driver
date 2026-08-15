@@ -1,4 +1,4 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Exceptions;
 using IFM.SDK.VSE.Parameters;
 using Microsoft.Extensions.Logging;
@@ -38,7 +38,7 @@ public sealed partial class DeviceObjects : IDisposable
         get => _averagingPeriod;
         set
         {
-            if (value < AveragingPeriodMin || value > AveragingPeriodMax)
+            if (value is < AveragingPeriodMin or > AveragingPeriodMax)
                 throw new ArgumentOutOfRangeException(nameof(value), value, $"Valid value range: {AveragingPeriodMin}ms-{AveragingPeriodMax}ms.");
 
             foreach (DeviceObject obj in _objects)

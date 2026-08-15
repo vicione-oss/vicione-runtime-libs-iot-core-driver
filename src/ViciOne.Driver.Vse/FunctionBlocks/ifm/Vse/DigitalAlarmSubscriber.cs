@@ -1,4 +1,4 @@
-using ViciOne.Communication.Vse.Data;
+﻿using ViciOne.Communication.Vse.Data;
 using ViciOne.Core.Contracts.Runtime;
 
 namespace ifm.Vse;

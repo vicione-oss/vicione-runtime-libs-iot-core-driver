@@ -1,11 +1,11 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
 /// A single Vse counter (e.g. Vse uptime, totalisator, ...), kept up to date by <see cref="Counters"/>
-/// from the Vse-SDK's own monitoring channel push.
+/// from the device's own monitoring channel push.
 /// </summary>
 public sealed class Counter(ICounter instance)
 {

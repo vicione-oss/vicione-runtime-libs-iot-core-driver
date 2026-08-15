@@ -17,7 +17,7 @@ namespace ViciOne.Communication.Vse;
 /// </summary>
 public sealed class VseConnection : IDisposable
 {
-    // The IFM-SDK logs most of its own connection/device chatter at Information - raising just its categories to
+    // The underlying device library logs most of its own connection/device chatter at Information - raising just its categories to
     // Warning keeps that noise out without affecting the caller's own log messages, which go through the same
     // sink but under different categories (see ForwardLoggerProvider).
     private static readonly LoggerFilterOptions s_sdkLoggerFilterOptions = new()
@@ -77,7 +77,7 @@ public sealed class VseConnection : IDisposable
         RawDataRecorder = new RawDataRecorder(Device, _eventManager, _logger);
     }
 
-    // The IFM-SDK builder and DeviceEventManager both want an ILoggerFactory, but callers only ever have a single
+    // The device builder and DeviceEventManager both want an ILoggerFactory, but callers only ever have a single
     // ILogger (matching the rest of this codebase's logging convention) - wrap it so every category it creates a
     // logger for ends up writing to that same sink.
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "ForwardLoggerProvider.Dispose() is a no-op (nothing to release) - ownership genuinely transfers into the returned LoggerFactory, which the constructor stores in _loggerFactory and disposes in Dispose().")]

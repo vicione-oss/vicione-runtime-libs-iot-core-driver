@@ -15,12 +15,11 @@ namespace ViciOne.Communication.IoTCore.Extensions;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Extension members syntax generates nested types")]
 public static class IoTCoreExtensions
 {
-    // Not exposed by the new SDK's own Identifiers class (which only covers generic IoTCore service names) -
-    // verified live against a real IO-Link master that these literal wire identifiers are unchanged.
+    // These device-specific service names have no named constant, so they are used as literal wire identifiers.
     private const string IolReadAcyclicIdentifier = "iolreadacyclic";
     private const string ValueKey = "value";
     // The "getdatamulti" request lists the addresses to read under "datatosend"; each answered address maps to
-    // an object carrying the read value under "data" - verified live against a real IO-Link master.
+    // an object carrying the read value under "data".
     private const string GetDataMultiIdentifier = "getdatamulti";
     private const string DataToSendKey = "datatosend";
     private const string DataKey = "data";
@@ -108,7 +107,7 @@ public static class IoTCoreExtensions
         public byte[]? ReadAcyclic(string deviceAddress, int index, int? subIndex = null)
         {
             string address = $"{deviceAddress}/{IolReadAcyclicIdentifier}";
-            Variant arg = Variant.FromObject(new ReadAcyclicRequest(index, subIndex ?? 0));
+            var arg = Variant.FromObject(new ReadAcyclicRequest(index, subIndex ?? 0));
             VariantObject? variantObject = GetServiceElement(core, address)?.Invoke(arg, new ServiceInfo()).AsVariantObject();
             if (variantObject is null)
                 return null;
@@ -160,7 +159,7 @@ public static class IoTCoreExtensions
     }
 
     /// <summary>
-    /// The payload shape the "iolreadacyclic" service expects - verified live against a real IO-Link master.
+    /// The payload shape the "iolreadacyclic" service expects
     /// </summary>
     private sealed record ReadAcyclicRequest(int Index, int SubIndex);
 

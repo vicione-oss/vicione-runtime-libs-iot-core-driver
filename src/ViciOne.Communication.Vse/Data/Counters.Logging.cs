@@ -1,4 +1,4 @@
-namespace ViciOne.Communication.Vse.Data;
+﻿namespace ViciOne.Communication.Vse.Data;
 
 // Logging helpers for the Counters class. See MonitoringChannelLog for the actual [LoggerMessage] definitions.
 public sealed partial class Counters

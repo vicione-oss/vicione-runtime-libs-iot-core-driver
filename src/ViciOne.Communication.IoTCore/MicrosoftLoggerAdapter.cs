@@ -1,12 +1,12 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace ViciOne.Communication.IoTCore;
 
 /// <summary>
-/// Adapts a <see cref="Microsoft.Extensions.Logging.ILogger"/> to the new IoTCore SDK's own
-/// <see cref="ifm.Logger.Contracts.ILogger"/>, which every <c>ifm.IoTCore.*</c> type requires instead.
+/// Adapts a <see cref="ILogger"/> to the
+/// <see cref="ifm.Logger.Contracts.ILogger"/> that every <c>ifm.IoTCore.*</c> type requires instead.
 /// </summary>
-public sealed class MicrosoftLoggerAdapter(Microsoft.Extensions.Logging.ILogger logger) : ifm.Logger.Contracts.ILogger
+public sealed class MicrosoftLoggerAdapter(ILogger logger) : ifm.Logger.Contracts.ILogger
 {
     /// <inheritdoc/>
     public void Debug(string message)

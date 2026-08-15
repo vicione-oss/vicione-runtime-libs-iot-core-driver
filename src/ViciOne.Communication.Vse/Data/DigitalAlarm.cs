@@ -1,10 +1,10 @@
-using IFM.SDK.VSE;
+﻿using IFM.SDK.VSE;
 using IFM.SDK.VSE.Parameters;
 
 namespace ViciOne.Communication.Vse.Data;
 
 /// <summary>
-/// A single digital (on/off) Vse alarm, kept up to date by <see cref="DigitalAlarms"/> from the Vse-SDK's own
+/// A single digital (on/off) Vse alarm, kept up to date by <see cref="DigitalAlarms"/> from the device's own
 /// monitoring channel push.
 /// </summary>
 public sealed class DigitalAlarm(IDigitalAlarm instance)
