@@ -38,6 +38,11 @@ public static partial class IoLinkParser
     private const string AddressSoftwareRevision = "/deviceinfo/swrevision";
     private const string AddressStatus = "/status";
     private const string AddressVendorId = "/vendorid";
+    private const string AddressMasterTemperature = "/processdatamaster/temperature";
+    private const string AddressMasterVoltage = "/processdatamaster/voltage";
+    private const string AddressMasterCurrent = "/processdatamaster/current";
+    private const string AddressMasterSupervisionStatus = "/processdatamaster/supervisionstatus";
+    private const string AddressUnitSuffix = "/unit";
     private const string ProfileIoLinkDeviceFull = "iolinkdevice_full";
     private const string IoLinkMasterIdentifier = "iolinkmaster";
 
@@ -625,7 +630,58 @@ public static partial class IoLinkParser
             device.ProductName = GetDataValueAsValue(ioLinkDevice, $"{root}{AddressProductName}", logger)?.GetString() ?? string.Empty;
             device.Manufacturer = GetDataValueAsValue(ioLinkDevice, $"{root}{AddressDeviceVendor}", logger)?.GetString() ?? string.Empty;
             device.DeviceFamily = GetDataValueAsValue(ioLinkDevice, $"{root}{AddressDeviceFamily}", logger)?.GetString() ?? string.Empty;
+
+            AddMasterDiagnostics(ioLinkDevice, device, root, logger);
         }
+    }
+
+    /// <summary>
+    /// Adds the master's own diagnostic values (internal temperature, supply voltage, current draw and overall
+    /// supervision status) as a "Diagnostics" group of loggable process-data leaves directly under the master
+    /// node, so they can be monitored/logged in the engineering UI just like a device's process data.
+    /// </summary>
+    /// <remarks>
+    /// Each value is read once here only to confirm the master actually mirrors it - not every master model
+    /// exposes <c>/processdatamaster</c> - and the leaf is only added when it does. The live values themselves
+    /// are delivered at runtime through the master-status function block, not from this tree snapshot.
+    /// </remarks>
+    private static void AddMasterDiagnostics(IoLinkMaster ioLinkDevice, DeviceTreeIoLinkMaster masterNode, string root, ILogger logger)
+    {
+        var diagnostics = new DeviceTreeStructureNode
+        {
+            Id = $"{masterNode.Id}/diagnostics",
+            Name = "Diagnostics",
+        };
+
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterTemperature}", "Temperature", DataType.Whole, logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterVoltage}", "Supply voltage", DataType.UnsignedWhole, logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterCurrent}", "Current", DataType.UnsignedWhole, logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterSupervisionStatus}", "Supervision status", DataType.UnsignedWhole, logger);
+
+        // Insert at the front so the master's own diagnostics sit above its ports, not buried after them.
+        if (diagnostics.Children.Count > 0)
+            masterNode.Children.Insert(0, diagnostics);
+    }
+
+    /// <summary>
+    /// Adds one master diagnostic value as a <see cref="DeviceTreeProcessData"/> leaf under <paramref name="parent"/>,
+    /// but only if the master actually returns a value for <paramref name="address"/>, reading its unit alongside.
+    /// </summary>
+    private static void AddMasterValue(DeviceTreeStructureNode parent, IoLinkMaster ioLinkDevice, string address, string name, DataType dataType, ILogger logger)
+    {
+        if (GetDataValueAsValue(ioLinkDevice, address, logger) is null)
+            return;
+
+        string unit = GetDataValueAsValue(ioLinkDevice, $"{address}{AddressUnitSuffix}", logger)?.GetString() ?? string.Empty;
+
+        parent.Children.Add(new DeviceTreeProcessData
+        {
+            Id = address,
+            Name = name,
+            DataType = dataType,
+            HasUnit = unit.Length > 0,
+            Unit = unit,
+        });
     }
 
     private static void RemoveUnavailableDevices(IoLinkMaster ioLinkDevice, List<IDeviceTreeBase> nodes, Dictionary<IDeviceTreeBase, IDeviceTreeBase> parentOf, ILogger logger)
