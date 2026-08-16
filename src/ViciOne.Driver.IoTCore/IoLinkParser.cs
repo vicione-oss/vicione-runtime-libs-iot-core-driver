@@ -32,6 +32,7 @@ public static partial class IoLinkParser
     private const string AddressDeviceVendor = "/deviceinfo/vendor";
     private const string AddressHardwareRevision = "/deviceinfo/hwrevision";
     private const string AddressProductName = "/productname";
+    private const string AddressDeviceSerial = "/serial";
     private const string AddressProductCode = "/deviceinfo/productcode";
     private const string AddressSerialNumber = "/deviceinfo/serialnumber";
     private const string AddressSoftwareRevision = "/deviceinfo/swrevision";
@@ -579,9 +580,9 @@ public static partial class IoLinkParser
                 device.VendorId = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressVendorId}", logger)?.GetUInt16() ?? 0;
             }
 
-            // Name and ProductId are static per physical device - if the same vendor/device id is
-            // already cached for this port, this full refresh was triggered by something other than
-            // an actual device swap (e.g. a brief timeout), so reuse the cached Name/ProductId
+            // Name, ProductId and SerialNumber are static per physical device - if the same vendor/device id
+            // is already cached for this port, this full refresh was triggered by something other than
+            // an actual device swap (e.g. a brief timeout), so reuse the cached values
             // instead of reading them again. This avoids capturing a transient placeholder the
             // master can report right after a reconnect, before identification has fully settled
             // (e.g. "unknown" for /productname) - such a value would otherwise get cached as if it
@@ -592,10 +593,12 @@ public static partial class IoLinkParser
             {
                 device.Name = cachedDeviceNode.Name;
                 device.ProductId = cachedDeviceNode.ProductId;
+                device.SerialNumber = cachedDeviceNode.SerialNumber;
             }
             else
             {
                 device.Name = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressProductName}", logger)?.GetString() ?? string.Empty;
+                device.SerialNumber = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressDeviceSerial}", logger)?.GetString() ?? string.Empty;
 
                 // ProductId (a slow ISDU read) is only needed to disambiguate same-named IODD variants;
                 // ReadIoddData reads it lazily there, so most devices never pay for it.

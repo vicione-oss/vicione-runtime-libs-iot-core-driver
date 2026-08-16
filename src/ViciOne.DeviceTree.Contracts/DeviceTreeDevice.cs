@@ -31,6 +31,11 @@ public sealed class DeviceTreeDevice : IDeviceTreeBase
     /// </summary>
     public string? ProductId { get; set; }
 
+    /// <summary>
+    /// The device's serial number, if it reports one.
+    /// </summary>
+    public string? SerialNumber { get; set; }
+
     /// <inheritdoc/>
     public List<IDeviceTreeBase> Children { get; set; } = [];
 
