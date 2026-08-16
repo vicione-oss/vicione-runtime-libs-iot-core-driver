@@ -416,13 +416,24 @@ public static partial class IoLinkParser
                 continue;
             }
 
-            // Prefer matching by ProductId: some IODDs define multiple DeviceVariants that share
-            // the same ProductName text (see e.g. Pepperl-Fuchs DK12-11, where two variants both
-            // resolve to "DK12-11-IO/92/136"), so Name alone can pick the wrong variant's image.
-            // Fall back to Name when ProductId is unavailable (e.g. a still-cached node from
-            // before this field existed) to avoid regressing devices that already match by name.
-            IDeviceVariant? deviceInfo = device.DeviceIdentity?.DeviceVariants?.FirstOrDefault(d => d.ProductId == deviceNode.ProductId)
-                ?? device.DeviceIdentity?.DeviceVariants?.FirstOrDefault(d => d.Name == deviceNode.Name);
+            // Match the IODD variant by ProductName; only when several share it (e.g. Pepperl-Fuchs
+            // DK12-11) read the slow ISDU ProductId to disambiguate. It's used for nothing else.
+            List<IDeviceVariant> variants = device.DeviceIdentity?.DeviceVariants?.ToList() ?? [];
+            List<IDeviceVariant> byName = variants.Where(d => d.Name == deviceNode.Name).ToList();
+
+            IDeviceVariant? deviceInfo;
+            if (byName.Count == 1)
+            {
+                // Unique name match - skip the slow ISDU ProductId read.
+                deviceInfo = byName[0];
+            }
+            else
+            {
+                // Zero or several name matches - read the ISDU ProductId to pick the right one.
+                deviceNode.ProductId ??= ReadProductId(masterDevice, deviceNode.Id.Split('~')[0], logger);
+                deviceInfo = variants.FirstOrDefault(d => d.ProductId == deviceNode.ProductId)
+                    ?? byName.FirstOrDefault();
+            }
 
             deviceNode.Description = new DeviceTreeNodeDescription()
             {
@@ -586,11 +597,8 @@ public static partial class IoLinkParser
             {
                 device.Name = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressProductName}", logger)?.GetString() ?? string.Empty;
 
-                // Not exposed as a simple mirrored address like ProductName/VendorId/DeviceId - read
-                // via the standard ISDU index for Product ID instead. Used in ReadIoddData to find
-                // the matching IODD DeviceVariant (e.g. for its product image) for devices whose
-                // IODD defines multiple variants under the same vendor/device id.
-                device.ProductId = ReadProductId(ioLinkDevice, device.Id.Split('~')[0], logger);
+                // ProductId (a slow ISDU read) is only needed to disambiguate same-named IODD variants;
+                // ReadIoddData reads it lazily there, so most devices never pay for it.
             }
 
             // After reading, the device's internal ID is amended so it's possible to detect whether the type of
