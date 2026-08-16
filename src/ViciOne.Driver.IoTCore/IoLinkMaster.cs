@@ -74,6 +74,9 @@ public sealed partial class IoLinkMaster : IDisposable
     private string _lastLoggedMessage = string.Empty;
     private readonly ILogger _logger;
     private readonly ConcurrentDictionary<int, DeviceProcessDataRegistration> _portProcessDataRegistrations = [];
+    private readonly ConcurrentDictionary<IIoLinkMasterDiagnosticSubscriber, byte> _masterDiagnosticSubscribers = [];
+    // The master's diagnostic units (°C/mV/mA) are static, so read once on the first dispatch and reused.
+    private (string Temperature, string Voltage, string Current)? _masterDiagnosticUnits;
     private bool _mirroringErrorLogged;
     private readonly Task _mirroringTask;
     // The "type" string the DeviceManagementProfileBuilder expects in AddDeviceRequestServiceData -
@@ -707,6 +710,11 @@ public sealed partial class IoLinkMaster : IDisposable
             {
                 _prefetchedValues = null;
             }
+
+            // Read the master's own diagnostics after the port-data prefetch window is cleared, so these reads
+            // (which are not part of the port-data batch) always go live regardless of getdatamulti mode.
+            if (Timeout is false)
+                ReadAndDispatchMasterDiagnostics();
         }
         finally
         {
@@ -920,5 +928,83 @@ public sealed partial class IoLinkMaster : IDisposable
 
         foreach (int port in portRegistrationsToRemove)
             _portProcessDataRegistrations.TryRemove(port, out _);
+    }
+
+    /// <summary>
+    /// Registers a FunctionBlock to receive the master's own diagnostic values every polling cycle.
+    /// </summary>
+    /// <param name="functionBlock">The FunctionBlock to dispatch the read diagnostics to.</param>
+    public void RegisterMasterDiagnostics(IIoLinkMasterDiagnosticSubscriber functionBlock)
+        => _masterDiagnosticSubscribers.TryAdd(functionBlock, default);
+
+    /// <summary>
+    /// Removes a FunctionBlock's master-diagnostics registration.
+    /// </summary>
+    /// <param name="functionBlock">The FunctionBlock to unregister.</param>
+    public void UnregisterMasterDiagnostics(IIoLinkMasterDiagnosticSubscriber functionBlock)
+        => _masterDiagnosticSubscribers.TryRemove(functionBlock, out _);
+
+    /// <summary>
+    /// Reads the master's own diagnostic values (temperature, supply voltage, current and supervision status)
+    /// and dispatches them to every registered <see cref="IIoLinkMasterDiagnosticSubscriber"/>.
+    /// </summary>
+    private void ReadAndDispatchMasterDiagnostics()
+    {
+        if (_masterDiagnosticSubscribers.IsEmpty || _mirroredDeviceAddress is null)
+            return;
+
+        try
+        {
+            _masterDiagnosticUnits ??= (
+                ReadMasterString($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterTemperature}{IoLinkParser.AddressUnitSuffix}"),
+                ReadMasterString($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterVoltage}{IoLinkParser.AddressUnitSuffix}"),
+                ReadMasterString($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterCurrent}{IoLinkParser.AddressUnitSuffix}"));
+
+            var diagnostics = new MasterDiagnostics(
+                ReadMasterNumber($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterTemperature}"), _masterDiagnosticUnits.Value.Temperature,
+                ReadMasterNumber($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterVoltage}"), _masterDiagnosticUnits.Value.Voltage,
+                ReadMasterNumber($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterCurrent}"), _masterDiagnosticUnits.Value.Current,
+                (long?)ReadMasterNumber($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterSupervisionStatus}"));
+
+            foreach (IIoLinkMasterDiagnosticSubscriber subscriber in _masterDiagnosticSubscribers.Keys)
+                subscriber.SetDiagnostics(diagnostics);
+        }
+        catch (Exception ex)
+        {
+            LogPollingError(ex);
+        }
+    }
+
+    /// <summary>
+    /// Reads a single master diagnostic value as a number, returning <see langword="null"/> if the master does
+    /// not expose it or the read is skipped/fails.
+    /// </summary>
+    private double? ReadMasterNumber(string address)
+    {
+        try
+        {
+            VariantValue? value = GetDataValueAsValue(address, skipIfInTimeout: true, out bool skipped);
+            return skipped || value is null ? null : value.GetInt32();
+        }
+        catch (IoTCoreException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Reads a single master diagnostic value's unit, returning an empty string if it has none or the read fails.
+    /// </summary>
+    private string ReadMasterString(string address)
+    {
+        try
+        {
+            VariantValue? value = GetDataValueAsValue(address, skipIfInTimeout: true, out bool skipped);
+            return skipped || value is null ? string.Empty : value.GetString();
+        }
+        catch (IoTCoreException)
+        {
+            return string.Empty;
+        }
     }
 }

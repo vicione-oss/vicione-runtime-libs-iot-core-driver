@@ -38,11 +38,11 @@ public static partial class IoLinkParser
     private const string AddressSoftwareRevision = "/deviceinfo/swrevision";
     private const string AddressStatus = "/status";
     private const string AddressVendorId = "/vendorid";
-    private const string AddressMasterTemperature = "/processdatamaster/temperature";
-    private const string AddressMasterVoltage = "/processdatamaster/voltage";
-    private const string AddressMasterCurrent = "/processdatamaster/current";
-    private const string AddressMasterSupervisionStatus = "/processdatamaster/supervisionstatus";
-    private const string AddressUnitSuffix = "/unit";
+    internal const string AddressMasterTemperature = "/processdatamaster/temperature";
+    internal const string AddressMasterVoltage = "/processdatamaster/voltage";
+    internal const string AddressMasterCurrent = "/processdatamaster/current";
+    internal const string AddressMasterSupervisionStatus = "/processdatamaster/supervisionstatus";
+    internal const string AddressUnitSuffix = "/unit";
     private const string ProfileIoLinkDeviceFull = "iolinkdevice_full";
     private const string IoLinkMasterIdentifier = "iolinkmaster";
 
@@ -651,12 +651,17 @@ public static partial class IoLinkParser
         {
             Id = $"{masterNode.Id}/diagnostics",
             Name = "Diagnostics",
+            Description = new DeviceTreeNodeDescription { Text = "The master's own diagnostic values." },
         };
 
-        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterTemperature}", "Temperature", DataType.Whole, logger);
-        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterVoltage}", "Supply voltage", DataType.UnsignedWhole, logger);
-        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterCurrent}", "Current", DataType.UnsignedWhole, logger);
-        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterSupervisionStatus}", "Supervision status", DataType.UnsignedWhole, logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterTemperature}", "Temperature", DataType.Whole,
+            "The master's internal temperature.", logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterVoltage}", "Supply voltage", DataType.UnsignedWhole,
+            "The master's supply voltage.", logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterCurrent}", "Current", DataType.UnsignedWhole,
+            "The master's total current draw across all ports.", logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterSupervisionStatus}", "Supervision status", DataType.UnsignedWhole,
+            "The master's overall supervision status (0 = no fault).", logger);
 
         // Insert at the front so the master's own diagnostics sit above its ports, not buried after them.
         if (diagnostics.Children.Count > 0)
@@ -667,7 +672,7 @@ public static partial class IoLinkParser
     /// Adds one master diagnostic value as a <see cref="DeviceTreeProcessData"/> leaf under <paramref name="parent"/>,
     /// but only if the master actually returns a value for <paramref name="address"/>, reading its unit alongside.
     /// </summary>
-    private static void AddMasterValue(DeviceTreeStructureNode parent, IoLinkMaster ioLinkDevice, string address, string name, DataType dataType, ILogger logger)
+    private static void AddMasterValue(DeviceTreeStructureNode parent, IoLinkMaster ioLinkDevice, string address, string name, DataType dataType, string description, ILogger logger)
     {
         if (GetDataValueAsValue(ioLinkDevice, address, logger) is null)
             return;
@@ -681,6 +686,7 @@ public static partial class IoLinkParser
             DataType = dataType,
             HasUnit = unit.Length > 0,
             Unit = unit,
+            Description = new DeviceTreeNodeDescription { Text = description },
         });
     }
 
