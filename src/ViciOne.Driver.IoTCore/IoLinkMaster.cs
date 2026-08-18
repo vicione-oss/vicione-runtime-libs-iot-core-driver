@@ -87,6 +87,11 @@ public sealed partial class IoLinkMaster : IDisposable
     private string? _mirroredDeviceAddress;
     // Detected but not-yet-reported change in child device availability, see PollingAsync.
     private bool _pendingChildDevicesChanged;
+    // Set on a fresh mirror so the first reachable polling cycle announces the tree once, even when no port
+    // reports a change - otherwise a master that only becomes reachable after start (its first-ever probe finds
+    // the devices already present, which the per-port change detection does not treat as a change) would never
+    // publish its now-online tree, and consumers would keep showing it offline. See ReportPendingChildDevicesChanged.
+    private bool _announceTreeAfterMirror;
     private Task? _pollingTask;
     private PeriodicTimer? _pollingTimer;
     private Dictionary<int, IoLinkMasterPortDeviceInfo>? _portDeviceInfos;
@@ -450,7 +455,7 @@ public sealed partial class IoLinkMaster : IDisposable
             return prefetched.GetValueOrDefault(elementAddress);
         }
 
-        IoTCoreException? timeoutException;
+        Exception? timeoutException;
         bool timeoutBefore = Timeout;
 
         // If a timeout is already in effect, don't start another request (unless explicitly asked whether the
@@ -473,8 +478,11 @@ public sealed partial class IoLinkMaster : IDisposable
             {
                 return Core.GetDataValueAsValue(elementAddress);
             }
-            catch (IoTCoreException ex) when (isConnectivityProbe && Timeout is false && ex.IsTimeout)
+            catch (Exception ex) when (isConnectivityProbe && Timeout is false)
             {
+                // The connectivity probe is the cycle's top-level reachability check: if it fails for ANY reason -
+                // a transport timeout, a connection error such as "no route to host", anything else - the master
+                // could not be reached and no values can be read this cycle, so it is unreachable.
                 Timeout = true;
                 timeoutException = ex;
             }
@@ -509,6 +517,23 @@ public sealed partial class IoLinkMaster : IDisposable
             addresses.Add($"{portDeviceInfo.Address}{PdInAddressSuffix}");
         }
 
+        // With a diagnostics subscriber registered, fold the master's own diagnostic values into this same batch
+        // (cyclic values on the same device) instead of reading them one by one afterwards. The units are read
+        // only until cached, so they are included only while _masterDiagnosticUnits has not been read yet.
+        if (_masterDiagnosticSubscribers.IsEmpty is false && _mirroredDeviceAddress is not null)
+        {
+            addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterTemperature}");
+            addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterVoltage}");
+            addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterCurrent}");
+            addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterSupervisionStatus}");
+            if (_masterDiagnosticUnits is null)
+            {
+                addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterTemperature}{IoLinkParser.AddressUnitSuffix}");
+                addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterVoltage}{IoLinkParser.AddressUnitSuffix}");
+                addresses.Add($"{_mirroredDeviceAddress}{IoLinkParser.AddressMasterCurrent}{IoLinkParser.AddressUnitSuffix}");
+            }
+        }
+
         try
         {
             _prefetchedValues = GetDataMulti(addresses);
@@ -516,7 +541,9 @@ public sealed partial class IoLinkMaster : IDisposable
         catch (Exception ex)
         {
             _prefetchedValues = null;
-            if (ex is IoTCoreException { IsTimeout: true } && Timeout is false)
+            // This single getdatamulti is the cycle's top-level read: any failure means the master could not be
+            // reached (transport timeout, connection error, ...), so mark it unreachable regardless of the type.
+            if (Timeout is false)
             {
                 Timeout = true;
                 TimeoutChanged?.Invoke();
@@ -609,6 +636,7 @@ public sealed partial class IoLinkMaster : IDisposable
 
             LogMirroringCompleted();
             Initialized = true;
+            _announceTreeAfterMirror = true;
 
             _pollingTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(PollingWaitTime));
             _pollingTask = PollingTaskAsync(_pollingTimer);
@@ -703,18 +731,19 @@ public sealed partial class IoLinkMaster : IDisposable
                 // queries right after (re-)connecting, e.g. while IO-Link negotiation is still in progress -
                 // reading it only once the master itself is confirmed reachable means neither a slow/failing
                 // read for one device nor its own try/catch can undo the availability just established above.
+                // The master's own diagnostics are dispatched here inside the prefetch window too: in
+                // getdatamulti mode they were folded into that batch (see PrefetchPortData) and so serve from it;
+                // without the batch (_prefetchedValues is null) they fall through to live reads as before.
                 if (Timeout is false)
+                {
                     ReadAndDispatchProcessData();
+                    ReadAndDispatchMasterDiagnostics();
+                }
             }
             finally
             {
                 _prefetchedValues = null;
             }
-
-            // Read the master's own diagnostics after the port-data prefetch window is cleared, so these reads
-            // (which are not part of the port-data batch) always go live regardless of getdatamulti mode.
-            if (Timeout is false)
-                ReadAndDispatchMasterDiagnostics();
         }
         finally
         {
@@ -822,9 +851,12 @@ public sealed partial class IoLinkMaster : IDisposable
     /// </summary>
     private void ReportPendingChildDevicesChanged()
     {
-        if (_pendingChildDevicesChanged && Timeout is false)
+        // _announceTreeAfterMirror forces one announcement on the first reachable cycle after a mirror, so a master
+        // that only became reachable after start publishes its now-online tree even though no port flagged a change.
+        if ((_pendingChildDevicesChanged || _announceTreeAfterMirror) && Timeout is false)
         {
             _pendingChildDevicesChanged = false;
+            _announceTreeAfterMirror = false;
             // Not needed to clear the condition cache here: it is keyed by vendor/device id in
             // addition to the port address, so a device change naturally produces a cache miss.
             ChildDevicesChanged?.Invoke();

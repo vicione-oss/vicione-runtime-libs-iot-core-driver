@@ -39,7 +39,7 @@ public class VseDeviceTests
     }
 
     [Fact]
-    public void ParametersChanged_NotRaisedOnFirstRebuild_RaisedOnSubsequentRebuild()
+    public void ParametersChanged_RaisedOnFirstAndSubsequentRebuilds()
     {
         (VseDevice device, Mock<IVSEDevice> sdk, _, _) = CreateDevice();
         using (device)
@@ -47,13 +47,16 @@ public class VseDeviceTests
             int raised = 0;
             device.ParametersChanged += () => raised++;
 
+            // The first rebuild announces too, so a device that only becomes reachable after start publishes its
+            // now-online tree instead of staying silent.
             RaiseConnected(sdk);
             WaitUntil(() => device.Initialized);
-            Assert.Equal(0, raised);
-
-            RaiseParametersChanged(sdk);
             WaitUntil(() => raised > 0);
             Assert.Equal(1, raised);
+
+            RaiseParametersChanged(sdk);
+            WaitUntil(() => raised > 1);
+            Assert.Equal(2, raised);
         }
     }
 

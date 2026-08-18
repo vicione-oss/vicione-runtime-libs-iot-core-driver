@@ -38,8 +38,10 @@ public sealed partial class VseDevice : IDisposable
     private readonly Lock _writingTimerLock = new();
     private IReadOnlyDictionary<string, object> _itemsById = new Dictionary<string, object>();
     private SystemMode _lastSystemMode = SystemMode.None;
-    private bool _hasRebuiltBefore;
     private string _lastWritingErrorMessage = string.Empty;
+    // Deduplicates the "cannot write, device not connected" warning so it is logged once per disconnected episode
+    // (while writes stay queued) rather than every writing cycle.
+    private bool _writeNotConnectedLogged;
     private PeriodicTimer? _writingTimer;
     private Task? _writingTask;
     private bool _disposed;
@@ -70,12 +72,6 @@ public sealed partial class VseDevice : IDisposable
     public bool Measuring => Connection.Status.SystemMode == SystemMode.Measure;
 
     /// <summary>
-    /// Set by <see cref="DeviceManager"/> once no <see cref="VseDriver"/> instance still needs this device -
-    /// null while at least one instance holds a reference to it.
-    /// </summary>
-    internal DateTime? ReleaseDate { get; set; }
-
-    /// <summary>
     /// Whether the device is currently in its normal monitoring ("Supervise") system mode.
     /// </summary>
     public bool Supervising => Connection.Status.SystemMode == SystemMode.Supervise;
@@ -91,6 +87,8 @@ public sealed partial class VseDevice : IDisposable
             if (field == value)
                 return;
             field = value;
+            if (value)
+                _logger.ConnectionLost(DeviceAddress);
             TimeoutChanged?.Invoke();
         }
     }
@@ -227,11 +225,11 @@ public sealed partial class VseDevice : IDisposable
 
         Initialized = true;
 
-        // Matches the original's tree-diffing semantics: don't report "parameters changed" the very first time
-        // there is anything to report at all, only on subsequent, genuine rebuilds.
-        if (_hasRebuiltBefore)
-            ParametersChanged?.Invoke();
-        _hasRebuiltBefore = true;
+        // Announce every (re)build, including the very first: a device that only becomes reachable after start
+        // must still publish its now-online tree here, otherwise nothing would (its first-ever build is not a
+        // "change" any port/parameter diff would catch, and the status-only update path needs an already-published
+        // tree). The subscriber republishes on this; redundant publishes are deduped downstream.
+        ParametersChanged?.Invoke();
     }
 
     private void OnRawDataReceived(Measurement measurement)
@@ -468,6 +466,12 @@ public sealed partial class VseDevice : IDisposable
                 }
 
                 LogConnectionReEstablished(ref _lastWritingErrorMessage);
+                _writeNotConnectedLogged = false;
+            }
+            else if (_writingAddresses.IsEmpty == false && _writeNotConnectedLogged == false)
+            {
+                _writeNotConnectedLogged = true;
+                _logger.DeviceToWriteNotConnected(DeviceAddress);
             }
         }
         catch (Exception ex)

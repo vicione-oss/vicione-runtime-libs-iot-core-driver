@@ -18,9 +18,11 @@ public sealed partial class VariantsSubscriber
 
         if (ProcessDataInputs.ActiveVariant.Changed)
         {
-            IsWriting = true;
             long value = ProcessDataInputs.ActiveVariant.Value;
-            SetConnectorValueIfNotEqual(ProcessDataOutputs.ActiveVariant, value);
+            // Only arm the write-echo suppression when the value actually changes: an unchanged write produces no
+            // push-back, so arming IsWriting would leave it set and swallow the next genuine external change.
+            if (SetConnectorValueIfNotEqual(ProcessDataOutputs.ActiveVariant, value))
+                IsWriting = true;
             Device!.Write($"{Settings.NodePath.Value}/ActiveVariant", value);
         }
     }

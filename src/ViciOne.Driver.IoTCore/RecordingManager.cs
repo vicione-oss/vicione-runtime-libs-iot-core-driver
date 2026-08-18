@@ -16,6 +16,7 @@ namespace ViciOne.Driver.IoTCore;
 public sealed partial class RecordingManager : IDisposable
 {
     private readonly BlobRecorder _blobRecorder;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private bool _disposed;
     private bool _isRecording;
     private readonly ILogger _logger;
@@ -45,12 +46,16 @@ public sealed partial class RecordingManager : IDisposable
         if (_disposed)
             return;
 
+        // Cancel a recording still in flight before disposing the recorder, so it ends cooperatively (see the
+        // token threaded through ExecuteAsync) instead of only via the disposed device's requests throwing.
+        _cancellationTokenSource.Cancel();
         _blobRecorder.Dispose();
 
         while (_recordingPorts.IsEmpty == false)
             _recordingPorts.TryDequeue(out _);
 
         BlobDataReceived = null;
+        _cancellationTokenSource.Dispose();
         _disposed = true;
     }
 
@@ -107,7 +112,7 @@ public sealed partial class RecordingManager : IDisposable
             {
                 if (_recordingPorts.TryPeek(out pair))
                 {
-                    (bool success, string? errorMessage, BlobCapture? capture) = await _blobRecorder.ExecuteAsync(pair.PortIndex, _logger, CancellationToken.None);
+                    (bool success, string? errorMessage, BlobCapture? capture) = await _blobRecorder.ExecuteAsync(pair.PortIndex, _logger, _cancellationTokenSource.Token);
                     if (success)
                     {
                         BlobCapture blobCapture = capture!;

@@ -85,8 +85,8 @@ public abstract class SubscriberBase<TBlock> : RuntimeFunctionBlock<TBlock>, IIo
         // This is in InitializeII so the IoTCoreConfiguration for this identifier has run its InitializeI first,
         // creating (and authenticating) the master this subscriber now reads through.
         Device = driver.GetIoLinkMaster(Settings.Identifier.Value);
-        Device.ChildDevicesChanged += OnDeviceTimeoutChanged;
-        Device.TimeoutChanged += OnDeviceChildDevicesChanged;
+        Device.ChildDevicesChanged += OnDeviceChildDevicesChanged;
+        Device.TimeoutChanged += OnDeviceTimeoutChanged;
         Device.RegisterProcessDataIn(Settings.PortIndex.Value, Settings.VendorId.Value, Settings.DeviceId.Value, Settings.ProcessDataInIndex.Value, this);
     }
 

@@ -19,9 +19,11 @@ public sealed partial class InputSubscriber
 
         if (ProcessDataInputs.Value.Changed)
         {
-            IsWriting = true;
             double value = ProcessDataInputs.Value.Value;
-            SetConnectorValueIfNotEqual(ProcessDataOutputs.Value, value);
+            // Only arm the write-echo suppression when the value actually changes: an unchanged write produces no
+            // push-back, so arming IsWriting would leave it set and swallow the next genuine external change.
+            if (SetConnectorValueIfNotEqual(ProcessDataOutputs.Value, value))
+                IsWriting = true;
             Device!.Write($"{Settings.NodePath.Value}/Value", value);
         }
     }
