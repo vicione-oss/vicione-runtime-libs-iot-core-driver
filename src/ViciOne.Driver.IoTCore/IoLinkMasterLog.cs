@@ -13,8 +13,8 @@ internal static partial class IoLinkMasterLog
     public static partial void InputProcessDataIndexUnknown(this ILogger logger, int processDataInIndex, ushort vendorId, uint deviceId, Uri deviceUri);
     [LoggerMessage(EventId = 1003, EventName = "MirroringCompleted", Level = LogLevel.Information, Message = "Master '{DeviceUri}' has been mirrored.")]
     public static partial void MirroringCompleted(this ILogger logger, Uri deviceUri);
-    [LoggerMessage(EventId = 1004, EventName = "MirroringErrorOccurred", Level = LogLevel.Error, Message = "An error occurred while mirroring master '{DeviceUri}'.")]
-    public static partial void MirroringErrorOccurred(this ILogger logger, Exception ex, Uri deviceUri);
+    [LoggerMessage(EventId = 1004, EventName = "MirroringErrorOccurred", Level = LogLevel.Error, Message = "An error occurred while mirroring master '{DeviceUri}'. {Details}")]
+    public static partial void MirroringErrorOccurred(this ILogger logger, Exception ex, Uri deviceUri, string? details);
     [LoggerMessage(EventId = 1005, EventName = "PollingErrorOccurred", Level = LogLevel.Error, Message = "An error occurred while polling master '{DeviceUri}'.")]
     public static partial void PollingErrorOccurred(this ILogger logger, Exception ex, Uri deviceUri);
     [LoggerMessage(EventId = 1006, EventName = "SecurityQueryFailed", Level = LogLevel.Warning, Message = "Could not query the security information of master '{DeviceUri}'.")]

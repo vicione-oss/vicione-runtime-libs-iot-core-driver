@@ -12,7 +12,13 @@ public sealed partial class IoLinkMaster
         => _logger.MirroringCompleted(Uri);
 
     private void LogMirroringError(Exception ex)
-        => _logger.MirroringErrorOccurred(ex, Uri);
+        => _logger.MirroringErrorOccurred(ex, Uri, ExtractErrorDetails(ex));
+
+    // The IoT-Core HTTP adapter throws away the real inner exception, keeping only its message on
+    // IoTCoreException.ErrorDetails. Surface that so failures like a rejected TLS handshake show their actual
+    // cause instead of the generic "The SSL connection could not be established, see inner exception."
+    private static string? ExtractErrorDetails(Exception ex)
+        => (ex as ifm.IoTCore.Common.Exceptions.IoTCoreException)?.ErrorDetails ?? ex.InnerException?.Message;
 
     private void LogSecurityQueryFailed(Exception ex)
         => _logger.SecurityQueryFailed(ex, Uri);
