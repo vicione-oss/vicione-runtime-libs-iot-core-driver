@@ -157,13 +157,32 @@ public sealed partial class IoLinkMasterScanner
     private static async Task<DcpDeviceSecurity> GetSecurityInfoAsync(HttpResponseMessage identityResponse, CancellationToken cancellationToken)
     {
         string content = await identityResponse.Content.ReadAsStringAsync(cancellationToken);
-        JsonNode? security = JsonNode.Parse(content)?["data"]?["security"];
+        JsonNode? data = JsonNode.Parse(content)?["data"];
+
+        // Firmware differs in both where the security block sits and how it names its fields: newer firmware nests
+        // it under "iot" with lowercase fields (passwordstatus/securitymode/authscheme); older firmware puts it at
+        // the data root with camelCase fields (securityMode/authScheme) and reports "isPasswdSet" instead of
+        // "passwordstatus". Older firmware without any security block keeps the defaults.
+        JsonNode? security = data?["security"] ?? data?["iot"]?["security"];
+        if (security is null)
+            return new DcpDeviceSecurity();
 
         return new DcpDeviceSecurity
         {
-            RequiresAuthentication = string.Equals(security?["passwordstatus"]?.GetValue<string>(), "required", StringComparison.OrdinalIgnoreCase),
-            AuthenticationScheme = security?["authscheme"]?.GetValue<string>(),
-            SecurityMode = security?["securitymode"]?.GetValue<string>(),
+            RequiresAuthentication =
+                string.Equals(Read(security, "passwordstatus"), "required", StringComparison.OrdinalIgnoreCase) ||
+                (string.Equals(Read(security, "securitymode", "securityMode"), "enabled", StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(Read(security, "isPasswdSet"), "true", StringComparison.OrdinalIgnoreCase)),
+            AuthenticationScheme = Read(security, "authscheme", "authScheme"),
+            SecurityMode = Read(security, "securitymode", "securityMode"),
         };
+
+        static string? Read(JsonNode node, params string[] keys)
+        {
+            foreach (string key in keys)
+                if (node[key] is JsonNode value)
+                    return value.GetValue<string>();
+            return null;
+        }
     }
 }
