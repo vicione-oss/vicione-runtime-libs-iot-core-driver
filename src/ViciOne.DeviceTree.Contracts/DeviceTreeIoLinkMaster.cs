@@ -75,5 +75,5 @@ public sealed class DeviceTreeIoLinkMaster : IDeviceTreeMasterNode, IDeviceTreeU
     /// <summary>
     /// Security-related information about the master, as reported by the master itself.
     /// </summary>
-    public DeviceTreeIoLinkMasterSecurity Security { get; set; } = new();
+    public DeviceSecurity Security { get; set; } = new();
 }

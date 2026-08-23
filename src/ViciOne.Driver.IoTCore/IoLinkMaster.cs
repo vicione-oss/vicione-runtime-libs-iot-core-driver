@@ -166,7 +166,7 @@ public sealed partial class IoLinkMaster : IDisposable
     /// (unauthenticated-looking) values beforehand, or if the master's firmware doesn't report a <c>security</c>
     /// block at all (older masters just omit it).
     /// </summary>
-    internal DeviceTreeIoLinkMasterSecurity Security { get; private set; } = new();
+    internal DeviceSecurity Security { get; private set; } = new();
 
     /// <summary>
     /// Raised with a finished BLOB-channel recording's result.
@@ -660,32 +660,21 @@ public sealed partial class IoLinkMaster : IDisposable
     /// </summary>
     /// <param name="deviceElement">The freshly mirrored device element.</param>
     /// <returns>The master's security info - every property keeps its default if no <c>security</c> block was present or the call failed.</returns>
-    private DeviceTreeIoLinkMasterSecurity QuerySecurity(IBaseElement deviceElement)
+    private DeviceSecurity QuerySecurity(IBaseElement deviceElement)
     {
         if (deviceElement.GetElementByPredicate(e => e.Identifier == "GetIdentity", false, false) is not IServiceElement getIdentityElement)
-            return new DeviceTreeIoLinkMasterSecurity();
+            return new DeviceSecurity();
 
         try
         {
-            Variant response = getIdentityElement.Invoke(null!, new ServiceInfo());
-            if (response.AsVariantObject().TryGetValue("security", out Variant securityVariant))
-            {
-                VariantObject security = securityVariant.AsVariantObject();
-                return new DeviceTreeIoLinkMasterSecurity
-                {
-                    RequiresAuthentication = security.TryGetValue("passwordstatus", out Variant passwordStatus) &&
-                        string.Equals(passwordStatus.ToString(), "required", StringComparison.OrdinalIgnoreCase),
-                    AuthenticationScheme = security.TryGetValue("authscheme", out Variant authScheme) ? authScheme.ToString() : null,
-                    SecurityMode = security.TryGetValue("securitymode", out Variant securityMode) ? securityMode.ToString() : null,
-                };
-            }
+            return IoTCoreSecurityBlock.Read(getIdentityElement.Invoke(null!, new ServiceInfo()).AsVariantObject());
         }
         catch (Exception ex)
         {
             LogSecurityQueryFailed(ex);
         }
 
-        return new DeviceTreeIoLinkMasterSecurity();
+        return new DeviceSecurity();
     }
 
     /// <summary>

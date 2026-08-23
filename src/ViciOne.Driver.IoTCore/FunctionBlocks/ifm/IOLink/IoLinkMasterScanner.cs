@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ViciOne.Communication.IoTCore.DcpScan;
 using ViciOne.Core.Contracts.Runtime;
+using ViciOne.DeviceTree.Contracts;
 using ViciOne.DeviceTree.Contracts.Scanning;
+using ViciOne.Driver.IoTCore;
 
 namespace ifm.IOLink;
 
@@ -154,35 +156,9 @@ public sealed partial class IoLinkMasterScanner
     /// <param name="identityResponse">The successful response from a <c>getidentity</c> request.</param>
     /// <param name="cancellationToken">Cancellation token for reading the response body.</param>
     /// <returns>The device's security info - every property keeps its default if no <c>security</c> block was present.</returns>
-    private static async Task<DcpDeviceSecurity> GetSecurityInfoAsync(HttpResponseMessage identityResponse, CancellationToken cancellationToken)
+    private static async Task<DeviceSecurity> GetSecurityInfoAsync(HttpResponseMessage identityResponse, CancellationToken cancellationToken)
     {
         string content = await identityResponse.Content.ReadAsStringAsync(cancellationToken);
-        JsonNode? data = JsonNode.Parse(content)?["data"];
-
-        // Firmware differs in both where the security block sits and how it names its fields: newer firmware nests
-        // it under "iot" with lowercase fields (passwordstatus/securitymode/authscheme); older firmware puts it at
-        // the data root with camelCase fields (securityMode/authScheme) and reports "isPasswdSet" instead of
-        // "passwordstatus". Older firmware without any security block keeps the defaults.
-        JsonNode? security = data?["security"] ?? data?["iot"]?["security"];
-        if (security is null)
-            return new DcpDeviceSecurity();
-
-        return new DcpDeviceSecurity
-        {
-            RequiresAuthentication =
-                string.Equals(Read(security, "passwordstatus"), "required", StringComparison.OrdinalIgnoreCase) ||
-                (string.Equals(Read(security, "securitymode", "securityMode"), "enabled", StringComparison.OrdinalIgnoreCase) &&
-                 string.Equals(Read(security, "isPasswdSet"), "true", StringComparison.OrdinalIgnoreCase)),
-            AuthenticationScheme = Read(security, "authscheme", "authScheme"),
-            SecurityMode = Read(security, "securitymode", "securityMode"),
-        };
-
-        static string? Read(JsonNode node, params string[] keys)
-        {
-            foreach (string key in keys)
-                if (node[key] is JsonNode value)
-                    return value.GetValue<string>();
-            return null;
-        }
+        return IoTCoreSecurityBlock.Read(JsonNode.Parse(content)?["data"]);
     }
 }

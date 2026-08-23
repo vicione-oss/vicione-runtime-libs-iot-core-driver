@@ -28,5 +28,5 @@ public sealed class DcpDevice
     /// <summary>
     /// Security-related information about the device, derived from its <c>getidentity</c> response.
     /// </summary>
-    public DcpDeviceSecurity Security { get; set; } = new();
+    public DeviceSecurity Security { get; set; } = new();
 }
