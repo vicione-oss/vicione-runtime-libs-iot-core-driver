@@ -143,7 +143,7 @@ public class RawDataRecorderTests
         // The device never confirms Measure mode, so this spins in its unlocked up-to-5-second wait loop in the
         // background - StopRecording() below must not be blocked behind that (same _lock) for anywhere
         // near that long.
-        _ = Task.Run(() => sut.StartRecording(sensor: 1, sampleRate: 50_000, duration: 100, waitUntilFinished: false));
+        _ = Task.Run(() => sut.StartRecording(sensor: 1, sampleRate: 50_000, duration: 100, waitUntilFinished: false), TestContext.Current.CancellationToken);
         await WaitUntilAsync(() => sut.IsRecording);
 
         var stopwatch = Stopwatch.StartNew();
@@ -196,7 +196,7 @@ public class RawDataRecorderTests
         logger.Verify(l => l.Log(
             LogLevel.Warning,
             It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("connection error", StringComparison.OrdinalIgnoreCase)),
+            It.Is<It.IsAnyType>((v, t) => v!.ToString()!.Contains("connection error", StringComparison.OrdinalIgnoreCase)),
             It.IsAny<Exception?>(),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }

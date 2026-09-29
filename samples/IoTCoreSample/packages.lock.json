@@ -15,7 +15,7 @@
         "type": "Direct",
         "requested": "[7.0.0, )",
         "resolved": "7.0.0",
-        "contentHash": "Z2ncOEj/8HXqKt8xQxheBA1FVM2s2eMUg5EmTXZaUXu/9QIIeRALfb+aSX0xk5QITwoVt/58SBJn4bN0YLwQ6A==",
+        "contentHash": "dgWckuDoWcgzCzIfZuLEmkCrjd+0w1r5haN+ZsENkIvjFXGF2Fr9iQbaOyU2XoEa1TaD1TFVxMGGLbZlRW1A3A==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.DataStore.Contracts": "1.0.5",
@@ -68,9 +68,9 @@
       },
       "ifm.IoTCore.NetAdapter.Http.Client": {
         "type": "Direct",
-        "requested": "[2.0.1, )",
-        "resolved": "2.0.1",
-        "contentHash": "10hAb1IvW9awOgGbX4j/XY5O1TR2hfgml77fS0UBU0TH2S4cH0QNDEyyxyabdmJaRMIyPAjJr7gBTUIxDSYPOA==",
+        "requested": "[2.0.2, )",
+        "resolved": "2.0.2",
+        "contentHash": "vCeHr0r0zjRHcnwzja7ewMy4VaQLW9KCJogP/GcudA8yTBBW20Qh/nO/5TYbElMAhmvnZ5qMHMg+n4mPswObKw==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.IoTCore.Common": "6.1.0",
@@ -82,9 +82,9 @@
       },
       "ifm.IoTCore.Profile.DeviceManagement": {
         "type": "Direct",
-        "requested": "[7.4.5, )",
-        "resolved": "7.4.5",
-        "contentHash": "aoxNK4W7WD1zRLXflYfKBtHLKlOrmFKBeVGpcacxTakOdcsemg/V+NCamPo6G6tisjC7jf9JIIqHGf2zHvJ+lg==",
+        "requested": "[7.4.6, )",
+        "resolved": "7.4.6",
+        "contentHash": "GGfX7ShdDvMNaeVpF0Rq4RCYeVfNSvtGEkEWWL5tomeppnHF8aZZr3nt88kxv4Xd1fmkGAr7IDYwyMFV06EeBg==",
         "dependencies": {
           "ifm.DataStore.Contracts": "1.0.5",
           "ifm.IoTCore.Contracts": "7.0.0",

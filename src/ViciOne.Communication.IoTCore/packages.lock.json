@@ -24,7 +24,7 @@
         "type": "Direct",
         "requested": "[7.0.0, )",
         "resolved": "7.0.0",
-        "contentHash": "Z2ncOEj/8HXqKt8xQxheBA1FVM2s2eMUg5EmTXZaUXu/9QIIeRALfb+aSX0xk5QITwoVt/58SBJn4bN0YLwQ6A==",
+        "contentHash": "dgWckuDoWcgzCzIfZuLEmkCrjd+0w1r5haN+ZsENkIvjFXGF2Fr9iQbaOyU2XoEa1TaD1TFVxMGGLbZlRW1A3A==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.DataStore.Contracts": "1.0.5",
@@ -44,9 +44,9 @@
       },
       "ifm.IoTCore.NetAdapter.Http.Client": {
         "type": "Direct",
-        "requested": "[2.0.1, )",
-        "resolved": "2.0.1",
-        "contentHash": "10hAb1IvW9awOgGbX4j/XY5O1TR2hfgml77fS0UBU0TH2S4cH0QNDEyyxyabdmJaRMIyPAjJr7gBTUIxDSYPOA==",
+        "requested": "[2.0.2, )",
+        "resolved": "2.0.2",
+        "contentHash": "vCeHr0r0zjRHcnwzja7ewMy4VaQLW9KCJogP/GcudA8yTBBW20Qh/nO/5TYbElMAhmvnZ5qMHMg+n4mPswObKw==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.IoTCore.Common": "6.1.0",
@@ -64,11 +64,11 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",
-        "requested": "[10.0.10, )",
-        "resolved": "10.0.10",
-        "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
+        "requested": "[10.0.12, )",
+        "resolved": "10.0.12",
+        "contentHash": "+24lC4plfbEDNfLAdTV/SWKS7dW+16X4HdydO3R++134kSNTzcbYA4KpR1Hdh6uWisB8Za3AzwyOn+K+NxWIug==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.12"
         }
       },
       "PacketDotNet": {
@@ -192,8 +192,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
+        "resolved": "10.0.12",
+        "contentHash": "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw=="
       },
       "vicione.devicetree.contracts": {
         "type": "Project"

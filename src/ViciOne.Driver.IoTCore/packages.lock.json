@@ -33,7 +33,7 @@
         "type": "Direct",
         "requested": "[7.0.0, )",
         "resolved": "7.0.0",
-        "contentHash": "Z2ncOEj/8HXqKt8xQxheBA1FVM2s2eMUg5EmTXZaUXu/9QIIeRALfb+aSX0xk5QITwoVt/58SBJn4bN0YLwQ6A==",
+        "contentHash": "dgWckuDoWcgzCzIfZuLEmkCrjd+0w1r5haN+ZsENkIvjFXGF2Fr9iQbaOyU2XoEa1TaD1TFVxMGGLbZlRW1A3A==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.DataStore.Contracts": "1.0.5",
@@ -86,9 +86,9 @@
       },
       "ifm.IoTCore.NetAdapter.Http.Client": {
         "type": "Direct",
-        "requested": "[2.0.1, )",
-        "resolved": "2.0.1",
-        "contentHash": "10hAb1IvW9awOgGbX4j/XY5O1TR2hfgml77fS0UBU0TH2S4cH0QNDEyyxyabdmJaRMIyPAjJr7gBTUIxDSYPOA==",
+        "requested": "[2.0.2, )",
+        "resolved": "2.0.2",
+        "contentHash": "vCeHr0r0zjRHcnwzja7ewMy4VaQLW9KCJogP/GcudA8yTBBW20Qh/nO/5TYbElMAhmvnZ5qMHMg+n4mPswObKw==",
         "dependencies": {
           "ifm.Common": "1.0.0",
           "ifm.IoTCore.Common": "6.1.0",
@@ -100,9 +100,9 @@
       },
       "ifm.IoTCore.Profile.DeviceManagement": {
         "type": "Direct",
-        "requested": "[7.4.5, )",
-        "resolved": "7.4.5",
-        "contentHash": "aoxNK4W7WD1zRLXflYfKBtHLKlOrmFKBeVGpcacxTakOdcsemg/V+NCamPo6G6tisjC7jf9JIIqHGf2zHvJ+lg==",
+        "requested": "[7.4.6, )",
+        "resolved": "7.4.6",
+        "contentHash": "GGfX7ShdDvMNaeVpF0Rq4RCYeVfNSvtGEkEWWL5tomeppnHF8aZZr3nt88kxv4Xd1fmkGAr7IDYwyMFV06EeBg==",
         "dependencies": {
           "ifm.DataStore.Contracts": "1.0.5",
           "ifm.IoTCore.Contracts": "7.0.0",
@@ -231,8 +231,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
+        "resolved": "10.0.12",
+        "contentHash": "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw=="
       },
       "ViciOne.Core.Contracts": {
         "type": "Transitive",
@@ -253,13 +253,13 @@
       "vicione.communication.iotcore": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.12, )",
           "PacketDotNet": "[1.4.8, )",
           "SharpPcap": "[6.3.1, )",
           "ViciOne.DeviceTree.Contracts": "[2.0.2, )",
           "ifm.IoTCore": "[7.0.0, )",
           "ifm.IoTCore.Common": "[6.1.0, )",
-          "ifm.IoTCore.NetAdapter.Http.Client": "[2.0.1, )",
+          "ifm.IoTCore.NetAdapter.Http.Client": "[2.0.2, )",
           "ifm.IoddParser": "[5.1.0, )",
           "ifm.IoddParser.Helpers": "[5.1.0, )",
           "ifm.Logger.Contracts": "[2.0.0, )"
@@ -270,11 +270,11 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[10.0.10, )",
-        "resolved": "10.0.10",
-        "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
+        "requested": "[10.0.12, )",
+        "resolved": "10.0.12",
+        "contentHash": "+24lC4plfbEDNfLAdTV/SWKS7dW+16X4HdydO3R++134kSNTzcbYA4KpR1Hdh6uWisB8Za3AzwyOn+K+NxWIug==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.12"
         }
       },
       "PacketDotNet": {
