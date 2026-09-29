@@ -24,7 +24,6 @@
     <Project Path="src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/ViciOne.Communication.IoTCore.Tests/ViciOne.Communication.IoTCore.Tests.csproj" />
     <Project Path="tests/ViciOne.Communication.Vse.Tests/ViciOne.Communication.Vse.Tests.csproj" />
     <Project Path="tests/ViciOne.Driver.IoTCore.Tests/ViciOne.Driver.IoTCore.Tests.csproj" />
     <Project Path="tests/ViciOne.Driver.Vse.Tests/ViciOne.Driver.Vse.Tests.csproj" />
