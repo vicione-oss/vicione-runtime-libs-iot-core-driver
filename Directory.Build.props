@@ -64,7 +64,17 @@
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('Tests')) And $(MSBuildProjectDirectory.Contains('tests'))">
     <IsPackable>false</IsPackable>
     <IsPublishable>true</IsPublishable>
+    <OutputType>Exe</OutputType>
+    <!-- Use the Microsoft Testing Platform runner (instead of VSTest) to enable the MTP command-line experience -->
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
   </PropertyGroup>
+
+  <!-- Add xUnit/coverage package references to test projects -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('Tests')) And $(MSBuildProjectDirectory.Contains('tests'))">
+    <PackageReference Include="xunit.v3.mtp-v2" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <Using Include="Xunit" />
+  </ItemGroup>
 
   <!-- Properties for sample projects -->
   <PropertyGroup Condition="$(MSBuildProjectDirectory.Contains('samples'))">

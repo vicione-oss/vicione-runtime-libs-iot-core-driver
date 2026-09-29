@@ -5,17 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts" />
-    <PackageReference Include="ifm.diagnostic.VSEIotCore" />
     <PackageReference Include="ifm.IoddParser" />
     <PackageReference Include="ifm.IoddParser.Helpers" />
-    <PackageReference Include="PacketDotNet" />
-    <PackageReference Include="SharpPcap" />
+    <PackageReference Include="ifm.IoTCore" />
+    <PackageReference Include="ifm.IoTCore.Common" />
+    <PackageReference Include="ifm.IoTCore.MessageConverter.Json" />
+    <PackageReference Include="ifm.IoTCore.NetAdapter.Http.Client" />
+    <PackageReference Include="ifm.IoTCore.Profile.DeviceManagement" />
+    <PackageReference Include="ifm.IoTCore.Device.Contracts" />
+    <PackageReference Include="ifm.IoTCore.Device.IoTCore" />
+    <PackageReference Include="ifm.DataStore" />
+    <PackageReference Include="ifm.Logger.Contracts" />
     <PackageReference Include="ViciOne.Engine.DefaultValidators" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ViciOne.Driver.IoTCore.Contracts\ViciOne.Driver.IoTCore.Contracts.csproj" />
+    <ProjectReference Include="..\ViciOne.Communication.IoTCore\ViciOne.Communication.IoTCore.csproj" />
+    <ProjectReference Include="..\ViciOne.DeviceTree.Contracts\ViciOne.DeviceTree.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

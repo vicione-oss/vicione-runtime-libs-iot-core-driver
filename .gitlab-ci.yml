@@ -3,6 +3,20 @@ include:
     file: '/CI-Templates/v2/dotnet.yml'
   - project: 'vicione-oss/tooling/ci-templates'
     file: '/project/v1/dotnet.yml'
+  - component: $CI_SERVER_FQDN/vicione-oss/tooling/dotnet-component/dotnet-test@v2.7.1
+    inputs:
+      name: 'Test'
+      stage: 'test'
+      no_build: false
+      image: mcr.microsoft.com/dotnet/sdk:10.0
+      coverage: true
+      config_file: 'tests/testconfig.json'
+      before_script:
+        - dotnet nuget update source JFrogNuGetProxy --configfile NuGet.Config -u $NuGet_User_JFrog -p $NuGet_PW_JFrog --store-password-in-clear-text
+        - dotnet nuget update source JFrogViciOne --configfile NuGet.Config -u $NuGet_User_JFrog -p $NuGet_PW_JFrog --store-password-in-clear-text
+        - dotnet nuget update source IFM-qa --configfile NuGet.Config -u $NuGet_User_JFrog -p $NuGet_PW_JFrog --store-password-in-clear-text
+        - dotnet nuget update source IFM-iotcore --configfile NuGet.Config -u $NuGet_User_JFrog -p $NuGet_PW_JFrog --store-password-in-clear-text
+        - dotnet restore --packages packages
 
 default:
   image: mcr.microsoft.com/dotnet/sdk:10.0
@@ -10,19 +24,68 @@ default:
 Build:
   extends: .dotnet-build
 
+# The component needs "dotnet Build", which does not exist here; it builds itself (no_build: false)
 Test:
-  extends: .dotnet-test-xunit
-  
-Deploy NuGet Contracts:
+  needs: []
+
+Deploy NuGet DeviceTree Contracts:
   extends: .dotnet-deploy-nuget
   variables:
-    PROJECT: 'src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj'
+    PROJECT: 'src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj'
     REPO: 'JFrogViciOne'
 
-Release NuGet Contracts:
+Release NuGet DeviceTree Contracts:
   extends: .dotnet-release-nuget
   variables:
-    PROJECT: 'src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj'
+    PROJECT: 'src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Communication IoTCore:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.IoTCore/ViciOne.Communication.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Communication IoTCore:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.IoTCore/ViciOne.Communication.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Communication Vse:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.Vse/ViciOne.Communication.Vse.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Communication Vse:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Communication.Vse/ViciOne.Communication.Vse.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Driver IoTCore:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Driver IoTCore:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
+    REPO: 'JFrogViciOne'
+
+Deploy NuGet Driver Vse:
+  extends: .dotnet-deploy-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
+    REPO: 'JFrogViciOne'
+
+Release NuGet Driver Vse:
+  extends: .dotnet-release-nuget
+  variables:
+    PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
     REPO: 'JFrogViciOne'
 
 Prerelease Raw:

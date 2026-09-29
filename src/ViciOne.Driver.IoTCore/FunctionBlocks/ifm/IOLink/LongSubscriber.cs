@@ -1,33 +1,19 @@
-﻿using System;
-using System.Globalization;
-using ViciOne.Core.Contracts.Runtime;
+﻿using ViciOne.Core.Contracts.Runtime;
 
 namespace ifm.IOLink;
 
 public sealed partial class LongSubscriber
 {
+    /// <inheritdoc/>
     protected override IRuntimeConnector<bool> AvailableRuntimeConnector => ProcessDataOutputs.Available;
+
+    /// <inheritdoc/>
     protected override IRuntimeConnector<string> UnitRuntimeConnector => ProcessDataOutputs.Unit;
 
+    /// <inheritdoc/>
     protected override void SetValueToConnectors(object value, string displayFormat)
     {
-        if (value is
-            byte or
-            ushort or
-            uint or
-            sbyte or
-            short or
-            int or
-            long)
-        {
-            SetConnectorValue(ProcessDataOutputs.Value, Convert.ToInt64(value, CultureInfo.InvariantCulture));
-        }
-        else if (value is string stringValue)
-        {
-            if (long.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out long parsedLongValue))
-            {
-                SetConnectorValue(ProcessDataOutputs.Value, parsedLongValue);
-            }
-        }
+        if (TryConvertToInt64(value, out long longValue))
+            SetConnectorValue(ProcessDataOutputs.Value, longValue);
     }
 }

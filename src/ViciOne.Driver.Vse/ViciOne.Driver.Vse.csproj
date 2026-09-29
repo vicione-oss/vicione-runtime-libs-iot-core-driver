@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ViciOne.Engine.DefaultValidators" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ViciOne.Communication.Vse\ViciOne.Communication.Vse.csproj" />
+    <ProjectReference Include="..\ViciOne.DeviceTree.Contracts\ViciOne.DeviceTree.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

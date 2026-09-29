@@ -1,23 +1,20 @@
-﻿using ACX.ViciOne.Data.Driver.CloudDataAdapter.Contracts;
-using System;
+﻿using System;
 using ViciOne.Core.Contracts.Runtime;
+using ViciOne.DeviceTree.Contracts;
 using ViciOne.Driver.IoTCore;
-using ViciOne.Driver.IoTCore.Contracts;
-using ViciOne.Driver.IoTCore.Contracts.Constants;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
 
 namespace ifm.IOLink;
 
 public sealed partial class BlobSubscriber
 {
-    private const string Unknown_ApplicationSpecificTag = "unknown";
     private const string Unknown_ProductName = "unknown";
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Verwerfbare Felder verwerfen", Justification = "Wird vom DeviceManager freigegeben.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Released by the DeviceManager.")]
     private IoLinkMaster? _device;
     private string? _recordingIdentifier;
     private bool _waitingForData;
 
+    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -30,11 +27,17 @@ public sealed partial class BlobSubscriber
     }
 
     private string GetRecordingIdentifier()
-        => Identifiers.GetIoLinkRawDataIdentifier(Settings.Address.Value!,
-            Settings.ApplicationSpecificTag.Value ?? Unknown_ApplicationSpecificTag, Settings.PortIndex.Value,
-            Settings.VendorId.Value, Settings.DeviceId.Value, Settings.ProductName.Value ?? Unknown_ProductName, Identifiers.Recording,
-            DeviceTreeBlobData.ReadBlobDuration, DeviceTreeBlobData.ReadBlobSampleRate);
+        => new IoLinkRawDataIdentifier(
+            _device?.Address ?? string.Empty,
+            Settings.PortIndex.Value,
+            Settings.VendorId.Value,
+            Settings.DeviceId.Value,
+            Settings.ProductName.Value ?? Unknown_ProductName,
+            "Recording",
+            DeviceTreeBlobData.ReadBlobDuration,
+            DeviceTreeBlobData.ReadBlobSampleRate).ToString();
 
+    /// <inheritdoc/>
     public override void InitializeII()
     {
         base.InitializeII();
@@ -42,17 +45,15 @@ public sealed partial class BlobSubscriber
         if (Driver is not IoTCoreDriver driver)
             throw new InvalidCastException($"Could not cast to {nameof(IoTCoreDriver)}.");
 
-        if (Settings.Address.Value is null)
-            throw new ArgumentException("Invalid address configuration.");
+        if (string.IsNullOrWhiteSpace(Settings.Identifier.Value))
+            throw new ArgumentException("Invalid identifier configuration.");
 
-        if (Settings.ProductName.Value is null)
-            throw new ArgumentException("Invalid product name configuration.");
+        // This is in InitializeII so the IoTCoreConfiguration for this identifier has run its InitializeI first,
+        // creating (and authenticating) the master this subscriber now reads through.
+        _device = driver.GetIoLinkMaster(Settings.Identifier.Value);
+        _device.BlobDataReceived += OnBlobDataReceived;
 
         _recordingIdentifier = GetRecordingIdentifier();
-
-        // Liegt im InitializeII damit der DeviceTreeSubscriber zuerst initialisiert wird und das Gerät mit dem konfigurierten IoddDirectory anlegt
-        _device = driver.GetOrAddIoLinkMaster(Settings.Address.Value);
-        _device.BlobDataReceived += OnBlobDataReceived;
     }
 
     private void OnBlobDataReceived(Measurement measurement)
@@ -60,15 +61,25 @@ public sealed partial class BlobSubscriber
         if (_waitingForData == false || string.Equals(measurement.Identifier, _recordingIdentifier, StringComparison.Ordinal) == false)
             return;
 
-        measurement.RecordReasons = [new ErrorState() { TriggerType = "Interval" }];
-
         _waitingForData = false;
-        SetConnectorValueIfNotEqual(ProcessDataOutputs.Data, measurement);
+
+        SetConnectorValueIfNotEqual(ProcessDataOutputs.Data, new Measurement()
+        {
+            Duration = measurement.Duration,
+            Frequency = measurement.Frequency,
+            Identifier = measurement.Identifier,
+            RawData = measurement.RawData,
+            RecordReasons = [new ErrorState() { TriggerType = "Interval" }],
+            Start = measurement.Start,
+            Values = measurement.Values,
+        });
     }
 
+    /// <inheritdoc/>
     protected override void OnSettingChanged(IRuntimeSetting setting)
         => _recordingIdentifier = GetRecordingIdentifier();
 
+    /// <inheritdoc/>
     protected override void ProcessCycle(IFunctionBlockCycleInfo cycleInfo)
     {
         if (FunctionBlockEnabled is false)

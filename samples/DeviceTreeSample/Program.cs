@@ -1,14 +1,16 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using ViciOne.DeviceTree.Contracts;
 using ViciOne.Driver.IoTCore;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
 
 namespace DeviceTreeSample;
 
-internal class Program
+internal sealed class Program
 {
     private static readonly string s_ioddDirectory = Path.GetFullPath(@"..\..\..\..\..\artifacts\IODDs");
+    private static readonly JsonSerializerOptions s_jsonOptions = new() { WriteIndented = true };
 
-    private const string DeviceAddress = "10.45.24.141";
+    private const string DeviceAddress = "192.168.178.96";
 
     internal static async Task Main()
     {
@@ -28,6 +30,13 @@ internal class Program
             }
             Console.WriteLine();
         }
+
+        // Same call (type + options) DeviceTreeSubscriber's IRuntimeConnector<DeviceTreeIoLinkMaster> output uses
+        // to serialize this tree for the engineering UI - i.e. exactly what that FunctionBlock would actually
+        // send over the wire.
+        Console.WriteLine("===== JSON =====");
+        Console.WriteLine(JsonSerializer.Serialize(deviceTree, s_jsonOptions));
+        Console.WriteLine("===== END JSON =====");
     }
 
     private static string GetDescription(DeviceTreeNodeDescription? description)
@@ -43,7 +52,7 @@ internal class Program
         IoLinkParser.Initialize(ioddDirectory, true, logger);
 
         var instanceHandle = Guid.NewGuid();
-        IoLinkMaster device = DeviceManager.GetOrAddIoLinkMaster(deviceAddress, instanceHandle, logger);
+        IoLinkMaster device = DeviceManager.GetOrAddIoLinkMaster(deviceAddress, deviceAddress, instanceHandle, logger);
         DeviceTreeIoLinkMaster deviceTree = await IoLinkParser.ParseDeviceAsync(device, logger);
         DeviceManager.ReleaseDevices(instanceHandle);
 

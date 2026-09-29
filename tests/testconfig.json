@@ -1,0 +1,30 @@
+{
+    "codeCoverage": {
+        "Configuration": {
+            "CodeCoverage": {
+                "Attributes": {
+                    "Exclude": {
+                        "Attribute": [
+                            "^System\\.CodeDom\\.Compiler\\.GeneratedCodeAttribute$",
+                            "^System\\.Diagnostics\\.CodeAnalysis\\.ExcludeFromCodeCoverageAttribute$"
+                        ]
+                    }
+                },
+                "Sources": {
+                    "Exclude": [
+                        ".*\\.g\\.cs$",
+                        ".*\\.nt\\.cs$"
+                    ]
+                },
+                "ModulePaths": {
+                    "Exclude": {
+                        "ModulePath": [
+                            ".*Facts\\.dll$",
+                            ".*Tests\\.dll$"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

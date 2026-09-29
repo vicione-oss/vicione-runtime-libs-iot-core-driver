@@ -17,10 +17,15 @@
     <Project Path="samples/VseSample/VseSample.csproj" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/ViciOne.Driver.IoTCore.Contracts/ViciOne.Driver.IoTCore.Contracts.csproj" />
+    <Project Path="src/ViciOne.Communication.IoTCore/ViciOne.Communication.IoTCore.csproj" />
+    <Project Path="src/ViciOne.Communication.Vse/ViciOne.Communication.Vse.csproj" />
+    <Project Path="src/ViciOne.DeviceTree.Contracts/ViciOne.DeviceTree.Contracts.csproj" />
     <Project Path="src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj" />
+    <Project Path="src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ViciOne.Communication.Vse.Tests/ViciOne.Communication.Vse.Tests.csproj" />
     <Project Path="tests/ViciOne.Driver.IoTCore.Tests/ViciOne.Driver.IoTCore.Tests.csproj" />
+    <Project Path="tests/ViciOne.Driver.Vse.Tests/ViciOne.Driver.Vse.Tests.csproj" />
   </Folder>
 </Solution>

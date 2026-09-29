@@ -1,5 +1,5 @@
 ﻿using ifm.IoddParser.Contracts;
-using ViciOne.Driver.IoTCore.IoddManagement;
+using ViciOne.Communication.IoTCore.IoddStore;
 
 namespace IoddSample;
 
@@ -12,18 +12,18 @@ internal sealed class Program
 
     internal static void Main()
     {
-        IoddParserManager.Initialize(s_ioddDirectory, true);
+        IoddCatalog.Initialize(s_ioddDirectory, true);
 
         IDevice? device = null;
         try
         {
-            device = IoddParserManager.GetIoddDevice(DeviceVendorId, DeviceDeviceId);
-            if (device is null && IoddParserManager.IoddAutoDownload)
+            device = IoddCatalog.GetIoddDevice(DeviceVendorId, DeviceDeviceId);
+            if (device is null && IoddCatalog.IoddAutoDownload)
             {
                 Console.WriteLine("IODD not found locally, attempting to download...");
-                try { IoddParserManager.DownloadIodd(DeviceVendorId, DeviceDeviceId, false, false); }
+                try { IoddCatalog.DownloadIodd(DeviceVendorId, DeviceDeviceId, false, false); }
                 catch (Exception ex) { Console.WriteLine($"Error downloading IODD: {ex.Message}"); }
-                device = IoddParserManager.GetIoddDevice(DeviceVendorId, DeviceDeviceId);
+                device = IoddCatalog.GetIoddDevice(DeviceVendorId, DeviceDeviceId);
             }
         }
         catch (Exception ex) { Console.WriteLine($"Error retrieving IODD: {ex.Message}"); }

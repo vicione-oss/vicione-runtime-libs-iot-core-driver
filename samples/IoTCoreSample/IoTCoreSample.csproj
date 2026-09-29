@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ifm.diagnostic.VSEIotCore" />
+    <PackageReference Include="ifm.IoTCore" />
+    <PackageReference Include="ifm.IoTCore.Common" />
+    <PackageReference Include="ifm.IoTCore.MessageConverter.Json" />
+    <PackageReference Include="ifm.IoTCore.NetAdapter.Http.Client" />
+    <PackageReference Include="ifm.IoTCore.Profile.DeviceManagement" />
+    <PackageReference Include="ifm.IoTCore.Device.Contracts" />
+    <PackageReference Include="ifm.IoTCore.Device.IoTCore" />
+    <PackageReference Include="ifm.DataStore" />
+    <PackageReference Include="ifm.Logger.Contracts" />
   </ItemGroup>
 
 </Project>

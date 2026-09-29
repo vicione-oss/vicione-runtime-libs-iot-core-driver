@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using ifm.Common.Variant;
 using ifm.IoddParser.Contracts;
 using ifm.IoddParser.Helpers;
-using ifmIoTCore;
-using ifmIoTCore.Common.Variant;
-using ifmIoTCore.Elements;
-using ifmIoTCore.Profiles.DeviceManagement.Elements;
+using ifm.IoTCore.Contracts;
+using ifm.IoTCore.ElementManager.Contracts.Elements;
 using Microsoft.Extensions.Logging;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree;
-using ViciOne.Driver.IoTCore.Contracts.DeviceTree.Extensions;
-using ViciOne.Driver.IoTCore.Extensions;
-using ViciOne.Driver.IoTCore.IoddManagement;
+using ViciOne.Communication.IoTCore.Extensions;
+using ViciOne.Communication.IoTCore.IoddStore;
+using ViciOne.DeviceTree.Contracts;
+using ViciOne.DeviceTree.Contracts.Extensions;
 
 namespace ViciOne.Driver.IoTCore;
 
+/// <summary>
+/// Builds the device tree for one <see cref="IoLinkMaster"/>: walks its live element tree, reads each
+/// connected device's identity and IODD-decoded process data, and reuses cached results for ports whose
+/// device hasn't changed since the last full parse.
+/// </summary>
 public static partial class IoLinkParser
 {
     private const string AddressApplicationSpecificTag = "/applicationspecifictag";
@@ -27,12 +32,19 @@ public static partial class IoLinkParser
     private const string AddressDeviceVendor = "/deviceinfo/vendor";
     private const string AddressHardwareRevision = "/deviceinfo/hwrevision";
     private const string AddressProductName = "/productname";
+    private const string AddressDeviceSerial = "/serial";
     private const string AddressProductCode = "/deviceinfo/productcode";
     private const string AddressSerialNumber = "/deviceinfo/serialnumber";
     private const string AddressSoftwareRevision = "/deviceinfo/swrevision";
     private const string AddressStatus = "/status";
     private const string AddressVendorId = "/vendorid";
+    internal const string AddressMasterTemperature = "/processdatamaster/temperature";
+    internal const string AddressMasterVoltage = "/processdatamaster/voltage";
+    internal const string AddressMasterCurrent = "/processdatamaster/current";
+    internal const string AddressMasterSupervisionStatus = "/processdatamaster/supervisionstatus";
+    internal const string AddressUnitSuffix = "/unit";
     private const string ProfileIoLinkDeviceFull = "iolinkdevice_full";
+    private const string IoLinkMasterIdentifier = "iolinkmaster";
 
     private static DeviceTreeDevice AddIoLinkDeviceNode(IBaseElement ioLinkDevice, IDeviceTreeBase parentNode)
     {
@@ -46,7 +58,7 @@ public static partial class IoLinkParser
         return node;
     }
 
-    private static DeviceTreeIoLinkMaster AddIoLinkMasterNode(IBaseElement ioLinkMaster, IDeviceTreeBase parentNode)
+    private static DeviceTreeIoLinkMaster AddIoLinkMasterNode(IBaseElement ioLinkMaster, IDeviceTreeBase parentNode, IoLinkMaster masterDevice)
     {
         string remoteDeviceIdentifier = ioLinkMaster.Parent.Identifier;
         var node = new DeviceTreeIoLinkMaster()
@@ -54,7 +66,10 @@ public static partial class IoLinkParser
             Id = ioLinkMaster.Address,
             MacAddress = remoteDeviceIdentifier,
             Name = IoLinkMaster.DefaultName,
-            Url = (ioLinkMaster as IProxyElement)!.RemoteContext.Uri,
+            Url = masterDevice.Uri,
+            Username = masterDevice.Username,
+            Password = masterDevice.Password,
+            Security = masterDevice.Security,
         };
 
         parentNode.Children.Add(node);
@@ -92,12 +107,12 @@ public static partial class IoLinkParser
     private static DataType GetDataType(object value)
         => value switch
         {
-            bool => DataType.BooleanT,
-            float or double => DataType.Float32T,
-            sbyte or short or int or long => DataType.IntegerT,
-            byte or ushort or uint or ulong => DataType.UIntegerT,
-            string => DataType.StringT,
-            _ => DataType.Invalid
+            bool => DataType.Flag,
+            float or double => DataType.Real,
+            sbyte or short or int or long => DataType.Whole,
+            byte or ushort or uint or ulong => DataType.UnsignedWhole,
+            string => DataType.Text,
+            _ => DataType.Unknown
         };
 
     private static VariantValue? GetDataValueAsValue(IoLinkMaster ioLinkDevice, string elementAddress, ILogger logger)
@@ -111,7 +126,7 @@ public static partial class IoLinkParser
         }
         catch (Exception ex)
         {
-            logger.ErrorWhileReadingDataFromIoLinkMaster(elementAddress, ex.Message, ex);
+            logger.ErrorWhileReadingDataFromIoLinkMaster(elementAddress, ex);
             return null;
         }
     }
@@ -127,19 +142,19 @@ public static partial class IoLinkParser
         }
         catch (Exception ex)
         {
-            logger.ErrorWhileReadingDataFromIoLinkMaster($"{address}/productid", ex.Message, ex);
+            logger.ErrorWhileReadingDataFromIoLinkMaster($"{address}/productid", ex);
             return null;
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Toten bedingten Code vermeiden", Justification = "Das warten auf die Initialisierung muss nur gestartet werden, wenn das Gerät nicht bereits initialisiert ist.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Toten bedingten Code vermeiden", Justification = "Waiting for initialization only needs to be started if the device isn't already initialized.")]
     public static async Task<DeviceTreeIoLinkMaster> ParseDeviceAsync(IoLinkMaster ioLinkDevice, ILogger logger)
     {
         // Acquire exclusive access before waiting for initialization so the polling loop
         // (which starts immediately after Initialized=true) is blocked until we are done.
         using IDisposable exclusiveAccess = await ioLinkDevice.AcquireExclusiveAccessAsync();
 
-        // TODO: Warten auf die Initialisierung in Erweiterungsmethode auslagern
+        // TODO: move waiting for initialization out into an extension method
         if (ioLinkDevice.Initialized == false)
         {
             const int MaxWaitTime = 30_000;
@@ -163,7 +178,7 @@ public static partial class IoLinkParser
                 // Not needed to clear the condition cache here: it is keyed by vendor/device id in
                 // addition to the port address, so a device change naturally produces a cache miss
                 // instead of requiring every full parse to re-attempt already-known-bad reads.
-                ParseIoTCoreTree(ioLinkDevice.Core, deviceTree);
+                ParseIoTCoreTree(ioLinkDevice, deviceTree);
 
                 // Ports whose availability/identity has not changed since the last successful full
                 // parse (IoLinkMasterPortDeviceInfo.NeedsFullRefresh is false) reuse their previously
@@ -186,7 +201,7 @@ public static partial class IoLinkParser
 
                 // Shared by QueryDeviceInfo and ReadIoddData, both of which look up a device's
                 // PortDeviceInfo by its (suffix-less) address.
-                Dictionary<string, IoLinkMasterPortDeviceInfo> portInfosByAddress = ioLinkDevice.PortDeviceInfos.ToDictionary(p => p.Address);
+                var portInfosByAddress = ioLinkDevice.PortDeviceInfos.ToDictionary(p => p.Address);
 
                 QueryDeviceInfo(ioLinkDevice.Core, ioLinkDevice, nodes, logger, reusedNodes, portInfosByAddress);
                 await ReadIoddData(ioLinkDevice, nodes, logger, reusedNodes, portInfosByAddress);
@@ -195,9 +210,9 @@ public static partial class IoLinkParser
                 // Unconditional, not just when Timeout is true: a reused cached node (see
                 // ReuseCachedDeviceNodes) is the exact same object stored in CachedPortDeviceNodes, so
                 // if it was marked offline during an earlier parse that ran while Timeout was true, it
-                // would otherwise stay stuck at IsOffline=true forever once Timeout clears again, even
+                // would otherwise stay stuck at Offline forever once Timeout clears again, even
                 // though ReadAndDecodeProcessDataIn keeps decoding fresh values into it.
-                deviceTree.SetIsOffline(ioLinkDevice.Timeout);
+                deviceTree.SetStatus(GetConnectionStatus(ioLinkDevice));
 
                 return deviceTree.Children.OfType<DeviceTreeIoLinkMaster>().First();
             }
@@ -214,16 +229,42 @@ public static partial class IoLinkParser
                     },
                     Name = IoLinkMaster.DefaultName,
                     Url = ioLinkDevice.Uri,
+                    Username = ioLinkDevice.Username,
+                    Password = ioLinkDevice.Password,
                     MacAddress = "00:00:00:00:00",
-                    IsOffline = true,
+                    Status = ConnectionStatus.Offline,
                 };
             }
         }
         catch (Exception ex)
         {
-            logger.ErrorWhileParsingDevice(ioLinkDevice.Address, ex.Message, ex);
+            logger.ErrorWhileParsingDevice(ioLinkDevice.Address, ex);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Determines the master's overall connection status for the published device tree.
+    /// </summary>
+    /// <param name="ioLinkDevice">The master to inspect.</param>
+    /// <returns>
+    /// <see cref="ConnectionStatus.Offline"/> if the master itself is unreachable; <see cref="ConnectionStatus.AuthenticationRequired"/>
+    /// if it reported needing authentication (see <see cref="IoLinkMaster.Security"/>) and no username was
+    /// configured to try; <see cref="ConnectionStatus.Online"/> otherwise.
+    /// <para>This can't (yet) distinguish "no credentials configured" from "wrong credentials configured" -
+    /// the latter currently still just looks like a normal <see cref="ConnectionStatus.Offline"/>/timeout, since
+    /// telling them apart would require classifying the actual read failures as authentication errors rather
+    /// than network errors, which hasn't been implemented.</para>
+    /// </returns>
+    internal static ConnectionStatus GetConnectionStatus(IoLinkMaster ioLinkDevice)
+    {
+        if (ioLinkDevice.Timeout)
+            return ConnectionStatus.Offline;
+
+        if (ioLinkDevice.Security.RequiresAuthentication && string.IsNullOrEmpty(ioLinkDevice.Username))
+            return ConnectionStatus.AuthenticationRequired;
+
+        return ConnectionStatus.Online;
     }
 
     public static void Initialize(string ioddDirectory, bool ioddAutoDownload, ILogger logger)
@@ -260,7 +301,7 @@ public static partial class IoLinkParser
     private static HashSet<DeviceTreeDevice> ReuseCachedDeviceNodes(IoLinkMaster ioLinkDevice, List<IDeviceTreeBase> nodes, Dictionary<IDeviceTreeBase, IDeviceTreeBase> parentOf)
     {
         var reusedNodes = new HashSet<DeviceTreeDevice>();
-        Dictionary<string, DeviceTreeDevice> skeletonsByAddress = nodes.OfType<DeviceTreeDevice>().ToDictionary(d => d.Id);
+        var skeletonsByAddress = nodes.OfType<DeviceTreeDevice>().ToDictionary(d => d.Id);
 
         foreach (IoLinkMasterPortDeviceInfo portInfo in ioLinkDevice.PortDeviceInfos)
         {
@@ -283,7 +324,7 @@ public static partial class IoLinkParser
     // IoLinkMasterPortDeviceInfo.NeedsFullRefresh stays false for that port.
     private static void CacheFreshDeviceNodes(IoLinkMaster ioLinkDevice, List<IDeviceTreeBase> nodes, HashSet<DeviceTreeDevice> reusedNodes)
     {
-        Dictionary<string, DeviceTreeDevice> devicesByAddress = nodes.OfType<DeviceTreeDevice>()
+        var devicesByAddress = nodes.OfType<DeviceTreeDevice>()
             .ToDictionary(d => d.Id.Split('~')[0]);
 
         foreach (IoLinkMasterPortDeviceInfo portInfo in ioLinkDevice.PortDeviceInfos)
@@ -334,7 +375,7 @@ public static partial class IoLinkParser
             {
                 if (attempt >= ProcessDataReadRetries)
                 {
-                    logger.ErrorWhileReadingAndDecodingProcessData(address, ex.Message, ex);
+                    logger.ErrorWhileReadingAndDecodingProcessData(address, ex);
                     return [];
                 }
 
@@ -358,16 +399,16 @@ public static partial class IoLinkParser
             {
                 if (deviceNode.VendorId > 0 && deviceNode.DeviceId > 0)
                 {
-                    device = IoddParserManager.GetIoddDevice(deviceNode.VendorId, deviceNode.DeviceId);
-                    if (device is null && IoddParserManager.IoddAutoDownload)
+                    device = IoddCatalog.GetIoddDevice(deviceNode.VendorId, deviceNode.DeviceId);
+                    if (device is null && IoddCatalog.IoddAutoDownload)
                     {
-                        try { IoddParserManager.DownloadIodd(deviceNode.VendorId, deviceNode.DeviceId, false, false); }
-                        catch (Exception ex) { logger.ErrorWhileDownloadingIodd(deviceNode.VendorId, deviceNode.DeviceId, ex.Message, ex); }
-                        device = IoddParserManager.GetIoddDevice(deviceNode.VendorId, deviceNode.DeviceId);
+                        try { IoddCatalog.DownloadIodd(deviceNode.VendorId, deviceNode.DeviceId, false, false); }
+                        catch (Exception ex) { logger.ErrorWhileDownloadingIodd(masterDevice.Address, deviceNode.VendorId, deviceNode.DeviceId, ex); }
+                        device = IoddCatalog.GetIoddDevice(deviceNode.VendorId, deviceNode.DeviceId);
                     }
                 }
             }
-            catch (Exception ex) { logger.ErrorWhileLoadingIodd(deviceNode.VendorId, deviceNode.DeviceId, ex.Message, ex); }
+            catch (Exception ex) { logger.ErrorWhileLoadingIodd(masterDevice.Address, deviceNode.VendorId, deviceNode.DeviceId, ex); }
 
             if (device is null)
             {
@@ -381,13 +422,24 @@ public static partial class IoLinkParser
                 continue;
             }
 
-            // Prefer matching by ProductId: some IODDs define multiple DeviceVariants that share
-            // the same ProductName text (see e.g. Pepperl-Fuchs DK12-11, where two variants both
-            // resolve to "DK12-11-IO/92/136"), so Name alone can pick the wrong variant's image.
-            // Fall back to Name when ProductId is unavailable (e.g. a still-cached node from
-            // before this field existed) to avoid regressing devices that already match by name.
-            IDeviceVariant? deviceInfo = device.DeviceIdentity?.DeviceVariants?.FirstOrDefault(d => d.ProductId == deviceNode.ProductId)
-                ?? device.DeviceIdentity?.DeviceVariants?.FirstOrDefault(d => d.Name == deviceNode.Name);
+            // Match the IODD variant by ProductName; only when several share it (e.g. Pepperl-Fuchs
+            // DK12-11) read the slow ISDU ProductId to disambiguate. It's used for nothing else.
+            List<IDeviceVariant> variants = device.DeviceIdentity?.DeviceVariants?.ToList() ?? [];
+            List<IDeviceVariant> byName = variants.Where(d => d.Name == deviceNode.Name).ToList();
+
+            IDeviceVariant? deviceInfo;
+            if (byName.Count == 1)
+            {
+                // Unique name match - skip the slow ISDU ProductId read.
+                deviceInfo = byName[0];
+            }
+            else
+            {
+                // Zero or several name matches - read the ISDU ProductId to pick the right one.
+                deviceNode.ProductId ??= ReadProductId(masterDevice, deviceNode.Id.Split('~')[0], logger);
+                deviceInfo = variants.FirstOrDefault(d => d.ProductId == deviceNode.ProductId)
+                    ?? byName.FirstOrDefault();
+            }
 
             deviceNode.Description = new DeviceTreeNodeDescription()
             {
@@ -412,11 +464,10 @@ public static partial class IoLinkParser
                     {
                         DataType = dataType,
                         Description = new DeviceTreeNodeDescription() { Text = value.Description ?? string.Empty },
-                        HasUnit = dataType is DataType.Float32T or DataType.IntegerT,
+                        HasUnit = dataType is DataType.Real or DataType.Whole,
                         Id = $"{deviceNode.Id}~{value.Name}~{value.SubIndex}",
                         Name = GenerateUniqueName(deviceNode.Children, value.Name),
-                        ShowDetailButton = dataType == DataType.StringT,
-                        StructureUnit = value.Unit ?? string.Empty,
+                        Unit = value.Unit ?? string.Empty,
                         SubIndex = value.SubIndex ?? 0,
                     };
 
@@ -449,17 +500,17 @@ public static partial class IoLinkParser
         }
     }
 
-    private static void ParseIoTCoreTree(IIoTCore core, IDeviceTreeBase deviceTree)
+    private static void ParseIoTCoreTree(IoLinkMaster ioLinkDevice, IDeviceTreeBase deviceTree)
     {
-        foreach (IBaseElement ioLinkMaster in IoddParserManager.GetIoLinkMasters(core.Root).ToArray())
+        foreach (IBaseElement ioLinkMaster in GetIoLinkMasters(ioLinkDevice.Core.Root).ToArray())
         {
-            IDeviceTreeBase masterDeviceNode = AddIoLinkMasterNode(ioLinkMaster, deviceTree);
+            IDeviceTreeBase masterDeviceNode = AddIoLinkMasterNode(ioLinkMaster, deviceTree, ioLinkDevice);
 
-            foreach (IBaseElement port in IoddParserManager.GetIoLinkMasterPorts(ioLinkMaster).ToArray())
+            foreach (IBaseElement port in GetIoLinkMasterPorts(ioLinkMaster).ToArray())
             {
                 IDeviceTreeBase portNode = AddIoLinkMasterPortNode(port, masterDeviceNode);
 
-                foreach (IBaseElement device in IoddParserManager.GetIoLinkMasterDevices(port).ToArray())
+                foreach (IBaseElement device in GetIoLinkMasterDevices(port).ToArray())
                 {
                     AddIoLinkDeviceNode(device, portNode);
                 }
@@ -467,13 +518,50 @@ public static partial class IoLinkParser
         }
     }
 
+    // Navigates the live ifm.IoTCore element tree of the master itself (which masters/ports/devices are
+    // currently present) - unrelated to IoddCatalog's job of loading/caching/downloading IODD file
+    // definitions from disk, which is why these live here instead.
+    internal static IEnumerable<IBaseElement> GetIoLinkMasters(IBaseElement element)
+        => element.GetElementsByPredicate(IsIoLinkMaster, recurse: true, includeSelf: false);
+
+    internal static IEnumerable<IBaseElement> GetIoLinkMasterDevices(IBaseElement element)
+        => element.GetElementsByPredicate(IsIoLinkMasterDevice, recurse: true, includeSelf: false);
+
+    private static IEnumerable<IBaseElement> GetIoLinkMasterPorts(IBaseElement element)
+        => element.GetElementsByPredicate(IsIoLinkMasterPort, recurse: true, includeSelf: false);
+
+    internal static int GetPortIndex(IBaseElement portElement)
+    {
+        Match match = PortRegex().Match(portElement.Identifier);
+        return match.Success
+            ? int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture)
+            : -1;
+    }
+
+    private static bool IsIoLinkMaster(IBaseElement element)
+        => element.Identifier == IoLinkMasterIdentifier &&
+           element.Type == "structure";
+
+    private static bool IsIoLinkMasterDevice(IBaseElement element)
+        => element.Identifier == "iolinkdevice" &&
+           element.Type == "structure" &&
+           element.Parent.Type == "structure";
+
+    private static bool IsIoLinkMasterPort(IBaseElement element)
+        => PortRegex().IsMatch(element.Identifier) &&
+           element.Type == "structure" &&
+           element.Parent.Type == "structure";
+
+    [GeneratedRegex("port\\[(?<port>\\d+)\\]")]
+    private static partial Regex PortRegex();
+
     private static void QueryDeviceInfo(IIoTCore core, IoLinkMaster ioLinkDevice, List<IDeviceTreeBase> nodes, ILogger logger, HashSet<DeviceTreeDevice> reusedNodes,
         Dictionary<string, IoLinkMasterPortDeviceInfo> portInfosByAddress)
     {
         DeviceTreeDevice[] ioLinkMasterDevices = [.. nodes
             .OfType<DeviceTreeDevice>()
             .Where(d => reusedNodes.Contains(d) is false)
-            .Where(d => core.GetElementByAddress(d.Id).Profiles.FirstOrDefault() == ProfileIoLinkDeviceFull)];
+            .Where(d => core.ElementManager.GetElementByAddress(d.Id, acquireLock: true).Profiles.FirstOrDefault() == ProfileIoLinkDeviceFull)];
 
         foreach (DeviceTreeDevice device in ioLinkMasterDevices)
         {
@@ -497,9 +585,9 @@ public static partial class IoLinkParser
                 device.VendorId = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressVendorId}", logger)?.GetUInt16() ?? 0;
             }
 
-            // Name and ProductId are static per physical device - if the same vendor/device id is
-            // already cached for this port, this full refresh was triggered by something other than
-            // an actual device swap (e.g. a brief timeout), so reuse the cached Name/ProductId
+            // Name, ProductId and SerialNumber are static per physical device - if the same vendor/device id
+            // is already cached for this port, this full refresh was triggered by something other than
+            // an actual device swap (e.g. a brief timeout), so reuse the cached values
             // instead of reading them again. This avoids capturing a transient placeholder the
             // master can report right after a reconnect, before identification has fully settled
             // (e.g. "unknown" for /productname) - such a value would otherwise get cached as if it
@@ -510,24 +598,23 @@ public static partial class IoLinkParser
             {
                 device.Name = cachedDeviceNode.Name;
                 device.ProductId = cachedDeviceNode.ProductId;
+                device.SerialNumber = cachedDeviceNode.SerialNumber;
             }
             else
             {
                 device.Name = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressProductName}", logger)?.GetString() ?? string.Empty;
+                device.SerialNumber = GetDataValueAsValue(ioLinkDevice, $"{device.Id}{AddressDeviceSerial}", logger)?.GetString() ?? string.Empty;
 
-                // Not exposed as a simple mirrored address like ProductName/VendorId/DeviceId - read
-                // via the standard ISDU index for Product ID instead. Used in ReadIoddData to find
-                // the matching IODD DeviceVariant (e.g. for its product image) for devices whose
-                // IODD defines multiple variants under the same vendor/device id.
-                device.ProductId = ReadProductId(ioLinkDevice, device.Id.Split('~')[0], logger);
+                // ProductId (a slow ISDU read) is only needed to disambiguate same-named IODD variants;
+                // ReadIoddData reads it lazily there, so most devices never pay for it.
             }
 
-            // Die interne ID des Devices wird nach dem Auslesen so geändert, dass man feststellen kann ob sich
-            // am Port der Typ des Gerätes geändert hat.
-            // Wenn der Typ gleich ist (Anwendungsfall z.B. Ersatzgerät), dann wird es im DeviceTree als dasselbe
-            // Element erkannt und die vorhandene Konfiguration weiterhin verwendet.
-            // Wenn der Typ anders ist (Anwendungsfall z.B. Tausch von Abstands- zu Temperatursensor), dann soll
-            // die vorhandene Konfiguration verworfen werden.
+            // After reading, the device's internal ID is amended so it's possible to detect whether the type of
+            // device on the port has changed.
+            // If the type is the same (e.g. a replacement device), it's recognized as the same element in the
+            // DeviceTree and the existing configuration continues to be used.
+            // If the type is different (e.g. swapping a distance sensor for a temperature sensor), the existing
+            // configuration should be discarded.
             device.Id += $"~{device.VendorId}~{device.DeviceId}";
         }
 
@@ -543,7 +630,64 @@ public static partial class IoLinkParser
             device.ProductName = GetDataValueAsValue(ioLinkDevice, $"{root}{AddressProductName}", logger)?.GetString() ?? string.Empty;
             device.Manufacturer = GetDataValueAsValue(ioLinkDevice, $"{root}{AddressDeviceVendor}", logger)?.GetString() ?? string.Empty;
             device.DeviceFamily = GetDataValueAsValue(ioLinkDevice, $"{root}{AddressDeviceFamily}", logger)?.GetString() ?? string.Empty;
+
+            AddMasterDiagnostics(ioLinkDevice, device, root, logger);
         }
+    }
+
+    /// <summary>
+    /// Adds the master's own diagnostic values (internal temperature, supply voltage, current draw and overall
+    /// supervision status) as a "Diagnostics" group of loggable process-data leaves directly under the master
+    /// node, so they can be monitored/logged in the engineering UI just like a device's process data.
+    /// </summary>
+    /// <remarks>
+    /// Each value is read once here only to confirm the master actually mirrors it - not every master model
+    /// exposes <c>/processdatamaster</c> - and the leaf is only added when it does. The live values themselves
+    /// are delivered at runtime through the master-status function block, not from this tree snapshot.
+    /// </remarks>
+    private static void AddMasterDiagnostics(IoLinkMaster ioLinkDevice, DeviceTreeIoLinkMaster masterNode, string root, ILogger logger)
+    {
+        var diagnostics = new DeviceTreeStructureNode
+        {
+            Id = $"{masterNode.Id}/diagnostics",
+            Name = "Diagnostics",
+            Description = new DeviceTreeNodeDescription { Text = "The master's own diagnostic values." },
+        };
+
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterTemperature}", "Temperature", DataType.Whole,
+            "The master's internal temperature.", logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterVoltage}", "Supply voltage", DataType.UnsignedWhole,
+            "The master's supply voltage.", logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterCurrent}", "Current", DataType.UnsignedWhole,
+            "The master's total current draw across all ports.", logger);
+        AddMasterValue(diagnostics, ioLinkDevice, $"{root}{AddressMasterSupervisionStatus}", "Supervision status", DataType.UnsignedWhole,
+            "The master's overall supervision status (0 = no fault).", logger);
+
+        // Insert at the front so the master's own diagnostics sit above its ports, not buried after them.
+        if (diagnostics.Children.Count > 0)
+            masterNode.Children.Insert(0, diagnostics);
+    }
+
+    /// <summary>
+    /// Adds one master diagnostic value as a <see cref="DeviceTreeProcessData"/> leaf under <paramref name="parent"/>,
+    /// but only if the master actually returns a value for <paramref name="address"/>, reading its unit alongside.
+    /// </summary>
+    private static void AddMasterValue(DeviceTreeStructureNode parent, IoLinkMaster ioLinkDevice, string address, string name, DataType dataType, string description, ILogger logger)
+    {
+        if (GetDataValueAsValue(ioLinkDevice, address, logger) is null)
+            return;
+
+        string unit = GetDataValueAsValue(ioLinkDevice, $"{address}{AddressUnitSuffix}", logger)?.GetString() ?? string.Empty;
+
+        parent.Children.Add(new DeviceTreeProcessData
+        {
+            Id = address,
+            Name = name,
+            DataType = dataType,
+            HasUnit = unit.Length > 0,
+            Unit = unit,
+            Description = new DeviceTreeNodeDescription { Text = description },
+        });
     }
 
     private static void RemoveUnavailableDevices(IoLinkMaster ioLinkDevice, List<IDeviceTreeBase> nodes, Dictionary<IDeviceTreeBase, IDeviceTreeBase> parentOf, ILogger logger)

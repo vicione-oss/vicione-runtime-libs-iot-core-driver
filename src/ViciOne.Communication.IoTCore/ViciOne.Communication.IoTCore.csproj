@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ifm.IoddParser" />
+    <PackageReference Include="ifm.IoddParser.Helpers" />
+    <PackageReference Include="ifm.IoTCore" />
+    <PackageReference Include="ifm.IoTCore.Common" />
+    <PackageReference Include="ifm.IoTCore.NetAdapter.Http.Client" />
+    <PackageReference Include="ifm.Logger.Contracts" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="PacketDotNet" />
+    <PackageReference Include="SharpPcap" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ViciOne.DeviceTree.Contracts\ViciOne.DeviceTree.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
