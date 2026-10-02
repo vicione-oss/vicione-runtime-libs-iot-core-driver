@@ -88,7 +88,7 @@ Release NuGet Driver Vse:
     PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
     REPO: 'JFrogViciOne'
 
-Prerelease Raw:
+Prerelease Raw Driver IoTCore:
   extends: .dotnet-deploy-raw-rids
   variables:
     SERVER: 'https://ifm.jfrog.io/artifactory/vicione-suite-dev'
@@ -103,7 +103,7 @@ Prerelease Raw:
   after_script:
     - !reference [.push-metadata]
 
-Release Raw:
+Release Raw Driver IoTCore:
   extends: .dotnet-release-raw-rids
   variables:
     SERVER: 'https://ifm.jfrog.io/artifactory/vicione-suite-staging'
@@ -112,6 +112,36 @@ Release Raw:
     PROJECT: 'src/ViciOne.Driver.IoTCore/ViciOne.Driver.IoTCore.csproj'
     DST_DIRECTORY: 'fbs/ViciOne.Driver.IoTCore'
     METADATA_FILE: 'src/ViciOne.Driver.IoTCore/metadata.json'
+    METADATA_VERSION_FILE: 'VERSION'
+    METADATA_MIN_VERSION_FILE: 'VERSION_CORE'
+    METADATA_MIN_VERSION_KEY: 'MinCoreVersion'
+  after_script:
+    - !reference [.push-metadata]
+
+Prerelease Raw Driver Vse:
+  extends: .dotnet-deploy-raw-rids
+  variables:
+    SERVER: 'https://ifm.jfrog.io/artifactory/vicione-suite-dev'
+    USER: ${Raw_User_RW_JFrog}
+    PASSWORD: ${Raw_PW_RW_JFrog}
+    PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
+    DST_DIRECTORY: 'fbs/ViciOne.Driver.Vse'
+    METADATA_FILE: 'src/ViciOne.Driver.Vse/metadata.json'
+    METADATA_VERSION_FILE: 'VERSION'
+    METADATA_MIN_VERSION_FILE: 'VERSION_CORE'
+    METADATA_MIN_VERSION_KEY: 'MinCoreVersion'
+  after_script:
+    - !reference [.push-metadata]
+
+Release Raw Driver Vse:
+  extends: .dotnet-release-raw-rids
+  variables:
+    SERVER: 'https://ifm.jfrog.io/artifactory/vicione-suite-staging'
+    USER: ${Raw_User_RW_JFrog}
+    PASSWORD: ${Raw_PW_RW_JFrog}
+    PROJECT: 'src/ViciOne.Driver.Vse/ViciOne.Driver.Vse.csproj'
+    DST_DIRECTORY: 'fbs/ViciOne.Driver.Vse'
+    METADATA_FILE: 'src/ViciOne.Driver.Vse/metadata.json'
     METADATA_VERSION_FILE: 'VERSION'
     METADATA_MIN_VERSION_FILE: 'VERSION_CORE'
     METADATA_MIN_VERSION_KEY: 'MinCoreVersion'
