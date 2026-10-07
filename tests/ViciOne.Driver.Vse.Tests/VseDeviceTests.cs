@@ -23,6 +23,20 @@ public class VseDeviceTests
         Assert.Throws<ArgumentException>(() => new VseDevice(address, connection, Mock.Of<ILogger>()));
     }
 
+    [Theory]
+    [InlineData("localhost:3321", "localhost", 3321)]
+    [InlineData("vse-sim:3321", "vse-sim", 3321)]
+    [InlineData("127.0.0.1:3321", "127.0.0.1", 3321)]
+    [InlineData("http://localhost:3321", "localhost", 3321)]
+    public void Constructor_AddressWithoutScheme_KeepsHostAndPort(string address, string expectedHost, int expectedPort)
+    {
+        using VseConnection connection = new(Mock.Of<IVSEDevice>(), logger: null);
+        using VseDevice device = new(address, connection, Mock.Of<ILogger>());
+
+        Assert.Equal(expectedHost, device.Uri.DnsSafeHost);
+        Assert.Equal(expectedPort, device.Uri.Port);
+    }
+
     [Fact]
     public void ConnectedEvent_TriggersRebuildAndMarksInitialized()
     {

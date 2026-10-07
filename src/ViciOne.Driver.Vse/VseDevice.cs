@@ -139,7 +139,7 @@ public sealed partial class VseDevice : IDisposable
             throw new ArgumentException($"Device address cannot be null or empty.", nameof(address));
 
         DeviceAddress = address;
-        Uri = new UriBuilder(DeviceAddress).Uri;
+        Uri = new UriBuilder(WithDefaultScheme(DeviceAddress)).Uri;
         _logger = logger;
 
         Connection = connection;
@@ -154,9 +154,19 @@ public sealed partial class VseDevice : IDisposable
         if (string.IsNullOrWhiteSpace(address))
             throw new ArgumentException($"Device address cannot be null or empty.", nameof(address));
 
-        Uri uri = new UriBuilder(address).Uri;
+        Uri uri = new UriBuilder(WithDefaultScheme(address)).Uri;
         return new VseConnection(uri.DnsSafeHost, uri.Port, logger);
     }
+
+    /// <summary>
+    /// Prefixes an address that has no scheme with "http://". <see cref="UriBuilder"/> reads "host:port" as scheme
+    /// "host" with path "port", so a hostname address like "localhost:3321" would otherwise lose its host and port.
+    /// IP addresses are unaffected either way, as a scheme cannot start with a digit.
+    /// </summary>
+    private static string WithDefaultScheme(string address)
+        => address.Contains(Uri.SchemeDelimiter, StringComparison.Ordinal)
+            ? address
+            : $"{Uri.UriSchemeHttp}{Uri.SchemeDelimiter}{address}";
 
     /// <summary>
     /// Stops the connection, unsubscribes from every item, and releases the underlying Vse connection.
