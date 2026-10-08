@@ -1,4 +1,6 @@
-﻿using IFM.SDK;
+﻿using System.Net;
+using System.Net.Sockets;
+using IFM.SDK;
 using IFM.SDK.VSE;
 using Microsoft.Extensions.Logging;
 using ViciOne.Communication.Vse.Data;
@@ -89,9 +91,32 @@ public sealed class VseConnection : IDisposable
         loggerFactory = CreateLoggerFactory(logger);
 
         ILoggingSpecification<IVSEDevice> deviceBuilder = new DeviceBuilder().VSEDevice()
-            .WithConnectionInfo(new ConnectionInfo(host, port))
+            .WithConnectionInfo(new ConnectionInfo(ResolveIpAddress(host), port))
             .WithDefaultDataMonitoringOptions();
         return (logger is null ? deviceBuilder.WithNoLogging() : deviceBuilder.WithLoggingConfiguration(loggerFactory!)).Build();
+    }
+
+    /// <summary>
+    /// Returns <paramref name="host"/> as an IP address, resolving it first if it is a hostname. The SDK's
+    /// <see cref="ConnectionInfo"/> only works with an IP: its IP constructor rejects hostnames, and its hostname
+    /// constructor leaves <see cref="ConnectionInfo.IP"/> null, which the SDK dereferences while initializing every
+    /// connection. IPv4 is preferred, as "localhost" commonly resolves to "::1" first while devices and simulators
+    /// usually only listen on IPv4. The address is resolved once, so a later change of the hostname's IP is not
+    /// followed until the connection is recreated.
+    /// </summary>
+    /// <param name="host">The device's IP address or hostname.</param>
+    /// <returns>The IP address to connect to, in its string form.</returns>
+    internal static string ResolveIpAddress(string host)
+    {
+        if (IPAddress.TryParse(host, out _))
+            return host;
+
+        IPAddress[] addresses = Dns.GetHostAddresses(host);
+        IPAddress address = addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork)
+            ?? addresses.FirstOrDefault()
+            ?? throw new ArgumentException($"Host '{host}' did not resolve to any IP address.", nameof(host));
+
+        return address.ToString();
     }
 
     public void Connect()

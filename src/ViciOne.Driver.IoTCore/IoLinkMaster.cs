@@ -184,6 +184,16 @@ public sealed partial class IoLinkMaster : IDisposable
     public event Action? TimeoutChanged;
 
     /// <summary>
+    /// Prefixes an address that has no scheme with "http://". <see cref="UriBuilder"/> reads "host:port" as scheme
+    /// "host" with path "port", so a hostname address like "localhost:41114" would otherwise lose its host and port.
+    /// IP addresses are unaffected either way, as a scheme cannot start with a digit.
+    /// </summary>
+    private static string WithDefaultScheme(string address)
+        => address.Contains(Uri.SchemeDelimiter, StringComparison.Ordinal)
+            ? address
+            : $"{Uri.UriSchemeHttp}{Uri.SchemeDelimiter}{address}";
+
+    /// <summary>
     /// Creates a new master connection and starts mirroring its device tree in the background.
     /// </summary>
     /// <param name="address">The IO-Link master's address.</param>
@@ -208,7 +218,7 @@ public sealed partial class IoLinkMaster : IDisposable
         // one, so no separate check against the master is needed - and none that could fail while it is
         // unreachable.
         bool authenticate = !string.IsNullOrWhiteSpace(username);
-        UriBuilder uriBuilder = new(address);
+        UriBuilder uriBuilder = new(WithDefaultScheme(address));
         if (authenticate)
         {
             uriBuilder.Scheme = "https";
