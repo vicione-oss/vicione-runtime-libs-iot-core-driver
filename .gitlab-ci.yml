@@ -7,6 +7,10 @@ include:
     inputs:
       name: 'Test'
       stage: 'test'
+      rules:
+        - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+        - if: '$CI_PIPELINE_SOURCE == "web"'
       no_build: false
       image: mcr.microsoft.com/dotnet/sdk:10.0
       coverage: true
